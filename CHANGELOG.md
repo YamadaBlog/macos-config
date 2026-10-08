@@ -100,3 +100,5 @@ Format : date — changement — fichiers/réglages — retour arrière. Détail
 - 2026-10-09 : retour à OmniWM (Dwindle) à la demande ; placement natif remis par défaut.
 - 2026-10-09 : AeroSpace désinstallé (config archivée) ; export Raycast déplacé dans le dossier privé ; STATUS mis à jour.
 - 2026-10-09: main docs in English (README, AGENTS, STATUS, architecture, shortcuts, secrets); Dwindle Ctrl+Option shortcuts fixed for AZERTY (W/A/Q/Z were on QWERTY positions).
+- 2026-10-09: published as public snapshot https://github.com/YamadaBlog/macos-config (single commit, history not published).
+- 2026-10-09: repos linked: `public` remote (fetch only) + `scripts/publish.sh` (sanitized snapshot, one commit per publish); direct push blocked by hook.

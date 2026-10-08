@@ -43,6 +43,7 @@ scripts/verify.sh          # does the machine match the repo? (exit 0 = yes)
 scripts/capture.sh         # prepare machine → repo capture (diff), then --accept
 scripts/apply.sh <id>      # preview repo → machine, then --write (backup + rollback shown)
 scripts/discover.sh        # raw inventory of what is installed
+scripts/publish.sh         # preview the sanitized public snapshot, then --push to GitHub
 ```
 
 ## Documentation

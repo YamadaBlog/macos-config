@@ -32,7 +32,10 @@ The public GitHub repo is published as a **fresh single-commit snapshot**, not t
 - author set to the GitHub no-reply address (the local history carries a machine hostname);
 - wallpaper images removed;
 - `.patch` headers rewritten to the same no-reply address;
-- scanned with `gitleaks` (history and working tree) before each push.
+- scanned with `gitleaks` before each push.
+
+Publishing: `scripts/publish.sh` (preview) then `scripts/publish.sh --push`. The local repo has a `public` remote
+for fetching only; its push URL is disabled and a `pre-push` hook blocks any direct `git push`.
 
 ## What detection does and does not cover
 This is **not a guarantee**.
