@@ -5,6 +5,9 @@ This repo lets you **understand, verify and rebuild** the machine. It contains n
 
 > Assistant or new user: read **`AGENTS.md`** first.
 >
+> **Personal setup.** Scripts change macOS settings and app configs of the machine they run on. Read them and use the
+> preview mode (default, no `--write`) before applying anything on your own Mac.
+>
 > Language: the main docs are in English; some detailed docs, the changelog and parts of `kit/` are still in French.
 
 ## The environment in one minute
