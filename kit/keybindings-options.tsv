@@ -1,0 +1,8 @@
+raccourci	responsable	action
+Cmd+Space	Raycast si retenu	Lanceur ; libérer Spotlight avant attribution
+Alt+Space	macOS si Raycast retenu	Spotlight déplacé
+Ctrl+R	fzf OU Atuin	Un seul moteur de recherche historique
+3 ou 4 doigts horizontaux	OmniWM	Défilement des colonnes ; choisir un seul nombre
+2 doigts	Application courante	Défilement du contenu conservé
+Gestes supplémentaires	BetterTouchTool si retenu	Définir après les gestes OmniWM/macOS
+Caps Lock vers Hyper	Non configuré	Facultatif : un seul remappeur, audit AZERTY avant activation

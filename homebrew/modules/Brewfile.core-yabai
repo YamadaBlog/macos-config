@@ -1,0 +1,4 @@
+# Native Spaces alternative: stable yabai. Do not run alongside OmniWM.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+tap "asmvik/formulae"
+brew "asmvik/formulae/yabai"

@@ -1,0 +1,11 @@
+# Preset minimal pour Neru 1.x. Fusionner dans la configuration existante si elle existe.
+# Dans OmniWM, Hyper doit etre Ctrl+Alt+Cmd (sans Shift).
+[hotkeys]
+"Primary+Shift+Space" = "__disabled__"
+"Primary+Shift+G" = "__disabled__"
+"Primary+Shift+C" = "__disabled__"
+"Primary+Shift+B" = "__disabled__"
+"Primary+Shift+S" = "__disabled__"
+"Ctrl+Alt+Cmd+N" = "hints"
+"Ctrl+Alt+Cmd+G" = "grid"
+"Ctrl+Alt+Cmd+S" = "scroll"

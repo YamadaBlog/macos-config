@@ -1,0 +1,28 @@
+# Palette originale Bleu Nuit ; pas de police supplementaire requise.
+font-size = 13
+window-padding-x = 12
+window-padding-y = 10
+background = #151924
+foreground = #d9e1ef
+cursor-color = #a9c5ff
+selection-background = #334466
+selection-foreground = #f4f6fb
+palette = 0=#202736
+palette = 1=#ef8795
+palette = 2=#9bd4a7
+palette = 3=#ebc988
+palette = 4=#91baff
+palette = 5=#c2a4f2
+palette = 6=#8ed3df
+palette = 7=#c9d3e7
+palette = 8=#66748e
+palette = 9=#ffa1ad
+palette = 10=#b5e9bf
+palette = 11=#ffe0a3
+palette = 12=#b1cfff
+palette = 13=#dbc0ff
+palette = 14=#b1edf3
+palette = 15=#eef3ff
+
+background-opacity = 1
+background-blur = false

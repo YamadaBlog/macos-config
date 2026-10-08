@@ -1,0 +1,18 @@
+fonction	propriétaire cible	note
+CLI / paquets shell	Nix + Home Manager	Un seul fournisseur choisi par exécutable
+Applications GUI	Homebrew autonome	Pas de nix-homebrew
+Daemon Nix	Installateur existant ou Lix	nix-darwin n’en prend pas la gestion
+Zsh et prompt	Home Manager après migration	Préserver intégrations PATH nécessaires
+WM et bureaux	OmniWM ou un remplaçant testé	Un seul WM résident
+Lanceur	Raycast gratuit	Spotlight déplacé si besoin
+Clipboard	Raycast ou alternative unique	Exclusions et rétention à valider
+Ctrl-R	Atuin local	fzf CLI reste présent
+Hyper / Caps Lock	Combinaison Ctrl+Alt+Cmd	Pas de remappeur Caps Lock au départ
+Hints / grille / contenu	Neru	Permissions selon modes
+Gestes de colonnes	WM	Ne pas voler deux doigts du contenu
+Gestes supplémentaires	BTT essai si utile	Pas de duplication WM/clipboard
+Contextes	Hammerspoon	Autre moteur seulement comme remplacement
+Bordures et barre	WM intégré	JankyBorders/SketchyBar conditionnels
+Préférences Finder/Dock	nix-darwin après audit	Valeurs précédentes sauvegardées
+Sauvegarde données	Time Machine ; restic conditionnel	Restauration réelle obligatoire
+Synchronisation	Syncthing conditionnel	Dossiers définis, pas une sauvegarde

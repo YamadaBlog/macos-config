@@ -1,0 +1,4 @@
+# Borders for the Yabai branch; a single border provider.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+tap "felixkratz/formulae"
+brew "felixkratz/formulae/borders"

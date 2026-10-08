@@ -1,0 +1,12 @@
+raccourci	responsable	action
+Cmd+Space	macOS	Spotlight
+Ctrl+Alt+Cmd+Left/Right/Up/Down	Hammerspoon vers yabai	Focus directionnel
+Ctrl+Alt+Cmd+Shift+Left/Right/Up/Down	Hammerspoon vers yabai	Reinsertion directionnelle
+Ctrl+Alt+Cmd+W/E/D/T	Hammerspoon vers yabai	Space nomme
+Ctrl+Alt+Cmd+Shift+W/E/D/T	Hammerspoon vers yabai	Deplacer fenetre sans suivre
+Ctrl+Alt+Cmd+F	Hammerspoon vers yabai	Flottant
+Ctrl+Alt+Cmd+Return	Hammerspoon vers yabai	Zoom dans le Space, sans plein ecran natif
+Ctrl+Alt+Cmd+N	Neru	Hints
+Ctrl+Alt+Cmd+G	Neru	Grille
+Ctrl+Alt+Cmd+S	Neru	Defilement
+Ctrl+Alt+Cmd+P	Hammerspoon	Projet

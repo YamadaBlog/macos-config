@@ -1,0 +1,65 @@
+action	raccourci
+switchWorkspace.0	Control+1
+moveToWorkspace.0	Control+Shift+1
+switchWorkspace.1	Control+2
+moveToWorkspace.1	Control+Shift+2
+switchWorkspace.2	Control+3
+moveToWorkspace.2	Control+Shift+3
+switchWorkspace.3	Control+4
+moveToWorkspace.3	Control+Shift+4
+switchWorkspace.4	Control+5
+moveToWorkspace.4	Control+Shift+5
+switchWorkspace.5	Control+6
+moveToWorkspace.5	Control+Shift+6
+switchWorkspace.6	Control+7
+moveToWorkspace.6	Control+Shift+7
+switchWorkspace.7	Control+8
+moveToWorkspace.7	Control+Shift+8
+switchWorkspace.8	Control+9
+moveToWorkspace.8	Control+Shift+9
+workspaceBackAndForth	Control+Option+Tab
+focus.left	Control+Left Arrow
+focus.down	Hyper+Down Arrow
+focus.up	Hyper+Up Arrow
+focus.right	Control+Right Arrow
+focusPrevious	Option+Tab
+moveWindowToWorkspaceUp	Control+Option+Shift+Up Arrow
+moveWindowToWorkspaceDown	Control+Option+Shift+Down Arrow
+moveColumnToWorkspaceUp	Control+Option+Shift+Page Up
+moveColumnToWorkspaceDown	Control+Option+Shift+Page Down
+move.left	Control+Shift+Left Arrow
+move.down	Hyper+Shift+Down Arrow
+move.up	Hyper+Shift+Up Arrow
+move.right	Control+Shift+Right Arrow
+focusMonitorNext	Control+Command+Tab
+focusMonitorLast	Control+Command+Grave
+toggleFullscreen	Control+Option+F
+moveColumn.left	Control+Option+Shift+Left Arrow
+moveColumn.right	Control+Option+Shift+Right Arrow
+moveColumnToFirst	Control+Option+Home
+moveColumnToLast	Control+Option+End
+focusColumn.0	Control+Option+1
+focusColumn.1	Control+Option+2
+focusColumn.2	Control+Option+3
+focusColumn.3	Control+Option+4
+focusColumn.4	Control+Option+5
+focusColumn.5	Control+Option+6
+focusColumn.6	Control+Option+7
+focusColumn.7	Control+Option+8
+focusColumn.8	Control+Option+9
+balanceSizes	Control+Option+R
+toggleSplit	Control+Option+E
+swapSplit	Control+Option+S
+resizeFocusedWindow.grow	Control+Option+Z
+resizeFocusedWindow.shrink	Control+Option+A
+preselect.left	Control+Option+Q
+preselect.right	Control+Option+D
+preselect.down	Control+Option+W
+preselectClear	Control+Option+C
+openCommandPalette	Hyper+Space
+rescueOffscreenWindows	Control+Option+X
+toggleFocusedWindowFloating	Control+Option+T
+openMenuAnywhere	Control+Option+M
+toggleQuakeTerminal	Hyper+Return
+toggleWorkspaceLayout	Control+Option+G
+toggleOverview	Hyper+O

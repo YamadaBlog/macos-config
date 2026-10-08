@@ -1,0 +1,3 @@
+# BetterTouchTool; paid trial, non-conflicting gestures only.
+# Reviewed: 2026-10-08. Homebrew versions not pinned.
+cask "bettertouchtool"

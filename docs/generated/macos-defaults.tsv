@@ -1,0 +1,42 @@
+domaine	clé	valeur
+com.apple.dock	autohide	1
+com.apple.dock	tilesize	43
+com.apple.dock	orientation	left
+com.apple.dock	show-recents	0
+com.apple.dock	magnification	0
+com.apple.dock	mru-spaces	0
+com.apple.dock	wvous-tl-corner	(absent = défaut macOS)
+com.apple.dock	wvous-tr-corner	(absent = défaut macOS)
+com.apple.dock	wvous-bl-corner	(absent = défaut macOS)
+com.apple.dock	wvous-br-corner	14
+com.apple.spaces	spans-displays	(absent = défaut macOS)
+com.apple.finder	ShowPathbar	1
+com.apple.finder	ShowStatusBar	1
+com.apple.finder	FXPreferredViewStyle	icnv
+com.apple.finder	NewWindowTarget	(absent = défaut macOS)
+com.apple.finder	FXDefaultSearchScope	(absent = défaut macOS)
+com.apple.finder	AppleShowAllFiles	(absent = défaut macOS)
+NSGlobalDomain	AppleShowAllExtensions	1
+NSGlobalDomain	AppleInterfaceStyle	Dark
+NSGlobalDomain	AppleAccentColor	4
+NSGlobalDomain	AppleHighlightColor	0.698039 0.843137 1.000000 Blue
+NSGlobalDomain	_HIHideMenuBar	1
+NSGlobalDomain	KeyRepeat	2
+NSGlobalDomain	InitialKeyRepeat	15
+NSGlobalDomain	ApplePressAndHoldEnabled	(absent = défaut macOS)
+NSGlobalDomain	com.apple.swipescrolldirection	1
+NSGlobalDomain	com.apple.keyboard.fnState	(absent = défaut macOS)
+NSGlobalDomain	AppleKeyboardUIMode	0
+com.apple.AppleMultitouchTrackpad	Clicking	1
+com.apple.AppleMultitouchTrackpad	TrackpadThreeFingerDrag	0
+com.apple.AppleMultitouchTrackpad	TrackpadThreeFingerHorizSwipeGesture	0
+com.apple.AppleMultitouchTrackpad	TrackpadThreeFingerVertSwipeGesture	2
+com.apple.AppleMultitouchTrackpad	TrackpadFourFingerHorizSwipeGesture	0
+com.apple.AppleMultitouchTrackpad	TrackpadFourFingerVertSwipeGesture	2
+com.apple.controlcenter	"NSStatusItem Visible Battery"	(absent = défaut macOS)
+com.apple.menuextra.clock	ShowSeconds	(absent = défaut macOS)
+com.apple.screencapture	location	(absent = défaut macOS)
+HIToolbox	disposition	French
+symbolichotkeys	64 Spotlight (Cmd+Espace)	enabled=false
+symbolichotkeys	65 Recherche Finder (Cmd+Option+Espace)	enabled=true
+dock	apps	Safari,Notes,R\\U00e9glages Syst\\U00e8me

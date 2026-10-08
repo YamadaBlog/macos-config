@@ -1,0 +1,16 @@
+RÉVISION DU PROMPT — 8 OCTOBRE 2026
+Ancien : mission longue en prose, nom Ops. Nouveau : Claude Opus 5.5, mission XML et procédure distincte.
+
+CHANGEMENTS APPLIQUÉS
+P1. Mission, contexte, autorisation, cible et critères de fin séparés ; exemples de blocages adaptés au Mac. Détails conservés dans RUNBOOK-OPUS.txt, pas supprimés. [A2]
+P2. Règle de continuation explicite : un jalon ne clôt pas le travail accessible. État, tâches et blocages permettent la reprise. [A1]
+P3. Réglages du client hors prompt ; medium de départ, modèle choisi réellement, pas de demande de raisonnement interne exposé. [A1,A3,A5]
+P4. État privé, références de tests et prochaine action persistants ; reprise d’après l’état confirmé et Git. [A4]
+P5. Preuves fonctionnelles natives ; pas de succès sur la seule installation. CLAUDE.md bref, fin des retests sans cause. [A6]
+P6. Variante Claude Code /goal : une condition vérifiée après les tours ; pas un mécanisme de permissions ou une garantie d’achèvement. [A7]
+
+CE QUI RESTE IDENTIQUE
+Nix dès le socle, séparation CLI/GUI, choix WM et variantes, thème, outils recommandés, sauvegardes et respect de l’état SIP/SSV indiqué.
+
+LIMITES DES CONTRÔLES
+XML analysé, cohérence prompt/kit vérifiée, scripts et archive contrôlés. Aucune comparaison A/B du comportement Opus, aucun déploiement ou test natif du Mac effectué. Les recommandations sont une adaptation des docs à cette mission.

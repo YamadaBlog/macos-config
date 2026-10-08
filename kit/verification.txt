@@ -1,0 +1,54 @@
+VÉRIFICATION DU KIT - 8 OCTOBRE 2026
+
+Environnement de vérification : Linux, pas le Mac cible.
+
+OK - Syntaxe shell
+7 scripts Bash et 2 presets POSIX sh compilés sans exécution.
+
+OK - TOML Neru
+Analyse TOML ; 3 commandes et 5 désactivations explicites.
+
+OK - Syntaxe Lua
+4 fichiers ; compilation par liblua 5.4 sans appels à macOS.
+
+OK - Projets, API hs simulée
+Deux backends testés ; arguments séparés ; données invalides refusées ; échec du workspace bloque l’ouverture ; backend invalide ou fichier illisible bloque les actions.
+
+OK - Touches yabai, API hs simulée
+18 bindings uniquement avec backend yabai ; focus, réinsertion, Spaces, transfert, flottant et zoom vérifiés sans processus réel.
+
+OK - Manifestes
+24 modules ; noms et déclarations Brewfile simples vérifiés. Résolution Homebrew sur Mac non exécutée.
+
+OK - Aperçus
+Liste + 24 modules + 2 thèmes + sauvegarde + effets yabai ; aucune modification du kit. Branches de mutation relues.
+
+OK - Garde-fous
+Application refusée sous Linux ; noms invalides, module inconnu, plusieurs modules et thème inconnu refusés.
+
+OK - Raccourcis
+12 familles sans doublon dans le registre ; conflits avec les apps et disposition française à tester sur le Mac.
+
+OK - Révision Nix / Paneru / sauvegarde
+Contrôles statiques des responsabilités ; modèle Nix non évalué ; lock volontairement absent.
+
+OK - Sources
+72 liens officiels, identifiants uniques et révision SIP dans sources.json.
+
+OK - Déploiement Ops
+Prompt et profil cohérents ; état initial non exécuté ; PDF identique ; Nix et Homebrew non repris par le modèle Darwin, non évalué ici.
+
+OK - Prompt Claude Opus 5.5
+XML analysé ; 3 exemples ; alias identiques ; entrée /goal inférieure à 4 000 caractères ; références et réglages présents. Efficacité du prompt non mesurée sur le modèle.
+
+LIMITES
+Les tests simulés ne valident pas Hammerspoon, l’IPC, les applications ou les permissions réelles.
+Les scripts n’ont pas installé Homebrew ou une application et n’ont pas modifié ton Mac.
+Les presets Ghostty suivent les options officielles consultées ; leur rendu et le parsing natif restent à tester sur le Mac.
+Les contrôles d’application Darwin, version macOS et Apple Silicon sont à confirmer sur la machine cible.
+Les essais de fenêtres, clavier français, écrans, démarrage, consommation et retour arrière figurent dans le PDF.
+Un Brewfile ne verrouille pas les versions des applications.
+Le modèle Nix n’a pas été évalué ou construit ici : absence de Nix. Identité et lock doivent être définis sur le Mac.
+Les branches apply/restore des effets yabai restent à tester nativement ; aucun changement root automatisé.
+Le modèle nix-darwin est préparé et non évalué ; les tests du prompt/checklist doivent être exécutés par Claude Opus sur le Mac.
+Aucune évaluation A/B du prompt ni exécution de Claude Code /goal effectuée ici. Version du client et capacités UI à vérifier sur le Mac.

@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "prepared_date": "2026-10-08",
+  "name": "macos-power-user-recommended",
+  "facts_source": "reported_by_user_reverify_on_target",
+  "ownership": {
+    "cli": "nix-home-manager",
+    "gui": "standalone-homebrew",
+    "window_manager": "omniwm",
+    "launcher": "raycast-free",
+    "clipboard": "raycast-or-one-tested-alternative",
+    "contexts": "hammerspoon",
+    "nix_daemon": "existing-installer-or-lix-installer",
+    "system_preferences": "nix-darwin-after-audit"
+  },
+  "home_manager_target": {
+    "enableShell": true,
+    "enableAtuin": true,
+    "enableTui": true,
+    "enableDev": "conditional",
+    "enableRestic": "conditional",
+    "enableSync": "conditional"
+  },
+  "brew_modules_primary": [
+    "terminal",
+    "core",
+    "launcher",
+    "navigation",
+    "projects",
+    "monitoring"
+  ],
+  "brew_modules_trial": [
+    "gestures"
+  ],
+  "brew_modules_conditional": [
+    "quicklook",
+    "dictation",
+    "transfer",
+    "network"
+  ],
+  "workspace_names": [
+    "Focus",
+    "Web",
+    "Messages",
+    "Atelier"
+  ],
+  "keyboard": {
+    "layout": "French-standard-AZERTY-reverify",
+    "hyper": [
+      "ctrl",
+      "alt",
+      "cmd"
+    ],
+    "workspace_keys": [
+      "W",
+      "E",
+      "D",
+      "T"
+    ],
+    "shift": "transfer",
+    "caps_lock_remap": false
+  },
+  "visual": {
+    "ghostty": "blue-night-glass-or-opaque-after-legibility-test",
+    "borders": "wm-built-in",
+    "bar": "wm-built-in",
+    "dock": "discreet"
+  },
+  "retain_existing": [
+    "Lunar",
+    "Tailscale",
+    "TopNotch"
+  ],
+  "wm_fallbacks": [
+    "Paneru",
+    "AeroSpace",
+    "yabai-only-for-specific-need"
+  ],
+  "limits": {
+    "paid_purchase": false,
+    "publish_remote_repo": false,
+    "change_SIP_SSV_bootargs_sudoers": false,
+    "force_restart": false,
+    "mass_debloat_restore": false,
+    "claim_unobserved_tests": false
+  }
+}

@@ -1,0 +1,3 @@
+# Raycast; disable its WM commands if OmniWM owns them.
+# Reviewed: 2026-10-08. Homebrew versions not pinned.
+cask "raycast"

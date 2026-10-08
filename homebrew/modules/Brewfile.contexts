@@ -1,0 +1,3 @@
+# Bunch; alternative to Hammerspoon for simple contexts.
+# Reviewed: 2026-10-08. Homebrew versions not pinned.
+cask "bunch"

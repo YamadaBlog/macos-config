@@ -1,0 +1,3 @@
+# Stats; limited modules and refresh rate.
+# Reviewed: 2026-10-08. Homebrew versions not pinned.
+cask "stats"

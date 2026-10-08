@@ -1,0 +1,4 @@
+# TypeWhisper, GPL core; choose local engines in the app.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+tap "typewhisper/tap"
+cask "typewhisper/tap/typewhisper"

@@ -1,0 +1,13 @@
+raccourci	responsable	action
+Cmd+Space	macOS	Spotlight conserve
+Ctrl+Alt+Cmd+Space	OmniWM	Palette de commandes
+Ctrl+Alt+Cmd+Return	OmniWM	Terminal Quake
+Ctrl+Alt+Cmd+O	OmniWM	Overview
+Ctrl+Alt+Cmd+Left/Right/Up/Down	OmniWM	Focus directionnel
+Ctrl+Alt+Cmd+Shift+Left/Right/Up/Down	OmniWM	Deplacement directionnel
+Ctrl+Alt+Cmd+W/E/D/T	OmniWM	Focus / Web / Messages / Atelier
+Ctrl+Alt+Cmd+Shift+W/E/D/T	OmniWM	Déplacer vers Focus / Web / Messages / Atelier
+Ctrl+Alt+Cmd+N	Neru	Hints
+Ctrl+Alt+Cmd+G	Neru	Grille
+Ctrl+Alt+Cmd+S	Neru	Defilement
+Ctrl+Alt+Cmd+P	Hammerspoon	Choix du projet

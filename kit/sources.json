@@ -1,0 +1,447 @@
+{
+  "audit_date": "2026-10-08",
+  "revision": "Plan complet : Nix dès le socle, défilement fenêtres + contenu ; kit contre-audité",
+  "profile": {
+    "hardware": "MacBook Pro Mac17,6 M5 Max, 64 Go, 2 To ; rapport utilisateur, non mesuré ici",
+    "macos": "26.6 build 25G72 ; rapport utilisateur",
+    "input": "AZERTY Français standard ; trackpad, défilement naturel",
+    "display": "XDR intégré, résolution logique non confirmée",
+    "SIP": "désactivé selon utilisateur ; SSV scellé",
+    "debloat": "136 services signalés désactivés ; dev-minimal non reconstitué",
+    "budget": "priorité gratuit/libre, propriétaires utiles admis après essai"
+  },
+  "sources": [
+    {
+      "id": "S01",
+      "title": "OmniWM - compatibilite",
+      "url": "https://omniwm.app/help/known-limitations/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S02",
+      "title": "OmniWM - installation et Nix",
+      "url": "https://omniwm.app/guides/install/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S03",
+      "title": "OmniWM 0.7.6 — release, IPC 19 et gestes",
+      "url": "https://github.com/OmniNull/OmniWM/releases/tag/v0.7.6",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S04",
+      "title": "OmniWM - configuration canonique",
+      "url": "https://omniwm.app/config/configuration/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S05",
+      "title": "OmniWM - palette et presse-papiers",
+      "url": "https://omniwm.app/features/command-palette/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S06",
+      "title": "OmniWM - Quake",
+      "url": "https://omniwm.app/features/quake-terminal/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S07",
+      "title": "OmniWM - raccourcis",
+      "url": "https://omniwm.app/guides/keyboard-shortcuts/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S08",
+      "title": "OmniWM - actions CLI",
+      "url": "https://omniwm.app/reference/cli/actions/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S09",
+      "title": "Neru - configuration",
+      "url": "https://github.com/y3owk1n/neru/blob/main/docs/reference/configuration.md",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S10",
+      "title": "Neru - installation",
+      "url": "https://github.com/y3owk1n/neru/blob/main/docs/guide/installation.md",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S11",
+      "title": "Neru - versions",
+      "url": "https://github.com/y3owk1n/neru/releases",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S12",
+      "title": "Ghostty - ordre des configurations",
+      "url": "https://ghostty.org/docs/config",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S13",
+      "title": "Ghostty - options visuelles",
+      "url": "https://ghostty.org/docs/config/reference",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S14",
+      "title": "Homebrew - Bundle",
+      "url": "https://docs.brew.sh/Brew-Bundle-and-Brewfile",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S15",
+      "title": "Homebrew - niveaux de support",
+      "url": "https://docs.brew.sh/Support-Tiers",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S16",
+      "title": "Hammerspoon - projet et licence",
+      "url": "https://github.com/Hammerspoon/hammerspoon",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S17",
+      "title": "Hammerspoon - hs.task",
+      "url": "https://www.hammerspoon.org/docs/hs.task.html",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S18",
+      "title": "Hammerspoon - hs.urlevent",
+      "url": "https://www.hammerspoon.org/docs/hs.urlevent.html",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S19",
+      "title": "MonitorControl - limites materielles",
+      "url": "https://github.com/MonitorControl/MonitorControl",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S20",
+      "title": "TypeWhisper - coeur libre et premium",
+      "url": "https://www.typewhisper.com/en/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S21",
+      "title": "TypeWhisper - installation",
+      "url": "https://github.com/TypeWhisper/typewhisper-mac",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S22",
+      "title": "Maccy - projet et licence",
+      "url": "https://github.com/p0deje/Maccy",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S23",
+      "title": "Quicksilver - projet et licence",
+      "url": "https://github.com/quicksilver/Quicksilver",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S24",
+      "title": "SwiftBar - projet et licence",
+      "url": "https://github.com/swiftbar/SwiftBar",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S25",
+      "title": "HotkeyClash - perimetre",
+      "url": "https://github.com/Wunderlandmedia/HotkeyClash",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S26",
+      "title": "Apple - sauvegarde Time Machine",
+      "url": "https://support.apple.com/guide/mac-help/back-up-files-mh35860/mac",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S27",
+      "title": "Syncthing - attributs et sauvegardes",
+      "url": "https://docs.syncthing.net/users/faq.html",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S28",
+      "title": "Screenpipe - licence actuelle",
+      "url": "https://github.com/screenpipe/screenpipe/blob/main/LICENSE.md",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S29",
+      "title": "nix-darwin - instructions officielles",
+      "url": "https://github.com/nix-darwin/nix-darwin",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S30",
+      "title": "LocalSend - projet",
+      "url": "https://github.com/localsend/localsend",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S31",
+      "title": "LuLu - installation",
+      "url": "https://objective-see.org/products/lulu.html",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S32",
+      "title": "Bunch - gratuite",
+      "url": "https://bunchapp.co/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S33",
+      "title": "Tuna - prix et limites",
+      "url": "https://tunaformac.com/",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S34",
+      "title": "Syntax Highlight - apercus",
+      "url": "https://github.com/sbarex/SourceCodeSyntaxHighlight",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S35",
+      "title": "AeroSpace - alternative et limites",
+      "url": "https://github.com/nikitabobko/AeroSpace",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S36",
+      "title": "yabai - fonctions et SIP",
+      "url": "https://github.com/asmvik/yabai/wiki/Disabling-System-Integrity-Protection",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S37",
+      "title": "Hammerspoon - versions",
+      "url": "https://github.com/Hammerspoon/hammerspoon/releases",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S38",
+      "title": "yabai - changelog et correctif non publie",
+      "url": "https://github.com/asmvik/yabai/blob/master/CHANGELOG.md",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S39",
+      "title": "yabai - installation et scripting addition",
+      "url": "https://github.com/asmvik/yabai/wiki/Installing-yabai-(latest-release)",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S40",
+      "title": "yabai - reference des commandes",
+      "url": "https://github.com/asmvik/yabai/blob/master/doc/yabai.asciidoc",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S41",
+      "title": "yabai - creation de Space sous 26.6, issue 2799",
+      "url": "https://github.com/asmvik/yabai/issues/2799",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S42",
+      "title": "JankyBorders - code, licence et installation",
+      "url": "https://github.com/FelixKratz/JankyBorders",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S43",
+      "title": "SketchyBar - installation",
+      "url": "https://felixkratz.github.io/SketchyBar/setup",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S44",
+      "title": "skhd - Secure Keyboard Entry et permissions",
+      "url": "https://github.com/asmvik/skhd",
+      "checked_date": "2026-10-07"
+    },
+    {
+      "id": "S45",
+      "title": "Lix — installation",
+      "url": "https://lix.systems/install/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S46",
+      "title": "Home Manager — socle utilisateur",
+      "url": "https://github.com/nix-community/home-manager",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S47",
+      "title": "nix-direnv — environnements de projet",
+      "url": "https://github.com/nix-community/nix-direnv",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S48",
+      "title": "nix-homebrew — rôle et limites",
+      "url": "https://github.com/zhaofengli/nix-homebrew",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S49",
+      "title": "Paneru — projet et installation",
+      "url": "https://github.com/karinushka/paneru",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S50",
+      "title": "Paneru — formule 0.5.2",
+      "url": "https://formulae.brew.sh/formula/paneru",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S51",
+      "title": "Raycast — offre et limites",
+      "url": "https://www.raycast.com/pricing",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S52",
+      "title": "BetterTouchTool — gestes et essai",
+      "url": "https://folivora.ai/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S53",
+      "title": "Stats — monitoring",
+      "url": "https://github.com/exelban/stats",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S54",
+      "title": "Atuin — historique local et synchronisation optionnelle",
+      "url": "https://github.com/atuinsh/atuin",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S55",
+      "title": "Yazi — gestionnaire de fichiers",
+      "url": "https://github.com/sxyazi/yazi",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S56",
+      "title": "Lazygit — interface Git",
+      "url": "https://github.com/jesseduffield/lazygit",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S57",
+      "title": "Starship — prompt",
+      "url": "https://starship.rs/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S58",
+      "title": "fzf — recherche interactive",
+      "url": "https://github.com/junegunn/fzf",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S59",
+      "title": "zoxide — navigation shell",
+      "url": "https://github.com/ajeetdsouza/zoxide",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S60",
+      "title": "restic — sauvegardes",
+      "url": "https://github.com/restic/restic",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S61",
+      "title": "mise — runtimes de développement",
+      "url": "https://mise.jdx.dev/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S62",
+      "title": "Niri — compositor Wayland, pas WM macOS",
+      "url": "https://github.com/niri-wm/niri",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S63",
+      "title": "chezmoi — alternative pour dotfiles",
+      "url": "https://github.com/twpayne/chezmoi",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S64",
+      "title": "bottom — monitoring TUI",
+      "url": "https://github.com/ClementTsang/bottom",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S65",
+      "title": "Lunar — projet",
+      "url": "https://github.com/alin23/Lunar",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S66",
+      "title": "Lunar — site et tarifs",
+      "url": "https://lunar.fyi/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S67",
+      "title": "Debloat — dépôt candidat, origine non établie",
+      "url": "https://github.com/OleksandrKrupko/mac-os-debloat",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S68",
+      "title": "OmniWM — cask Apple Silicon/macOS 26",
+      "url": "https://formulae.brew.sh/cask/omniwm",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S69",
+      "title": "Ghostty — release 1.3.1",
+      "url": "https://ghostty.org/docs/install/release-notes/1-3-1",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S70",
+      "title": "Karabiner-Elements — remappage",
+      "url": "https://karabiner-elements.pqrs.org/",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S71",
+      "title": "Apple — Shortcuts",
+      "url": "https://support.apple.com/guide/shortcuts-mac/intro-to-shortcuts-apdf22b0444c/mac",
+      "checked_date": "2026-10-08"
+    },
+    {
+      "id": "S72",
+      "title": "BetterDisplay — projet et options",
+      "url": "https://github.com/waydabber/BetterDisplay",
+      "checked_date": "2026-10-08"
+    }
+  ]
+}

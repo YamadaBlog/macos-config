@@ -1,0 +1,24 @@
+BRANCHE YABAI — FACULTATIVE, 8 OCTOBRE 2026
+Motif : préférer Spaces natifs, BSP, transparence et animations de fenêtres via scripting addition.
+Le SIP désactivé rend certaines fonctions accessibles ; il ne prouve pas que l'extension est chargée.
+macOS 26.6 : yabai 7.1.25 stable ; le correctif add_space pour 26.6 est décrit dans master, non dans cette release.
+Ne pas compiler master silencieusement et ne pas automatiser la création/destruction de Spaces à ce stade.
+
+1. Sauvegarde, arrêter OmniWM/Paneru/AeroSpace, retirer leur lancement automatique.
+2. Installer le module core-yabai, lire la procédure officielle de la version effectivement installée.
+3. Créer les Spaces manuellement ; étiqueter les quatre existants Focus/Web/Messages/Atelier.
+4. Tester yabai sans SA ; presets configs/yabai/yabairc à relire et adapter, pas copie forcée.
+5. Hammerspoon facultatif : poweruser-backend.lua = yabai ; charger poweruser-yabai-keys.lua.
+   Hyper W/E/D/T focus ; Shift pour transfert ; flèches, F flottant, Return zoom.
+   Vérification AZERTY/native indispensable ; espaces doivent exister et porter ces labels.
+6. SA uniquement si les effets ou opérations voulues la requièrent : suivre wiki exact, version/ABI/chargement.
+   La procédure root et sudoers n'est pas exécutée par ce kit. Garder le SSV scellé.
+   En cas d'upgrade du binaire, relire les exigences SA et éventuelle règle sudoers basée sur son hash.
+7. Effets : bash bin/yabai-effects.sh (aperçu), puis --apply après validation.
+   Le script capture 5 valeurs et tente leur restauration sur échec. Garder le fichier TSV imprimé.
+   --restore fichier.tsv restaure ces valeurs ; cela ne restaure pas des fenêtres/Spaces ou un yabairc.
+8. Bordures externes seulement si besoin ; SketchyBar après stabilité, pas en même temps que la barre OmniWM.
+
+Retour : arrêter le service yabai, retirer l'activation SA/démarrage suivant sa documentation ; rétablir les configs sauvegardées ; réouvrir l'autre WM seul.
+Les scripts ne modifient ni SIP, SSV, boot-args, sudoers, ni les fichiers launchd.
+Sources : https://github.com/asmvik/yabai ; https://github.com/asmvik/yabai/blob/master/CHANGELOG.md ; https://github.com/asmvik/yabai/issues/2799 ; https://github.com/asmvik/yabai/wiki/Installing-yabai-(latest-release)

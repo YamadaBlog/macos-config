@@ -1,0 +1,21 @@
+service	client	attendu	justification	test_apres_octroi
+kTCCServiceAccessibility	com.barut.OmniWM	2	gérer les fenêtres	omniwmctl ping ; Hyper+E change de bureau
+kTCCServiceScreenCapture	com.barut.OmniWM	2	Overview et aperçus	Hyper+O affiche l'Overview
+kTCCServiceAccessibility	com.y3owk1n.neru	2	éléments cliquables	Hyper+N affiche les hints
+kTCCServiceAccessibility	org.hammerspoon.Hammerspoon	2	hotkeys, contextes	Hyper+P affiche le sélecteur
+kTCCServiceAccessibility	com.raycast.macos	2	collage, snippets	;bjr se développe
+kTCCServiceAccessibility	eu.exelban.Stats	2	accordée à l'installation (non requise de base)	—
+kTCCServiceAccessibility	fyi.lunar.Lunar	2	préexistant (raccourcis luminosité)	—
+kTCCServiceAccessibility	com.hegenberg.BetterTouchTool	2	RÉSIDU : app désinstallée le 2026-10-08, entrée à supprimer	—
+kTCCServiceAppleEvents	com.hegenberg.BetterTouchTool	2	RÉSIDU : app désinstallée le 2026-10-08, entrée à supprimer	—
+kTCCServiceBluetoothAlways	com.hegenberg.BetterTouchTool	2	RÉSIDU : app désinstallée le 2026-10-08, entrée à supprimer	—
+kTCCServiceAccessibility	pro.betterdisplay.BetterDisplay	2	RÉSIDU : app absente (retirée le 2026-10-07), entrée à supprimer	—
+kTCCServiceAccessibility	com.hnc.Discord	0	refusée (préexistant)	—
+kTCCServiceListenEvent	com.hnc.Discord	0	refusée (préexistant)	—
+kTCCServiceSystemPolicyDownloadsFolder	com.hnc.Discord	2	préexistant	—
+kTCCServiceSystemPolicyAllFiles	/usr/libexec/sshd-keygen-wrapper	2	Connexion à distance (préexistant)	—
+kTCCServiceSystemPolicyAllFiles	/usr/sbin/smbd	0	partage de fichiers refusé (préexistant)	—
+kTCCServiceAccessibility	/nix/store/hr5jdf535nm54yq3jzkyx8k9a0m3hwql-bash-5.3p9/bin/bash	*	RÉSIDU DE SÉCURITÉ : créée par erreur le 2026-10-08 15:32 (incident Neru) ; doit être supprimée ; signalée en alerte si accordée	—
+kTCCServiceAccessibility	com.barut.OmniWM.dev	*	RÉSIDU : app de test OmniWM Dev retirée le 2026-10-08 (rangée dans les sauvegardes), entrée à supprimer	—
+kTCCServiceScreenCapture	com.barut.OmniWM.dev	*	RÉSIDU : app de test OmniWM Dev retirée le 2026-10-08, entrée à supprimer	—
+kTCCServiceScreenCapture	com.mitchellh.ghostty	*	RÉSIDU : refusée (sans effet)	—

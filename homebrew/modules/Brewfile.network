@@ -1,0 +1,3 @@
+# LuLu. System extension and network filter must be approved manually.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+cask "lulu"

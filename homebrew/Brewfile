@@ -1,0 +1,15 @@
+tap "y3owk1n/tap"
+# Improved top (interactive process viewer)
+brew "htop"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Desktop automation application
+cask "hammerspoon"
+# Keyboard driven navigation
+cask "y3owk1n/tap/neru", trusted: true
+# Tiling window manager
+cask "omniwm"
+# Control your tools with a few keystrokes
+cask "raycast"
+# System monitor for the menu bar
+cask "stats"

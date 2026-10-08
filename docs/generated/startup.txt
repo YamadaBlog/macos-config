@@ -1,0 +1,24 @@
+# Fichiers launchd tiers
+/Library/LaunchAgents:
+
+/Library/LaunchDaemons:
+org.nixos.darwin-store.plist
+org.nixos.nix-daemon.plist
+systems.lix.nix-installer.nix-hook.plist
+
+/Users/mao/Library/LaunchAgents:
+org.nix-community.home.hammerspoon.plist
+org.nix-community.home.logrotate.plist
+org.nix-community.home.neru.plist
+org.nix-community.home.omniwm.plist
+org.nix-community.home.stats.plist
+org.nix-community.home.theme-auto.plist
+
+# Extensions système
+io.tailscale.ipn.macsys.network-extension (1.102.4/101.102.4) [activated enabled]
+
+# Overrides launchctl désactivés : nombre, hors FolderActionsDispatcher (détail : docs/debloat.md)
+152
+# com.apple.FolderActionsDispatcher : bascule lors d'appels osascript, sans incidence (non suivi)
+
+# Ouverture à la session : non lisible sans admin (sfltool) — voir docs/demarrage-services.md

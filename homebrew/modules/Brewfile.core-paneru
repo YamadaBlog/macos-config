@@ -1,0 +1,3 @@
+# Scrolling alternative; manual start only.
+# Reviewed: 2026-10-08. Homebrew versions not pinned.
+brew "paneru"

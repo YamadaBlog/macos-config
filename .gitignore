@@ -1,0 +1,33 @@
+.DS_Store
+diagnostic*.txt
+*.secret
+*.key
+*.env
+backups/
+state/
+clipboard-history*
+config.override.toml
+
+result-home
+result
+.DS_Store
+*.log
+atuin.db*
+
+result-darwin
+deployment/state.json
+deployment/journal*
+deployment/logs/
+
+# Secrets and private data
+secrets/
+*.rayconfig
+*.bttpreset.license
+aster-endpoint.json
+.zsh_history
+history.jsonl
+home-manager/result-home
+
+# Wallpapers: third-party images, not published (unknown rights)
+wallpapers/*.png
+wallpapers/*.jpg

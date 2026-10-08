@@ -1,0 +1,27 @@
+MODE D’EMPLOI DU PROMPT POUR CLAUDE OPUS 5.5
+Recherche officielle : 8 octobre 2026. Adaptation au déploiement macOS ; pas une évaluation comparative du prompt sur le Mac.
+
+CLIENT
+Utiliser un agent avec terminal sur le Mac et, pour les réglages, un moyen d’interagir avec les apps. Un chat sans ces outils ne déploie pas la machine.
+Sélectionner le modèle dans le client : l’écrire dans le prompt ne le sélectionne pas. Claude Code exige une version compatible ; la documentation consultée indique v2.1.280 minimum pour Opus 5.5. Vérifier la version et l’offre du fournisseur.
+Sur Claude Code connecté à l’API Anthropic, depuis le dossier du kit décompressé :
+claude --model claude-opus-5-5 --effort medium
+Cette commande ouvre une session ; elle ne désactive pas les permissions. Sur un autre fournisseur, vérifier son identifiant de modèle.
+Commencer à medium ; augmenter l’effort seulement si les tâches difficiles bénéficient de ce réglage. Les paramètres du client priment sur des formulations comme « pense davantage ».
+
+UNE CONSIGNE À TRANSMETTRE
+Agent généraliste : joindre le ZIP et copier entièrement PROMPT-OPUS-5.5.txt.
+Claude Code avec /goal : ouvrir la session à la racine du kit, puis copier PROMPT-OPUS-5.5-CLAUDE-CODE.txt comme une seule commande. Ce message référence le prompt complet local et une condition de clôture ; /goal poursuit le travail après des bilans intermédiaires. Vérifier que la commande est disponible. Elle ne change pas le mode de permissions et peut s’arrêter si le travail n’avance plus ; les statuts restent nécessaires.
+Ne pas coller /goal dans un autre chat en supposant qu’il y sera exécuté. Utiliser alors le prompt complet ; le client peut encore nécessiter une relance après une fin de tour prématurée.
+CLAUDE.md conserve seulement les règles communes et les pointeurs vers l’état/runbook pour les reprises.
+
+API / ORCHESTRATEUR PERSONNALISÉ — À CONFIGURER HORS DU PROMPT
+Modèle Anthropic : claude-opus-5-5 ; output_config.effort = medium comme point de départ.
+Thinking est toujours actif : ne pas envoyer disabled ou un budget manuel ; tool_choice auto est adapté aux outils, contrairement à any/tool forcé. Omettre les paramètres de sampling personnalisés. max_tokens doit couvrir réflexion et réponse ; le calibrer sur les tours observés.
+Pour les outils, retourner les messages assistant/blocs thinking complets et non modifiés ; lire les blocs par type. Pour voir les notes d’avancement API, vérifier thinking.display updates et son en-tête beta documenté ; cela ne se configure pas avec une phrase dans le prompt. Voir le guide de migration avant d’ajouter computer use.
+L’orchestrateur doit distinguer fin de tour et fin de mission : vérifier checklist, preuves et blocages à end_turn, attendre les commandes pendantes, puis relancer seulement les tâches accessibles. Borner à deux ou trois relances automatiques sans progrès sur la même cause. Une continuation ne peut contourner un refus ou une approbation.
+
+PORTÉE
+Les consignes sont structurées et testables ; leur meilleure efficacité dépend du client, des outils et des essais natifs. Pas de promesse de « prompt parfait », d’accès Mac automatique ou de permissions contournées.
+Les détails de déploiement restent dans RUNBOOK-OPUS.txt pour limiter répétitions et contradictions dans le prompt principal.
+Sources et justification des modifications : deployment/prompting-sources.json et deployment/PROMPT-REVISION.txt.

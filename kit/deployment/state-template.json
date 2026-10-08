@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "run_id": null,
+  "target": {
+    "verified": false,
+    "os_version": null,
+    "build": null,
+    "hardware": null
+  },
+  "status_values": [
+    "not_started",
+    "prepared",
+    "installed",
+    "configured",
+    "tested",
+    "waiting_user",
+    "blocked",
+    "not_applicable",
+    "rolled_back"
+  ],
+  "phases": [
+    {
+      "id": "preflight",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "backup-and-state",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "nix-cli",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "shell-and-terminal",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "window-manager",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "launcher-navigation-gestures",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "contexts-theme-monitoring",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "nix-darwin-conditional",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "other-conditional-modules",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    },
+    {
+      "id": "startup-and-validation",
+      "status": "not_started",
+      "evidence": [],
+      "changed_files": [],
+      "backup_paths": [],
+      "rollback": [],
+      "blockers": []
+    }
+  ],
+  "completed": false,
+  "last_updated": null,
+  "run_status": "not_started",
+  "next_action": null,
+  "continuations_without_progress": 0
+}

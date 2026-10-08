@@ -1,0 +1,4 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Essai : bash configs/borders/bordersrc. Un service distinct seulement apres validation.
+exec /opt/homebrew/bin/borders style=round width=4.0 active_color=0xff91baff inactive_color=0xff30394b

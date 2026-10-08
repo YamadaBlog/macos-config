@@ -1,0 +1,21 @@
+{
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "low"
+    }
+  },
+  "theme": "dark-ansi",
+  "permissions": {
+    "allow": [
+      "python3 -I ~/Tools/mac-os-debloat/debloat --help | grep -i custom",
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "skipDangerousModePermissionPrompt": true
+}

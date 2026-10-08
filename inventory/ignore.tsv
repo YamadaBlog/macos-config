@@ -1,0 +1,30 @@
+motif	raison
+app:com.apple.*	apps Apple livrées avec macOS (Safari suivi explicitement)
+launchd:com.apple.*	services Apple
+dot:.CFUserTextEncoding	fichier système macOS
+dot:.DS_Store	métadonnées Finder
+dot:.Trash	corbeille
+dot:.cache	caches régénérables
+dot:.local	conteneur (~/.local/bin et state couverts ailleurs)
+dot:.config	conteneur (sous-dossiers suivis via config:*)
+config:htop	dossier vide, suivi via htop
+home:dev	ce dépôt
+nixdefault:*	binaires Lix (suivis via nixdefault:nix)
+appsupport:com.apple.*	données de services Apple (système)
+appsupport:AddressBook	Contacts (données Apple, privées)
+appsupport:Animoji	Memoji (Apple)
+appsupport:CallHistoryDB	historique d'appels (Apple, privé)
+appsupport:CallHistoryTransactions	historique d'appels (Apple, privé)
+appsupport:CloudDocs	iCloud Drive (Apple)
+appsupport:CrashReporter	rapports de plantage (système)
+appsupport:DifferentialPrivacy	télémétrie Apple
+appsupport:DiskImages	images disque (système)
+appsupport:FaceTime	FaceTime (Apple, privé)
+appsupport:FileProvider	fournisseurs de fichiers (système)
+appsupport:homeenergyd	service Apple Maison
+appsupport:icdd	service Apple (capture d'images)
+appsupport:iCloud	iCloud (Apple, privé)
+appsupport:Knowledge	base Siri/suggestions (Apple, privée)
+appsupport:locationaccessstored	localisation (Apple)
+appsupport:networkserviceproxy	proxy réseau Apple
+appsupport:SESStorage	stockage sécurisé Apple

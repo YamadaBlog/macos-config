@@ -1,0 +1,4 @@
+# Stable Neru. Maintainer's third-party tap; no nightly.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+tap "y3owk1n/tap"
+cask "y3owk1n/tap/neru"

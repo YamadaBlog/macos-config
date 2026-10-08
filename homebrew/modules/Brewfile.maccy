@@ -1,0 +1,3 @@
+# Alternative to the OmniWM clipboard; enable only one history.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+cask "maccy"

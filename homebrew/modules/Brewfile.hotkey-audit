@@ -1,0 +1,4 @@
+# One-off diagnostic; partial coverage of configurations.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+tap "wunderlandmedia/tap"
+cask "wunderlandmedia/tap/hotkeyclash"

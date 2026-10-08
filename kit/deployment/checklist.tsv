@@ -1,0 +1,27 @@
+id	phase	test	preuve attendue	statut initial
+P01	prévol	Cible Darwin Apple Silicon et compte	Versions / architecture natives observées	non testé
+P02	prévol	Debloat et fonctions natives	Origine trouvée ou inconnus consignés ; dépendances testées	non testé
+B01	sauvegarde	Fichiers avant modification	Chemins source/destination et valeurs antérieures	non testé
+B02	sauvegarde	Time Machine	Fichier restauré ou dépendance destination explicitée	non testé
+N01	Nix	Lock et build activationPackage	Lock réel, résultat build et sortie d’évaluation	non testé
+N02	CLI	Origines PATH dans nouveau terminal	Une origine attendue par binaire retenu	non testé
+N03	shell	Zsh / Starship / historique	Commandes, accents et Ctrl-R testés sans conflit	non testé
+N04	TUI	Yazi et Lazygit	Navigation et diff Git dans dépôt de test ou kit ; aucune donnée modifiée involontairement	non testé
+T01	terminal	Ghostty autonome	Lancement Finder, onglets, saisie et thème lisible	non testé
+W01	WM	App/CLI cohérents	Versions et protocole observés, commande test réussie	non testé
+W02	WM	Colonnes + contenu	Deux doigts contenu, trois/quatre colonnes testés	non testé
+W03	WM	Safari / Discord / Ghostty / dialogues	Fenêtres, focus, fermeture et plein écran utilisables	non testé
+K01	clavier	AZERTY et raccourcis	W/E/D/T, Shift, flèches, accents et raccourcis natifs testés	non testé
+L01	lanceur	Raycast	App, quicklink et snippet fonctionnent ; Spotlight accessible	non testé
+L02	clipboard	Un seul moteur	Capture, exclusions et effacement ; aucun secret en preuve	non testé
+R01	navigation	Neru	Hints/grille/contenu ; modes et permissions observés	non testé
+G01	gestes	BTT essai	Deux gestes libres ou abandon justifié sans achat	non testé
+C01	contextes	Focus/Web/Messages/Atelier	Bureau et bonnes ressources ; échec focus bloque ouverture	non testé
+A01	apparence	Bordures/barre/Finder/Dock	Lisibilité, absence de doublons, valeurs sauvegardées	non testé
+M01	monitoring	Stats et énergie	Comparaison au repos et modules configurés ; aucune promesse chiffrée	non testé
+D01	nix-darwin	Build / activation / conflits	Diffs, sauvegardes et valeurs relues ; activé ou attente motivée	non testé
+O01	modules conditionnels	Choix un par un	Déployé et testé, non applicable ou dépendance précise	non testé
+S01	démarrage	Un propriétaire par service	Inventaire Login Items/launchd ; aucun double WM	non testé
+S02	veille	Cycles et reprise	Résultat observé ou test en attente humaine	non testé
+S03	login/reboot	Persistance et services	Résultat observé ; aucun reboot forcé	non testé
+F01	bilan	Retour arrière	Commandes exactes et chemins réels par modification	non testé

@@ -1,0 +1,13 @@
+id	type	vivant	depot	appliquer	note
+omniwm	file	~/.config/omniwm/settings.toml	tools/omniwm/config/settings.toml	copie-app-quittee	quitter OmniWM avant ; ou tools/omniwm/apply-registry.py
+neru	file	~/.config/neru/config.toml	tools/neru/config/config.toml	copie	valider : neru config validate
+hammerspoon	file	~/.hammerspoon/init.lua	tools/hammerspoon/config/init.lua	copie	recharger Hammerspoon
+hammerspoon	file	~/.hammerspoon/poweruser.lua	tools/hammerspoon/config/poweruser.lua	copie	
+hammerspoon	file	~/.hammerspoon/poweruser-backend.lua	tools/hammerspoon/config/poweruser-backend.lua	copie	
+hammerspoon	file	~/.hammerspoon/poweruser-projects.lua	tools/hammerspoon/config/poweruser-projects.lua	copie	
+claude-code	file	~/.claude/settings.json	tools/claude-code/config/settings.json	copie	
+stats	plist	eu.exelban.Stats	tools/stats/config/eu.exelban.Stats.plist	defaults-import-app-quittee	remote_id retiré
+topnotch	plist	pl.maketheweb.TopNotch	tools/topnotch/config/pl.maketheweb.TopNotch.plist	defaults-import-app-quittee	
+homebrew	brewfile	brew bundle dump	homebrew/Brewfile	brew-bundle	
+home-manager	nix	home-manager/	home-manager/	hm-switch	le dépôt est la source
+hammerspoon	file	~/.hammerspoon/poweruser-apps.lua	tools/hammerspoon/config/poweruser-apps.lua	copie	

@@ -1,0 +1,14 @@
+À COMPLÉTER SUR LE MAC AVANT APPLICATION
+Un rollback générique n’est pas une preuve de restauration. Pour chaque action : état avant, fichiers/valeurs sauvegardés, commande exacte et test de sortie.
+
+Nix/HM : conserver génération précédente ; home-manager generations puis chemin d’activation choisi. Première activation : copies des dotfiles concernés et procédure officielle ; pas de génération précédente imaginaire.
+Homebrew : distinguer app nouvellement installée et app préexistante ; arrêter service/démarrage avant retrait. Ne pas promettre un downgrade cask garanti. Ne pas supprimer un paquet préexistant pour annuler une config.
+WM : sauvegarde de settings ; arrêt et retrait de SON démarrage ; relance d’un seul backend choisi. Ne pas supprimer des Spaces occupés.
+Shell : préserver .zshrc/.zshenv/.zprofile et éventuel XDG ; conserver les hooks PATH nécessaires ; nouvelle fenêtre terminal pour vérifier.
+Raycast/clipboard : exporter les préférences concernées ; restaurer raccourcis Spotlight ; désactiver capture si abandonnée sans effacer d’autres données.
+Hammerspoon/Neru/BTT : copier configurations ou exports, ne pas écraser init.lua ; retirer seulement require/bindings/gestes ajoutés.
+Finder/Dock : noter la présence ou absence de chaque clé avant changement. Pour une clé absente à l’origine, supprimer cette seule clé ; pour une valeur présente, rétablir son type et sa valeur. Retirer une déclaration nix-darwin ne restaure pas automatiquement sa valeur précédente.
+nix-darwin : génération système précédente si elle existe ; copies /etc réellement affectées ; procédure de désinstallation officielle si première activation, sans désinstaller le daemon resté indépendant. Inspecter les effets réels.
+Nix/Lix : garder reçu et procédure de l’installateur réellement utilisé ; ne pas rm -rf /nix.
+Sauvegarde : Time Machine/restic exigent un test de restauration ; Syncthing n’est pas un rollback.
+Échec : restaurer la dernière étape concernée, contrôler le résultat, marquer rolled_back et poursuivre les phases indépendantes.

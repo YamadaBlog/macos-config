@@ -1,0 +1,3 @@
+# Code previews, only if you work with these formats.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+cask "syntax-highlight"

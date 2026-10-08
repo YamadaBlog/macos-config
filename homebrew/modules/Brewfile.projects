@@ -1,0 +1,3 @@
+# Hammerspoon for project contexts.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+cask "hammerspoon"

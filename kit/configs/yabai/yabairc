@@ -1,0 +1,14 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Base de test, sans sudo, chargement d'extension ou lancement d'un autre service.
+set -eu
+task_yabai=/opt/homebrew/bin/yabai
+"$task_yabai" -m config layout bsp
+"$task_yabai" -m config top_padding 12
+"$task_yabai" -m config bottom_padding 12
+"$task_yabai" -m config left_padding 12
+"$task_yabai" -m config right_padding 12
+"$task_yabai" -m config window_gap 10
+"$task_yabai" -m config focus_follows_mouse off
+"$task_yabai" -m config mouse_follows_focus off
+"$task_yabai" -m config auto_balance off

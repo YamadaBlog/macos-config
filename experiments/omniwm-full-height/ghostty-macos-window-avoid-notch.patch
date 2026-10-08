@@ -1,0 +1,113 @@
+From 73ffbfcc6039b7343d368e9fa827ed821247250c Mon Sep 17 00:00:00 2001
+From: mao <118530756+YamadaBlog@users.noreply.github.com>
+Date: Thu, 8 Oct 2026 23:17:26 +0200
+Subject: [PATCH] macos: add macos-window-avoid-notch option
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../Terminal/BaseTerminalController.swift        |  6 +++++-
+ .../Terminal/Window Styles/TerminalWindow.swift  | 16 ++++++++++++++++
+ macos/Sources/Ghostty/Ghostty.Config.swift       |  8 ++++++++
+ src/config/Config.zig                            |  7 +++++++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/macos/Sources/Features/Terminal/BaseTerminalController.swift b/macos/Sources/Features/Terminal/BaseTerminalController.swift
+index 79ca5b6e0..41eef27ad 100644
+--- a/macos/Sources/Features/Terminal/BaseTerminalController.swift
++++ b/macos/Sources/Features/Terminal/BaseTerminalController.swift
+@@ -595,7 +595,11 @@ class BaseTerminalController: NSWindowController,
+         guard !window.styleMask.contains(.fullScreen) else { return }
+ 
+         guard let screen = window.screen else { return }
+-        let visibleFrame = screen.visibleFrame
++        let avoidNotch = (window as? TerminalWindow)?.derivedConfig.macosWindowAvoidNotch ?? true
++        var visibleFrame = screen.visibleFrame
++        if !avoidNotch {
++            visibleFrame.size.height = screen.frame.maxY - visibleFrame.minY
++        }
+         var newFrame = window.frame
+ 
+         // Clamp width/height
+diff --git a/macos/Sources/Features/Terminal/Window Styles/TerminalWindow.swift b/macos/Sources/Features/Terminal/Window Styles/TerminalWindow.swift
+index 81b6666a1..6ffb8c70f 100644
+--- a/macos/Sources/Features/Terminal/Window Styles/TerminalWindow.swift	
++++ b/macos/Sources/Features/Terminal/Window Styles/TerminalWindow.swift	
+@@ -635,6 +635,19 @@ class TerminalWindow: NSWindow {
+ 
+     // MARK: Config
+ 
++    override func constrainFrameRect(_ frameRect: NSRect, to screen: NSScreen?) -> NSRect {
++        // AppKit keeps titled windows below the menu bar area (and the notch)
++        // even when the menu bar is hidden. Let the frame reach the physical
++        // top when configured, still bounded by the screen itself.
++        guard !derivedConfig.macosWindowAvoidNotch,
++              !styleMask.contains(.fullScreen),
++              let screen = screen ?? self.screen
++        else { return super.constrainFrameRect(frameRect, to: screen) }
++        var frame = frameRect
++        if frame.maxY > screen.frame.maxY { frame.origin.y = screen.frame.maxY - frame.height }
++        return frame
++    }
++
+     struct DerivedConfig {
+         let title: String?
+         let backgroundBlur: Ghostty.Config.BackgroundBlur
+@@ -643,8 +656,10 @@ class TerminalWindow: NSWindow {
+         let macosWindowButtons: Ghostty.MacOSWindowButtons
+         let macosTitlebarStyle: Ghostty.Config.MacOSTitlebarStyle
+         let windowCornerRadius: CGFloat
++        let macosWindowAvoidNotch: Bool
+ 
+         init() {
++            self.macosWindowAvoidNotch = true
+             self.title = nil
+             self.backgroundColor = NSColor.windowBackgroundColor
+             self.backgroundOpacity = 1
+@@ -661,6 +676,7 @@ class TerminalWindow: NSWindow {
+             self.macosWindowButtons = config.macosWindowButtons
+             self.backgroundBlur = config.backgroundBlur
+             self.macosTitlebarStyle = config.macosTitlebarStyle
++            self.macosWindowAvoidNotch = config.macosWindowAvoidNotch
+ 
+             // Set corner radius based on macos-titlebar-style
+             // Native, transparent, and hidden styles use 16pt radius
+diff --git a/macos/Sources/Ghostty/Ghostty.Config.swift b/macos/Sources/Ghostty/Ghostty.Config.swift
+index 78cc9024d..6c4638ef3 100644
+--- a/macos/Sources/Ghostty/Ghostty.Config.swift
++++ b/macos/Sources/Ghostty/Ghostty.Config.swift
+@@ -391,6 +391,14 @@ extension Ghostty {
+             return v
+         }
+ 
++        var macosWindowAvoidNotch: Bool {
++            guard let config = self.config else { return true }
++            var v = true
++            let key = "macos-window-avoid-notch"
++            _ = ghostty_config_get(config, &v, key, UInt(key.lengthOfBytes(using: .utf8)))
++            return v
++        }
++
+         var macosIcon: MacOSIcon {
+             let defaultValue = MacOSIcon.official
+             guard let config = self.config else { return defaultValue }
+diff --git a/src/config/Config.zig b/src/config/Config.zig
+index 4a0431921..ccc2de2d7 100644
+--- a/src/config/Config.zig
++++ b/src/config/Config.zig
+@@ -3531,6 +3531,13 @@ keybind: Keybinds = .{},
+ /// find false more visually appealing.
+ @"macos-window-shadow": bool = true,
+ 
++/// Whether windows are kept out of the area beside the notch (and the menu
++/// bar area) on macOS. The default is true, which matches standard AppKit
++/// behavior. Set this to false to let a window manager place windows up to
++/// the physical top of the screen, for example when the menu bar is set to
++/// hide automatically. Fullscreen windows are not affected.
++@"macos-window-avoid-notch": bool = true,
++
+ /// If true, the macOS icon in the dock and app switcher will be hidden. This is
+ /// mainly intended for those primarily using the quick-terminal mode.
+ ///
+-- 
+2.54.0 (Apple Git-157)
+

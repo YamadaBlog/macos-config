@@ -1,0 +1,47 @@
+{
+  "checked_date": "2026-10-08",
+  "model": "Claude Opus 5.5",
+  "scope": "Official sources only; adaptation, not measured prompt performance",
+  "sources": [
+    {
+      "id": "A1",
+      "title": "Prompting Claude Opus 5.5",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5"
+    },
+    {
+      "id": "A2",
+      "title": "Prompting best practices",
+      "url": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"
+    },
+    {
+      "id": "A3",
+      "title": "Claude Opus 5.5 overview",
+      "url": "https://platform.claude.com/docs/en/models/opus-5-5/overview"
+    },
+    {
+      "id": "A4",
+      "title": "Effective harnesses for long-running agents",
+      "url": "https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents"
+    },
+    {
+      "id": "A5",
+      "title": "Claude Opus 5.5 migration guide",
+      "url": "https://platform.claude.com/docs/en/models/opus-5-5/migration-guide"
+    },
+    {
+      "id": "A6",
+      "title": "Best practices for Claude Code",
+      "url": "https://code.claude.com/docs/en/best-practices"
+    },
+    {
+      "id": "A7",
+      "title": "Keep Claude working toward a goal",
+      "url": "https://code.claude.com/docs/en/goal"
+    },
+    {
+      "id": "A8",
+      "title": "Model configuration / effort",
+      "url": "https://code.claude.com/docs/en/model-config"
+    }
+  ]
+}

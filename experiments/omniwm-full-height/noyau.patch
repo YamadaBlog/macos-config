@@ -1,0 +1,31 @@
+# Esquisse NON COMPILÉE (Xcode 27 / Swift 6.4 requis) — cœur du changement dans
+# Sources/OmniWM/Core/Controller/WMController+LayoutGeometry.swift, contre v0.7.6 (3c07839).
+# À compléter : GapSettings (+ défaut, surcharge par écran, TOML, migration), SettingsView, IPC/CLI, traductions, docs, tests.
+--- a/Sources/OmniWM/Core/Controller/WMController+LayoutGeometry.swift
++++ b/Sources/OmniWM/Core/Controller/WMController+LayoutGeometry.swift
+@@ buildLayoutFrames(for:scale:)
+         let reserved = workspaceBarReservedInsets(for: monitor)
+         let gaps = settings.gaps.resolved(for: monitor)
+-        let menuBarInset = max(0, monitor.frame.maxY - monitor.visibleFrame.maxY)
++        // Option : toute la hauteur quand la barre des menus est masquée (sinon comportement inchangé).
++        let useFullHeight = gaps.fullHeightWhenMenuBarHidden && MenuBarVisibility.isAutoHidden
++        var parentArea = monitor.visibleFrame
++        if useFullHeight {
++            parentArea.size.height = monitor.frame.maxY - parentArea.minY
++        }
++        let menuBarInset = useFullHeight ? 0 : max(0, monitor.frame.maxY - monitor.visibleFrame.maxY)
+@@
+         let rawWorkingFrame = computeWorkingArea(
+-            parentArea: monitor.visibleFrame,
++            parentArea: parentArea,
+@@
+         let workingFrame = computeWorkingArea(
+-            parentArea: monitor.visibleFrame,
++            parentArea: parentArea,
++
++// Nouveau fichier Sources/OmniWM/Core/Monitor/MenuBarVisibility.swift (esquisse)
++// enum MenuBarVisibility {
++//     /// Réglages > Centre de contrôle > Masquer automatiquement la barre des menus = Toujours
++//     static var isAutoHidden: Bool { UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?["_HIHideMenuBar"] as? Bool ?? false }
++// }
++// (à observer : notification de changement de ce réglage pour relancer la mise en page)

@@ -1,0 +1,44 @@
+MODE D’EMPLOI — DÉPLOIEMENT CLAUDE OPUS 5.5
+1. Sur le Mac, ouvrir l’agent avec accès au terminal et, si disponible, aux réglages/UI.
+2. Joindre Kit-macos-power-user.zip ; le PDF est inclus dans docs/.
+3. Vérifier si souhaité l’intégrité depuis le dossier du kit : shasum -a 256 -c SHA256SUMS.
+   Copier tout PROMPT-OPUS-5.5.txt en UN message. Aucune variable de compte à compléter à la main : l’agent doit détecter le compte et adapter les modèles.
+4. Laisser l’agent réaliser les phases ; répondre seulement aux demandes nécessaires de permissions/authentification/destination.
+   Variante Claude Code : depuis le dossier du kit, utiliser PROMPT-OPUS-5.5-CLAUDE-CODE.txt (/goal), si la commande est disponible. Lire deployment/OPUS-5.5-REGLAGES.txt pour la sélection du modèle et de l’effort.
+5. Exiger le bilan et les statuts natifs. Un prompt unique ne supprime pas les dialogues de permissions macOS ni les contraintes d’accès de l’agent.
+
+PRIORITÉ DES DOCUMENTS
+Le prompt + ce fichier + deployment/profile.json fixent le profil cible du déploiement.
+Le PDF décrit les alternatives et leur justification. README et scripts restent des bases techniques.
+Les modules facultatifs du PDF ne sont pas tous installés : déployer le profil cohérent, ses compléments retenus et les modules conditionnels justifiés.
+
+PROFIL CIBLE
+Socle Nix/Home Manager, shell, Atuin local et TUI ; Ghostty ; OmniWM ; Raycast gratuit ; Neru ; Hammerspoon/contextes ; thème et Stats.
+BTT = essai sans achat, gestes disponibles non concurrents. nix-darwin = branche finale ciblée, après inventaire et sauvegarde.
+Alternative Paneru si échec WM ; pas de double backend ni de scripts Hammerspoon pointant vers l’ancien WM.
+Lunar/Tailscale/TopNotch = conserver et inventorier, pas réinstaller par réflexe.
+Syncthing/restic/BetterDisplay/dictée/devshell/LocalSend = conditionnels, avec résultat explicite.
+
+CONTENU AJOUTÉ
+PROMPT-OPUS-5.5.txt : mission XML autonome et critères de clôture.
+PROMPT-OPS-5.5.txt : même contenu, nom conservé pour compatibilité.
+PROMPT-OPUS-5.5-CLAUDE-CODE.txt : entrée /goal pour client compatible.
+CLAUDE.md : règles courtes de reprise.
+deployment/RUNBOOK-OPUS.txt : phases opérationnelles détaillées.
+deployment/OPUS-5.5-REGLAGES.txt : paramètres du client/API séparés du prompt.
+deployment/prompting-sources.json : documentation officielle consultée.
+deployment/profile.json : choix de fonctionnalités, sans secret.
+deployment/state-template.json : statuts à copier dans le répertoire d’état PRIVÉ du Mac.
+deployment/checklist.tsv : tests natifs de sortie ; vide = non vérifié.
+deployment/ownership.tsv : un propriétaire par fonction.
+deployment/rollback.txt : inventaire des retours à compléter avec chemins/valeurs réels.
+bin/ops-preflight.sh : lecture seule ; ne teste pas réellement TCC, santé des services ou sauvegarde.
+nix-darwin/ : modèle de réglages Finder/Dock, pas évalué sur Nix ; identité et lock à établir sur le Mac.
+SHA256SUMS : intégrité des fichiers livrés, pas preuve de confiance envers des dépendances téléchargées ensuite.
+
+ÉTAT ET CONFIDENTIALITÉ
+État actif : ~/.local/state/macos-power-user-deploy, permissions restrictives.
+Les sauvegardes complètes, logs de launchctl, historiques, tokens et captures privées n’entrent pas dans Git.
+Un état « terminé » exige des tests observés ; installé/configuré ne signifient pas testé.
+Conserver un bilan expurgé dans le dépôt ; aucune publication automatique.
+Aucune exécution sur le Mac n’a eu lieu lors de la préparation de ce kit.

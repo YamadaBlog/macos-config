@@ -1,0 +1,4 @@
+# SketchyBar for the Yabai branch; manual configuration and service.
+# Audit: 2026-10-07. Versions not pinned by Homebrew.
+tap "felixkratz/formulae"
+brew "felixkratz/formulae/sketchybar"
