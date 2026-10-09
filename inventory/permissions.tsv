@@ -16,6 +16,10 @@ kTCCServiceSystemPolicyDownloadsFolder	com.hnc.Discord	2	préexistant	—
 kTCCServiceSystemPolicyAllFiles	/usr/libexec/sshd-keygen-wrapper	2	Connexion à distance (préexistant)	—
 kTCCServiceSystemPolicyAllFiles	/usr/sbin/smbd	0	partage de fichiers refusé (préexistant)	—
 kTCCServiceAccessibility	/nix/store/hr5jdf535nm54yq3jzkyx8k9a0m3hwql-bash-5.3p9/bin/bash	*	RÉSIDU DE SÉCURITÉ : créée par erreur le 2026-10-08 15:32 (incident Neru) ; doit être supprimée ; signalée en alerte si accordée	—
-kTCCServiceAccessibility	com.barut.OmniWM.dev	*	RÉSIDU : app de test OmniWM Dev retirée le 2026-10-08 (rangée dans les sauvegardes), entrée à supprimer	—
+kTCCServiceAccessibility	com.barut.OmniWM.dev	*	RÉSIDU : app de test OmniWM Dev supprimée le 2026-10-09, entrée à supprimer dans Réglages	—
 kTCCServiceScreenCapture	com.barut.OmniWM.dev	*	RÉSIDU : app de test OmniWM Dev retirée le 2026-10-08, entrée à supprimer	—
 kTCCServiceScreenCapture	com.mitchellh.ghostty	*	RÉSIDU : refusée (sans effet)	—
+kTCCServiceListenEvent	com.barut.OmniWM	2	Surveillance des entrées (requise par OmniWM pour les raccourcis et gestes)	Ctrl+2 change de bureau
+kTCCServiceAccessibility	com.mitchellh.ghostty	2	sessions Claude Code dans Ghostty (automatisation des tests et réglages)	—
+kTCCServiceAppleEvents	com.mitchellh.ghostty	2	osascript depuis Ghostty (quitter/relancer des apps)	—
+kTCCServiceScreenCapture	org.hammerspoon.Hammerspoon	2	captures d'écran pour diagnostic (hs.screen:snapshot)	—

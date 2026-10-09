@@ -36,6 +36,8 @@ com.apple.AppleMultitouchTrackpad	TrackpadFourFingerVertSwipeGesture	2
 com.apple.controlcenter	"NSStatusItem Visible Battery"	(absent = défaut macOS)
 com.apple.menuextra.clock	ShowSeconds	(absent = défaut macOS)
 com.apple.screencapture	location	(absent = défaut macOS)
+com.apple.WindowManager	GloballyEnabled	0
+com.apple.WindowManager	EnableTilingByEdgeDrag	(absent = défaut macOS)
 HIToolbox	disposition	French
 symbolichotkeys	64 Spotlight (Cmd+Espace)	enabled=false
 symbolichotkeys	65 Recherche Finder (Cmd+Option+Espace)	enabled=true

@@ -45,6 +45,8 @@ com.apple.AppleMultitouchTrackpad TrackpadFourFingerVertSwipeGesture
 com.apple.controlcenter "NSStatusItem Visible Battery"
 com.apple.menuextra.clock ShowSeconds
 com.apple.screencapture location
+com.apple.WindowManager GloballyEnabled
+com.apple.WindowManager EnableTilingByEdgeDrag
 EOF
   printf 'HIToolbox\tdisposition\t%s\n' "$(defaults read com.apple.HIToolbox AppleSelectedInputSources 2>/dev/null | awk -F'= ' '/KeyboardLayout Name/{gsub(/;/,"",$2);print $2}' | tr '\n' ' ' | sed 's/ *$//')"
   printf 'symbolichotkeys\t64 Spotlight (Cmd+Espace)\tenabled=%s\n' "$(/usr/libexec/PlistBuddy -c 'Print :AppleSymbolicHotKeys:64:enabled' "$HOME/Library/Preferences/com.apple.symbolichotkeys.plist" 2>/dev/null)"

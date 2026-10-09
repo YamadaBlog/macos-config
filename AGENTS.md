@@ -80,3 +80,21 @@ After any change: `verify.sh` → `capture.sh` → review `git diff` → commit 
 
 ## 6. Remaining actions (validation criteria)
 See `STATUS.md` (sections A–D, evidence M/S/I/R), `docs/actions-humaines.md` (H1–H7) and `docs/tests-manuels.md` — the only up-to-date lists.
+
+## Accessibility and window managers (incident 2026-10-09)
+- Turning off OmniWM's Accessibility while it runs froze all input outside the focused app (event taps left installed).
+- Guard: `tools/hammerspoon/config/ax-guard.lua` restarts OmniWM and Neru on every `com.apple.accessibility.api` notification (15 s cooldown).
+- Fix (stop services on revoke + 1 s trust polling) VERIFIED for real on 2026-10-09 (toggle turned off in Settings: input stayed fluid) and INSTALLED: `/Applications/OmniWM.app` is a local ad-hoc build of `~/dev/omniwm` branch `stop-services-on-ax-revoke` (bundle id unchanged). Auto-updates off (`updateChecksEnabled = false`). Official 0.7.6 backup: `~/.local/state/macos-power-user-deploy/backups/OmniWM-officiel-0.7.6.app`. Build with `tools/omniwm/build-local.sh [branch]`: it signs with the local self-signed certificate "OmniWM Local Signing" (login keychain, codesign-only access), so permissions SURVIVE rebuilds. Never build with ad-hoc signing (`package-app.sh` alone) or permissions are lost.
+- Never re-enable `com.apple.talagent` (see `docs/debloat.md`). In Hammerspoon, keep references to `hs.timer` objects. Do not call `hs.reload()` through `hs -c` (IPC gets stuck); restart the app instead.
+
+## Parked-window strip in the right margin (2026-10-09)
+- Cause: OmniWM parks inactive-workspace windows 1 px inside the right edge; their edge + shadow darken the 8 px margin.
+- Rejected: right margin 0 (user rule: no window touches an edge); bottom-right corner parking (macOS pulls the title bar back on screen: a 246×52 px block stayed visible; WIP branch `hide-inactive-in-corner`).
+- Fix: `tools/hammerspoon/config/ws-hide.lua` subscribes to OmniWM `active-workspace` and hides (Cmd+H) apps with no window on the active workspace, unhides the others. Measured: edge clean, windows in place in ~0.12 s; also after moving Safari Web→Focus→Web.
+- Limit: an app with windows on SEVERAL workspaces cannot be hidden (it would hide the visible ones too), so its parked windows still show at the right edge. Keep one app per workspace (OmniWM rules).
+
+## Drag-and-drop insertion (2026-10-09)
+- Local OmniWM branch `dwindle-drag-insert` (on top of the Accessibility fix): plain title-bar drag (dropped on mouse up) or Option+drag, drop near a tile edge (outer 30 % band) → window removed from the tree (space reabsorbed) and inserted beside the target; center (inner 40 %) → swap as upstream.
+- Verified live with simulated Option+drag (left-edge insert, center swap, top-edge insert) and 8 tests in `DwindleInteractiveMoveTests`. Installed with `tools/omniwm/build-local.sh dwindle-drag-insert`.
+- Never simulate mouse input while the user is using the Mac: a test drag landed on their active workspace (2026-10-09).
+- ws-hide also gives focus after a switch (window under the pointer, else first window): OmniWM's own focus fails while the app is still hidden. Verified: Ctrl+2 → Safari focused 3/3.

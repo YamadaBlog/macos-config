@@ -11,3 +11,5 @@ topnotch	plist	pl.maketheweb.TopNotch	tools/topnotch/config/pl.maketheweb.TopNot
 homebrew	brewfile	brew bundle dump	homebrew/Brewfile	brew-bundle	
 home-manager	nix	home-manager/	home-manager/	hm-switch	le dépôt est la source
 hammerspoon	file	~/.hammerspoon/poweruser-apps.lua	tools/hammerspoon/config/poweruser-apps.lua	copie	
+hammerspoon	file	~/.hammerspoon/ax-guard.lua	tools/hammerspoon/config/ax-guard.lua	copie	
+hammerspoon	file	~/.hammerspoon/ws-hide.lua	tools/hammerspoon/config/ws-hide.lua	copie	

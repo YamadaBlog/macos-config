@@ -40,4 +40,5 @@ Options si un diagnostic de plantage devient nécessaire (aucune appliquée) :
 ## Exceptions appliquées (réparations ciblées)
 | Service | Raison | Retour |
 |---|---|---|
+| `com.apple.talagent` (gui/501) | **Do NOT re-enable.** Tried 2026-10-09: talagentd started but never answered `com.apple.window_proxies`; System Settings and app switching froze system-wide (hang report: blocked waiting for talagentd). Disabled again. | — |
 | `com.apple.amsengagementd` (gui/501) | achats App Store en échec (Xcode) | `launchctl disable gui/501/com.apple.amsengagementd; launchctl bootout gui/501/com.apple.amsengagementd` |

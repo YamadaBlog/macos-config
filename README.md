@@ -18,6 +18,11 @@ This repo lets you **understand, verify and rebuild** the machine. It contains n
   Ctrl+Option+W/Q/R/F/E/S = grow/shrink/balance/fullscreen/orientation/swap.
   Hyper (Ctrl+Option+Cmd) stays for Neru (N/G/S) and contexts (P). Option alone stays free for typing `{ } [ ] | @`.
 - **Contexts**: **Hammerspoon** (Hyper+P) opens the workspace, then its resources.
+- **OmniWM local build** (`tools/omniwm/build-local.sh`, signed with a local certificate so permissions survive rebuilds):
+  upstream OmniWM + [fix for Accessibility revoke freezing input](https://github.com/OmniNull/OmniWM/pull/837)
+  + drag-and-drop by title bar (drop on an edge = insert beside, center = swap).
+- **Hammerspoon helpers**: `ws-hide.lua` hides apps absent from the active workspace (no parked-window strip in the
+  margin) and refocuses after a switch; `ax-guard.lua` restarts OmniWM and Neru when an Accessibility setting changes.
 - **Keyboard navigation**: **Neru**. **Launcher / clipboard**: Raycast (configuration pending).
 - **Terminal**: Ghostty. **Theme**: palette derived automatically from the wallpaper (Stylix + `scripts/theme-auto.sh`).
 - Details: `docs/architecture.md` · shortcuts: `docs/raccourcis.md` · status: `STATUS.md`.

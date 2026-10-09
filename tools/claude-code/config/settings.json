@@ -1,13 +1,7 @@
 {
-  "modelSettings": {
-    "claude-opus-5-5": {
-      "effortLevel": "low"
-    }
-  },
-  "theme": "dark-ansi",
   "permissions": {
     "allow": [
-      "python3 -I ~/Tools/mac-os-debloat/debloat --help | grep -i custom",
+      "Bash(python3 -I ~/Tools/mac-os-debloat/debloat --help | grep -i custom)",
       "Bash",
       "Read",
       "Edit",
@@ -17,5 +11,11 @@
     ],
     "defaultMode": "bypassPermissions"
   },
-  "skipDangerousModePermissionPrompt": true
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-ansi"
 }

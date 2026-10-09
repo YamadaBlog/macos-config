@@ -21,7 +21,8 @@
 | **Ctrl+Option+T** | float ↔ tile the window |
 | **Ctrl+Option+G** | toggle this workspace between Dwindle and Niri (scrolling) |
 | **Ctrl+Option+X** | bring back off-screen windows |
-| **Option+drag / Option+drag an edge** | move / resize with the mouse |
+| **Drag a window by its title bar** (or Option+drag anywhere in it) | drop near an **edge** of another window: inserted on that side, the rest reflows (no gap, no overlap); drop in its **center**: the two swap |
+| **Option+drag an edge** | resize with the mouse |
 | **Hyper+Space** | OmniWM command palette (every action, even unbound ones) |
 | **Hyper+O** | Overview |
 | **Hyper+Return** | Quake terminal |

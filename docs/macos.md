@@ -46,3 +46,8 @@ même barre des menus masquée — le centre de cette bande est occupé par la c
 fenêtres sous l'encoche (marge haute négative testée : ignorée) ; le contenu y serait masqué.
 Conséquence : sur cet écran, masquer la barre des menus **ne libère aucun espace** pour les fenêtres ; la bande reste vide.
 Marge haute retenue : `outer.top = 48` (la doc OmniWM la mesure depuis le bord physique) → 8 px sous la limite de l'encoche, comme les autres côtés. Terminal.app peut laisser quelques px supplémentaires (taille par caractères).
+
+## Stage Manager: must stay OFF (2026-10-09)
+Stage Manager (`com.apple.WindowManager GloballyEnabled`) fights OmniWM: on workspace switches the screen stayed empty for seconds
+and windows piled up as thumbnails on the right edge. Turn off: `defaults write com.apple.WindowManager GloballyEnabled -bool false; killall WindowManager`.
+It can be turned on by accident from Control Center; `scripts/verify.sh` now flags it (snapshot `docs/generated/macos-defaults.tsv`).

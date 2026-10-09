@@ -54,7 +54,8 @@ REGISTRY = {
 }
 NAMES = {"1": "Focus", "2": "Web", "3": "Messages", "4": "Atelier"}
 INVERSE = {v: k for k, v in NAMES.items()}
-GENERAL = {"ipcEnabled": "true", "hyperKeyModifiers": '"Control+Option+Command"'}
+GENERAL = {"ipcEnabled": "true", "updateChecksEnabled": "false",  # local build with the Accessibility fix: no auto-update
+           "hyperKeyModifiers": '"Control+Option+Command"'}
 # Apparence : bordure et barre DÉSACTIVÉES par choix de l'utilisateur (2026-10-08) ; réglages conservés
 # pour une réactivation éventuelle (passer enabled à "true"). Accent #91baff = Ghostty palette 4.
 SECTIONS = {
@@ -66,13 +67,15 @@ SECTIONS = {
                    "workspaceSwipeAxis": '"horizontal"', "workspaceSwipeFingerCount": "4"},
     # Disposition Dwindle partout : 1 fenêtre = tout l'écran, l'espace se divise à chaque ouverture.
     "[general]": {"defaultLayoutType": '"dwindle"'},
+    # Dwindle, window alone: "fill" ignores the outer gaps (window touches the edges). Exact size =
+    # 1728-16 x 1117-40-8, i.e. the working area: no window may touch a screen edge, on any workspace.
+    "[dwindle]": {"singleWindowFit": '"1712x1069"'},
     # Niri (si réactivé sur un bureau) : 2 colonnes visibles, colonnes à la moitié.
     "[niri]": {"visibleContainerCount": "2", "defaultContainerPrimarySpan": "0.5", "edgeGaps": "false",
                # Fenêtre seule : taille fixe = écran intégré 1728x1117 (Retina 2x) moins les marges
                # (1728-16 x 1117-40-8). À adapter si l'écran ou sa résolution changent.
                "singleWindowFit": '"1712x1069"'},
     "[gaps]": {"size": "8.0"},
-    # Marges 8 px partout. outer.top se mesure depuis le bord PHYSIQUE (doc OmniWM) : 32 pt de bande en 1728x1117 + 8 = 40.
     "[gaps.outer]": {"top": "40.0", "bottom": "8.0", "left": "8.0", "right": "8.0"},
     "[workspaceBar]": {"enabled": "false", "transparentBackground": "true", "showLabels": "true",
                        "hideEmptyWorkspaces": "true", "deduplicateAppIcons": "true",

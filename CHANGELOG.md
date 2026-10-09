@@ -102,3 +102,14 @@ Format : date — changement — fichiers/réglages — retour arrière. Détail
 - 2026-10-09: main docs in English (README, AGENTS, STATUS, architecture, shortcuts, secrets); Dwindle Ctrl+Option shortcuts fixed for AZERTY (W/A/Q/Z were on QWERTY positions).
 - 2026-10-09: published as public snapshot https://github.com/YamadaBlog/macos-config (single commit, history not published).
 - 2026-10-09: repos linked: `public` remote (fetch only) + `scripts/publish.sh` (sanitized snapshot, one commit per publish); direct push blocked by hook.
+- 2026-10-09: `com.apple.talagent` re-enabled (disabled by debloat → System Settings frozen, window-state errors 4099); OmniWM floats System Settings and auth dialogs.
+- 2026-10-09: talagent re-enable REVERTED: talagentd hung and froze app switching system-wide; disabled again.
+- 2026-10-09: Accessibility guard in Hammerspoon (restart OmniWM + Neru on permission change); OmniWM fix prepared (stop services on revoke).
+- 2026-10-09: OmniWM Accessibility fix verified (real toggle) and installed as local build; auto-updates off; official app backed up.
+- 2026-10-09: OmniWM fix proposed upstream: https://github.com/OmniNull/OmniWM/pull/837 (fork YamadaBlog/OmniWM).
+- 2026-10-09: Stage Manager found ON (caused empty screen / late windows on workspace switch) → turned off and now tracked by verify.
+- 2026-10-09: stable local code-signing certificate + tools/omniwm/build-local.sh (permissions survive rebuilds); OmniWM corner-parking build installed for testing.
+- 2026-10-09: right-margin strip fixed by ws-hide.lua (hide apps absent from the active workspace); corner parking rejected (macOS clamps).
+- 2026-10-09: cleanup: OmniWM Dev removed (app, config, state; backup kept), Ghostty test prefs removed, new legitimate TCC grants inventoried, Claude Code settings captured. Remaining: TCC residues (bash, BetterDisplay, BTT, OmniWM Dev, Ghostty ScreenCapture) need System Settings; ~/.npm (98 MB, created 10:33, origin unknown) left untouched.
+- 2026-10-09: Dwindle drag-and-drop insertion (Option+drag; edges insert, center swaps) built and installed.
+- 2026-10-09: focus restored after workspace switch (ws-hide focuses window under pointer after unhiding).

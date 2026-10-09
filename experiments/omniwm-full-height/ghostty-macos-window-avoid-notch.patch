@@ -1,5 +1,5 @@
 From 73ffbfcc6039b7343d368e9fa827ed821247250c Mon Sep 17 00:00:00 2001
-From: mao <118530756+YamadaBlog@users.noreply.github.com>
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Thu, 8 Oct 2026 23:17:26 +0200
 Subject: [PATCH] macos: add macos-window-avoid-notch option
 
