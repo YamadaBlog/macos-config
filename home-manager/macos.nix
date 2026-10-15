@@ -83,6 +83,8 @@ in {
     "com.barut.OmniWM" = {                        # options added by tools/omniwm/patches
       OverviewHideWorkspaceLabels = true;
       OverviewHideSearchBar = true;
+      WorkspaceSwipeSensitivity = 1.8;            # vertical swipe: earlier trigger, less travel per workspace
+      SuppressSecureInputExplanation = true;      # no panel after 10 s of Secure Input (it stays on)
     };
   };
   targets.darwin.currentHostDefaults.NSGlobalDomain = {

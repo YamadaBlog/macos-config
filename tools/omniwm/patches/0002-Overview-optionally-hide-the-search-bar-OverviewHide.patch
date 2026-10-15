@@ -1,7 +1,7 @@
-From 3eababb54f2c883adffd06e916d05fdcae40f4c6 Mon Sep 17 00:00:00 2001
+From a23a7ada167cf1c9900ad2cdf1868121108f344a Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Thu, 15 Oct 2026 16:30:47 +0200
-Subject: [PATCH 2/7] Overview: optionally hide the search bar
+Subject: [PATCH 02/15] Overview: optionally hide the search bar
  (OverviewHideSearchBar default)
 
 ---

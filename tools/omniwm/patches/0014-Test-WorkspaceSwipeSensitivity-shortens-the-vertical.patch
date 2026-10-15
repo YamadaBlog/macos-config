@@ -1,0 +1,43 @@
+From eead0304fa3b682906d9ce475439d24f7d3afce6 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 00:49:21 +0200
+Subject: [PATCH 14/15] Test: WorkspaceSwipeSensitivity shortens the vertical
+ swipe trigger and travel
+
+---
+ .../WorkspaceSwipeResponsivenessTests.swift   | 26 +++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+ create mode 100644 Tests/OmniWMTests/WorkspaceSwipeResponsivenessTests.swift
+
+diff --git a/Tests/OmniWMTests/WorkspaceSwipeResponsivenessTests.swift b/Tests/OmniWMTests/WorkspaceSwipeResponsivenessTests.swift
+new file mode 100644
+index 00000000..d275c4eb
+--- /dev/null
++++ b/Tests/OmniWMTests/WorkspaceSwipeResponsivenessTests.swift
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++@testable import OmniWM
++import XCTest
++
++/// Regression (2026-10-16): the vertical workspace swipe started late again after a rebuild that dropped the
++/// WorkspaceSwipeSensitivity option. The setting must shorten both the travel per workspace and the trigger.
++final class WorkspaceSwipeResponsivenessTests: XCTestCase {
++    private let key = "WorkspaceSwipeSensitivity"
++    override func tearDown() { UserDefaults.standard.removeObject(forKey: key); super.tearDown() }
++
++    func testSensitivityShortensTriggerAndTravel() {
++        UserDefaults.standard.removeObject(forKey: key)
++        let defaultTrigger = TrackpadGestureIntent.workspaceSwipeTriggerUnits
++        let defaultTravel = WorkspaceSwipeMotion.travelUnits
++        UserDefaults.standard.set(1.8, forKey: key)
++        XCTAssertLessThan(TrackpadGestureIntent.workspaceSwipeTriggerUnits, defaultTrigger * 0.6)
++        XCTAssertLessThan(WorkspaceSwipeMotion.travelUnits, defaultTravel * 0.6)
++    }
++
++    func testOutOfRangeValuesAreClamped() {
++        UserDefaults.standard.set(100.0, forKey: key)
++        XCTAssertEqual(WorkspaceSwipeMotion.sensitivity, 3)
++    }
++}

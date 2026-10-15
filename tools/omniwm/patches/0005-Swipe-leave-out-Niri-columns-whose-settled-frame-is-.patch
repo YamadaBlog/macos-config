@@ -1,7 +1,7 @@
-From c03777b3d72926a3a4454ef9fc590d657879cffb Mon Sep 17 00:00:00 2001
+From 7c9f9e54b50206d10ac86f09abeb96f1ba1b590c Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Thu, 15 Oct 2026 17:11:03 +0200
-Subject: [PATCH 5/7] Swipe: leave out Niri columns whose settled frame is
+Subject: [PATCH 05/15] Swipe: leave out Niri columns whose settled frame is
  edge-clamped over a visible one; tests for click-swallowing masks and 2x
  captures
 

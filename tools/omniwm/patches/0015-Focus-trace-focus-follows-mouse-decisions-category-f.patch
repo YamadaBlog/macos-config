@@ -1,0 +1,127 @@
+From 133a7a36f21738f5e7d5bde2603f28923076aa3e Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 00:59:57 +0200
+Subject: [PATCH 15/15] Focus: trace focus-follows-mouse decisions (category
+ focus-trace); hover exemption uses the per-pid bundle cache
+
+---
+ .../MouseEventHandler+FocusFollowsMouse.swift | 50 +++++++++++++++++--
+ 1 file changed, 46 insertions(+), 4 deletions(-)
+
+diff --git a/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift b/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
+index 64f1b7ee..cc52a50b 100644
+--- a/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
++++ b/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
+ 
+ import AppKit
++import OSLog
+ import Foundation
+ 
+ extension MouseEventHandler {
+@@ -19,8 +20,8 @@ extension MouseEventHandler {
+         case let .managed(token):
+             // System Settings and authorization dialogs keep focus until an explicit click:
+             // hovering a tiled window must not raise it above them.
+-            guard let bundleId = NSRunningApplication(processIdentifier: token.pid)?.bundleIdentifier
+-            else { return false }
++            // Runs on every mouse move: use the per-pid cache, not a LaunchServices lookup.
++            guard let bundleId = controller?.appInfoCache.bundleId(for: token.pid) else { return false }
+             return Self.hoverFocusExemptBundleIds.contains(bundleId)
+         case .none:
+             return false
+@@ -54,6 +55,7 @@ extension MouseEventHandler {
+             cancelActiveMouseInteraction()
+             return
+         }
++        FocusTrace.hover(windowIdUnderPointer)
+ 
+         controller.workspaceBarManager.handleAutoHideMouseMoved(at: location)
+ 
+@@ -63,6 +65,7 @@ extension MouseEventHandler {
+         }
+ 
+         if shouldBlockOwnWindowInput(at: location) {
++            FocusTrace.decision("skip: pointer over an OmniWM surface", controller: controller)
+             resetHoveredEdgesIfNeeded()
+             return
+         }
+@@ -72,6 +75,13 @@ extension MouseEventHandler {
+            shouldHandleFocusFollowsMouse(at: location)
+         {
+             handleFocusFollowsMouse(at: location, windowIdUnderPointer: windowIdUnderPointer)
++        } else if controller.focusFollowsMouseEnabled {
++            FocusTrace.decision(
++                state.isMoving || state.isResizing ? "skip: move/resize in progress"
++                    : isTrackpadSwipeSessionActive ? "skip: trackpad swipe active"
++                    : "skip: Niri scroll animation running (no re-check afterwards)",
++                controller: controller
++            )
+         }
+ 
+         guard !state.isResizing else { return }
+@@ -116,25 +126,36 @@ extension MouseEventHandler {
+               !hasPendingNativeFullscreenTransition(at: location),
+               !isPointerDisplayShowingFullscreenSpace(at: location)
+         else {
++            FocusTrace.decision("skip: external focus / native fullscreen", controller: controller)
+             return
+         }
+ 
+         let now = Date()
+         guard now.timeIntervalSince(state.lastFocusFollowsMouseTime) >= state.focusFollowsMouseDebounce else {
++            FocusTrace.decision("skip: debounce (no retry if the pointer stops here)", controller: controller)
+             return
+         }
+ 
+         guard let target = resolveFocusFollowsMouseTarget(
+             at: location,
+             windowIdUnderPointer: windowIdUnderPointer
+-        ) else { return }
++        ) else {
++            FocusTrace.decision("skip: no managed target under pointer", controller: controller)
++            return
++        }
+         let token = focusFollowsMouseToken(for: target)
+ 
+-        guard token != controller.workspaceManager.nativeManagedFocusToken else { return }
++        guard token != controller.workspaceManager.nativeManagedFocusToken else {
++            FocusTrace.decision("skip: OmniWM believes it is already focused", controller: controller, token: token)
++            return
++        }
++        var allowed = false
+         controller.focusPolicyEngine.performIfFocusFollowsMouseAllowed {
++            allowed = true
+             state.lastFocusFollowsMouseTime = now
+             activateFocusFollowsMouseTarget(target)
+         }
++        FocusTrace.decision(allowed ? "focus requested" : "skip: focus policy denied", controller: controller, token: token)
+     }
+ 
+     private func hasPendingNativeFullscreenTransition(at location: CGPoint) -> Bool {
+@@ -301,3 +322,24 @@ extension MouseEventHandler {
+         }
+     }
+ }
++
++/// Diagnostics for focus-follows-mouse (category `focus-trace`): one line each time the hovered window or
++/// the decision changes, with OmniWM's focus token and the macOS frontmost app, so internal vs native
++/// focus divergences are visible. `/usr/bin/log stream --predicate 'category == "focus-trace"'`.
++@MainActor
++enum FocusTrace {
++    private static let log = Logger(subsystem: "com.barut.OmniWM", category: "focus-trace")
++    private static var hovered: Int?
++    private static var lastLine = ""
++
++    static func hover(_ windowId: Int?) { hovered = windowId }
++
++    static func decision(_ reason: StaticString, controller: WMController, token: WindowToken? = nil) {
++        let omni = controller.workspaceManager.nativeManagedFocusToken.map { String($0.windowId) } ?? "-"
++        let front = NSWorkspace.shared.frontmostApplication.map { "\($0.localizedName ?? "?")(\($0.processIdentifier))" } ?? "-"
++        let line = "hover=\(hovered.map(String.init) ?? "-") target=\(token.map { String($0.windowId) } ?? "-") omniFocus=\(omni) front=\(front) lock=\(controller.isLockScreenActive) | \(reason)"
++        guard line != lastLine else { return }
++        lastLine = line
++        log.info("\(line, privacy: .public)")
++    }
++}

@@ -1,0 +1,51 @@
+From be5c12d2f6a7fdd94fec294b5b8c648bf3c23208 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Sat, 10 Oct 2026 19:26:54 +0200
+Subject: [PATCH 09/15] Workspace swipe sensitivity
+ (WorkspaceSwipeSensitivity): less finger travel per workspace
+
+(cherry picked from commit 24b32344cd6f220a97cc4d8e016f2d597a6262a8)
+---
+ .../OmniWM/Core/Animation/WorkspaceSwipeMotion.swift | 12 +++++++++++-
+ .../OmniWM/Core/Input/TrackpadGestureIntent.swift    |  5 ++++-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/Sources/OmniWM/Core/Animation/WorkspaceSwipeMotion.swift b/Sources/OmniWM/Core/Animation/WorkspaceSwipeMotion.swift
+index ea87315e..cdedcd69 100644
+--- a/Sources/OmniWM/Core/Animation/WorkspaceSwipeMotion.swift
++++ b/Sources/OmniWM/Core/Animation/WorkspaceSwipeMotion.swift
+@@ -4,7 +4,17 @@
+ import Foundation
+ 
+ final class WorkspaceSwipeMotion {
+-    static let travelUnits = 300.0
++    /// `defaults write com.barut.OmniWM WorkspaceSwipeSensitivity -float 1.8`: less finger travel
++    /// per workspace (0.5 ... 3; default 1).
++    static var sensitivity: Double {
++        let value = UserDefaults.standard.double(forKey: "WorkspaceSwipeSensitivity")
++        return value > 0 ? min(3, max(0.5, value)) : 1
++    }
++
++    static var travelUnits: Double {
++        300.0 / sensitivity
++    }
++
+     static let progressBounds = -0.30 ... 1.30
+     private static let resistance = 0.55
+     private static let stretch = 0.30
+diff --git a/Sources/OmniWM/Core/Input/TrackpadGestureIntent.swift b/Sources/OmniWM/Core/Input/TrackpadGestureIntent.swift
+index 1a4d23bb..9b8179ee 100644
+--- a/Sources/OmniWM/Core/Input/TrackpadGestureIntent.swift
++++ b/Sources/OmniWM/Core/Input/TrackpadGestureIntent.swift
+@@ -81,7 +81,10 @@ enum TrackpadGestureIntent {
+         }
+     }
+ 
+-    static let workspaceSwipeTriggerUnits: CGFloat = 140.0
++    static var workspaceSwipeTriggerUnits: CGFloat {
++        140.0 / CGFloat(WorkspaceSwipeMotion.sensitivity)
++    }
++
+     static let workspaceSwipeReleaseVelocityFloor: Double = 800.0
+ 
+     static func effectiveWorkspaceSwipeAxis(

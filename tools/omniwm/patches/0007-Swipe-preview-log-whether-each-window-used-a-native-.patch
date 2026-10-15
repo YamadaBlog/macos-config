@@ -1,7 +1,7 @@
-From 797ce59105aceace80a8eef741bff63a628087c8 Mon Sep 17 00:00:00 2001
+From 34428c02ebc8c0e178495b2d634eaba70119daf1 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Thu, 15 Oct 2026 17:36:24 +0200
-Subject: [PATCH 7/7] Swipe preview: log whether each window used a native
+Subject: [PATCH 07/15] Swipe preview: log whether each window used a native
  snapshot or the stream capture
 
 ---
