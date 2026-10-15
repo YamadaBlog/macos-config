@@ -101,12 +101,13 @@ def conflicts_with_typing(binding):
 
 
 def palette_border():
-    """Couleur de bordure = base0D (accent) de la palette Stylix (~/.config/stylix/palette.json), si présente."""
-    import json, os
-    f = os.path.expanduser("~/.config/stylix/palette.json")
-    if not os.path.exists(f):
+    """Border colour = base0D (accent) of the palette in home-manager/palette.nix (the source of truth,
+    generated from the wallpaper), so the result is the same on every machine and in CI."""
+    nix = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "home-manager", "palette.nix")
+    m = re.search(r'base0D\s*=\s*"#?([0-9a-fA-F]{6})"', open(nix).read()) if os.path.exists(nix) else None
+    if not m:
         return
-    h = json.load(open(f))["base0D"]
+    h = m.group(1)
     r, g, b = (round(int(h[i:i + 2], 16) / 255, 4) for i in (0, 2, 4))
     SECTIONS["[borders.color]"] = {"red": str(r), "green": str(g), "blue": str(b), "alpha": "0.85"}
 
