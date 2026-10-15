@@ -11,8 +11,8 @@ Empty workspaces are skipped. Details: `docs/omniwm.md`.
 |---|---|
 | **Ctrl+1…9** | go to workspace 1–9 |
 | **Ctrl+Shift+1…9** | send the active window to that workspace |
-| **Ctrl+← → / Hyper+↑ ↓** | focus the neighbouring window |
-| **Ctrl+Shift+← → / Hyper+Shift+↑ ↓** | move the window |
+| **Ctrl+← → ↑ ↓** | focus the neighbouring window |
+| **Ctrl+Shift+← → ↑ ↓** | move the window (Dwindle: swap with the neighbour; Niri: ←/→ into the next column, ↑/↓ inside the column) |
 | **Option+Tab** | previous window (also across workspaces) |
 | **Ctrl+Option+Tab** | previous workspace |
 | **Ctrl+Option+W / A** | grow / shrink the active window |
@@ -56,7 +56,7 @@ Full OmniWM list: the `[[hotkeys]]` entries of `tools/omniwm/config/settings.tom
 | **3 fingers left / right** | OmniWM | scroll Niri columns (Niri workspaces only) |
 | **4 fingers up** | OmniWM | Overview (also Hyper+O); click a window to jump to it |
 
-macOS 3- and 4-finger swipes and the Mission Control gesture are disabled by `scripts/macos-defaults.sh`.
+macOS 3- and 4-finger swipes and the Mission Control gesture are disabled in `home-manager/macos.nix`.
 
 ## Technical notes
 - **OmniWM binds physical key positions (QWERTY names).** In `settings.toml`, printed AZERTY **W** is `Z`,

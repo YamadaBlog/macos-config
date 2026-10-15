@@ -41,12 +41,18 @@ Before changing anything listed here, read the entry and keep its verification p
 - **Safari after a workspace switch (2026-10-09), established:** the Safari window had become *floating*,
   and ws-hide only refocused tiled windows. Fix: app rules force `layout = "tile"` for Safari/Ghostty/
   Discord/Finder, ws-hide also considers floating windows. Verified 8/8 manual switches.
-- **Open (2026-10-15):** intermittent "Safari ignores the first clicks after a switch". Logs showed the
-  macOS state consistent (Safari active, right window main/focused) after a focus-follows-mouse hand-off
-  between two Safari windows; the cause is **not established**. Investigation tools: a passive probe that
-  logs front app, focused window, clicks and the clicked window's traffic-light colour, plus
-  `/usr/bin/log stream --predicate 'eventMessage CONTAINS "SETFRONT:"'` (who activates which app).
-  Hypothesis to test next: same-app focus hand-off leaves the window non-key (B5 above).
+- **Open — several windows of one app drawn as active (2026-10-16, reproduced):** 4 Ghostty windows showed
+  coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
+  the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the
+  app's *current* key window whatever window id it carries; the key-window records (0x01/0x02) are routed by
+  WindowServer and interact with focus-follows-mouse. A patch that sent the deactivation record to every other
+  window of the app did **not** clear a stale window (reverted). Cause **not established**; next tests:
+  (1) a day with `focus.followsMouse = false` to see whether same-app hover hand-offs create the stale windows,
+  (2) re-assert the key window through AX after each hand-off (the earlier key-window reconcile).
+  Measuring tools: count windows whose traffic-light area is coloured (screen capture of each window's top-left
+  corner) and compare with `AXFocusedWindow` of the app.
+- Safari ignoring its first clicks after a switch is probably the same family (window not key while it looks
+  it, or the reverse).
 
 ### B6 — Black strip / black line / "transparent column" at the screen edges
 | Step | Symptom | Cause (established) | Fix |
@@ -87,7 +93,7 @@ Before changing anything listed here, read the entry and keep its verification p
   ws-hide kept its name but only refocuses.
 - **Missed swipes on diagonal starts (established):** a diagonal start resolved to no mode. Fix existed
   — **not in the current build**.
-- **Empty screens on switch (established):** Stage Manager was on; now off (`scripts/macos-defaults.sh`).
+- **Empty screens on switch (established):** Stage Manager was on; now off (`home-manager/macos.nix`).
 
 ### B10 — Grey previews in the Overview
 - **Cause (established):** hidden apps cannot be captured; also missing Screen Recording permission.
@@ -97,7 +103,7 @@ Before changing anything listed here, read the entry and keep its verification p
 ### B11 — Trackpad gestures fought with macOS (Mission Control behind the Overview)
 - **Cause (established):** macOS still owned 3/4-finger swipes (including the per-host key
   `com.apple.trackpad.threeFingerVertSwipeGesture` and the Dock's `showMissionControlGestureEnabled`).
-- **Fix:** all of them declared in `scripts/macos-defaults.sh` (preview / `--write` with restore script).
+- **Fix:** all of them declared in `home-manager/macos.nix` (applied by Home Manager); `scripts/macos-defaults.sh` checks the live Mac.
 - **Verify:** `scripts/macos-defaults.sh` exits 0; `scripts/doctor.sh`.
 
 ### B12 — Turning Accessibility off froze all input

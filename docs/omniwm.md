@@ -48,7 +48,7 @@ Their history: `docs/bugs.md`.
 |---|---|
 | `~/.config/omniwm/settings.toml` ↔ `tools/omniwm/config/settings.toml` | the full OmniWM config (captured copy) |
 | `tools/omniwm/apply-registry.py` | enforces the parts this repo owns: hotkeys, gestures, workspace names, gaps, layouts, Overview look, and `singleWindowFit` computed from the main screen. Preview by default, `--write` with OmniWM **quit** (it rewrites the file otherwise). `scripts/theme-sync.sh` runs it on every wallpaper change, so the registry must always describe the wanted state (`scripts/check.sh` tests that it changes nothing in the captured file). |
-| `defaults write com.barut.OmniWM …` | the two patch options (0001, 0002); set by `scripts/macos-defaults.sh` |
+| `defaults write com.barut.OmniWM …` | the two patch options (0001, 0002); set by `home-manager/macos.nix` |
 
 ## 3. Workspaces and layouts
 | # | Name | Layout | Apps assigned by rule |
@@ -90,7 +90,7 @@ the workspace swipe automatically takes the other axis (vertical). A diagonal st
 fix for that is not in this build, see §1).
 
 macOS must not see these gestures, otherwise Mission Control / Spaces animate behind OmniWM's:
-`scripts/macos-defaults.sh` turns off the macOS 3- and 4-finger swipes (built-in and Bluetooth trackpad
+`home-manager/macos.nix` turns off the macOS 3- and 4-finger swipes (built-in and Bluetooth trackpad
 domains + the per-host keys) and the Mission Control / App Exposé trackpad gestures
 (`com.apple.dock showMissionControlGestureEnabled = 0`).
 
@@ -119,8 +119,8 @@ Hyper = Control+Option+Command. Option alone is never bound (it types `{ } [ ] |
 |---|---|
 | Control+1…9 / Control+Shift+1…9 | go to workspace N / send the window there |
 | Control+Option+Tab | previous workspace (back and forth) |
-| Control+←/→, Hyper+↑/↓ | focus left/right/up/down |
-| Control+Shift+←/→, Hyper+Shift+↑/↓ | move the window |
+| Control+←/→/↑/↓ | focus the neighbouring window |
+| Control+Shift+←/→/↑/↓ | move the window: Dwindle swaps with the neighbour; Niri ←/→ moves it into the next column (stacks there), ↑/↓ reorders it inside its column |
 | Control+Option+Shift+←/→ | move the column (Niri) |
 | Control+Option+Shift+↑/↓ (PgUp/PgDn = column) | send window / column to the workspace above/below |
 | Control+Option+1…9, Home/End | focus column N, move column to first/last |

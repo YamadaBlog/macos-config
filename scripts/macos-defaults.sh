@@ -1,70 +1,47 @@
 #!/bin/bash
-# macOS settings this setup depends on, declared once (desired state).
-#   scripts/macos-defaults.sh            preview: current vs wanted, writes nothing (exit 1 if any differ)
-#   scripts/macos-defaults.sh --write    back up the current values to a restore script, then apply
-# The restore script (printed at the end) puts back every value it changed, including "absent".
-# Why each gesture value: docs/omniwm.md "Gestures"; macOS must not own 3-finger swipes (OmniWM does)
-# nor the 4-finger up swipe (OmniWM Overview), otherwise Mission Control opens behind the Overview.
+# Compare the macOS settings declared in home-manager/macos.nix with this Mac (read-only).
+#   scripts/macos-defaults.sh          list every declared setting whose live value differs; exit 1 if any
+#   scripts/macos-defaults.sh --write  apply them = activate Home Manager (scripts/apply.sh home-manager --write)
+# Home Manager is the only writer (targets.darwin.defaults); rollback = previous generation (docs/recovery.md).
 . "$(dirname "$0")/lib.sh"
-write=0; [ "${1:-}" = --write ] && write=1
-# domain | key | type | value     ("-currentHost" prefix = per-host global domain)
-WANTED='
-com.apple.dock|autohide|bool|true
-com.apple.dock|tilesize|int|43
-com.apple.dock|orientation|string|left
-com.apple.dock|show-recents|bool|false
-com.apple.dock|magnification|bool|false
-com.apple.dock|mru-spaces|bool|false
-com.apple.dock|showMissionControlGestureEnabled|bool|false
-com.apple.dock|showAppExposeGestureEnabled|bool|false
-com.apple.finder|ShowPathbar|bool|true
-com.apple.finder|ShowStatusBar|bool|true
-com.apple.finder|FXPreferredViewStyle|string|icnv
-NSGlobalDomain|AppleShowAllExtensions|bool|true
-NSGlobalDomain|AppleInterfaceStyle|string|Dark
-NSGlobalDomain|_HIHideMenuBar|bool|true
-NSGlobalDomain|KeyRepeat|int|2
-NSGlobalDomain|InitialKeyRepeat|int|15
-NSGlobalDomain|com.apple.swipescrolldirection|bool|true
-com.apple.WindowManager|GloballyEnabled|bool|false
-com.apple.AppleMultitouchTrackpad|Clicking|bool|true
-com.apple.AppleMultitouchTrackpad|TrackpadThreeFingerDrag|bool|false
-com.apple.AppleMultitouchTrackpad|TrackpadThreeFingerHorizSwipeGesture|int|0
-com.apple.AppleMultitouchTrackpad|TrackpadThreeFingerVertSwipeGesture|int|0
-com.apple.AppleMultitouchTrackpad|TrackpadFourFingerHorizSwipeGesture|int|0
-com.apple.AppleMultitouchTrackpad|TrackpadFourFingerVertSwipeGesture|int|0
-com.apple.driver.AppleBluetoothMultitouch.trackpad|TrackpadThreeFingerHorizSwipeGesture|int|0
-com.apple.driver.AppleBluetoothMultitouch.trackpad|TrackpadThreeFingerVertSwipeGesture|int|0
-com.apple.driver.AppleBluetoothMultitouch.trackpad|TrackpadFourFingerHorizSwipeGesture|int|0
-com.apple.driver.AppleBluetoothMultitouch.trackpad|TrackpadFourFingerVertSwipeGesture|int|0
--currentHost NSGlobalDomain|com.apple.trackpad.threeFingerHorizSwipeGesture|int|0
--currentHost NSGlobalDomain|com.apple.trackpad.threeFingerVertSwipeGesture|int|0
--currentHost NSGlobalDomain|com.apple.trackpad.fourFingerVertSwipeGesture|int|0
-com.barut.OmniWM|OverviewHideWorkspaceLabels|bool|true
-com.barut.OmniWM|OverviewHideSearchBar|bool|true
-'
-norm() { case "$1|$2" in bool\|true|bool\|1) echo 1;; bool\|false|bool\|0) echo 0;; *) echo "$2";; esac; }
-restore="$STATE/backups/macos-defaults-$(date +%Y%m%d-%H%M%S).restore.sh"
-diff=0; changed=0
-[ "$write" = 1 ] && { mkdir -p "$(dirname "$restore")"; echo '#!/bin/bash' > "$restore"; }
-while IFS='|' read -r dom key type val; do
-  [ -n "$dom" ] || continue
-  host=""; case "$dom" in "-currentHost "*) host="-currentHost"; dom="${dom#-currentHost }";; esac
-  # shellcheck disable=SC2086  # $host is empty or one flag
-  cur="$(defaults $host read "$dom" "$key" 2>/dev/null)" || cur="(absent)"
-  want="$(norm "$type" "$val")"
-  [ "$(norm "$type" "$cur")" = "$want" ] && continue
-  diff=1; printf '  %-58s now=%-10s want=%s\n' "${host:+$host }$dom $key" "$cur" "$val"
-  [ "$write" = 1 ] || continue
-  if [ "$cur" = "(absent)" ]; then echo "defaults $host delete '$dom' '$key'" >> "$restore"
-  else echo "defaults $host write '$dom' '$key' -$type '$cur'" >> "$restore"; fi
-  # shellcheck disable=SC2086
-  defaults $host write "$dom" "$key" "-$type" "$val"; changed=1
-done <<< "$WANTED"
-if [ "$diff" = 0 ]; then echo "macOS settings: all as wanted."; exit 0; fi
-if [ "$write" = 0 ]; then echo "Preview only (--write to apply, with a restore script)."; exit 1; fi
-if [ "$changed" = 1 ]; then
-  killall Dock Finder SystemUIServer 2>/dev/null || true
-  /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u 2>/dev/null || true
-  chmod +x "$restore"; echo "Applied. Restore: bash $restore  (then log out/in for trackpad settings)"
-fi
+if [ "${1:-}" = --write ]; then exec "$REPO/scripts/apply.sh" home-manager --write; fi
+cd "$REPO/home-manager" || exit 2
+attr='.#homeConfigurations.mac.config'
+want="$(MACOS_CONFIG_REPO="$REPO" nix eval --impure --json "$attr.targets.darwin" \
+  --apply 't: { d = t.defaults; h = t.currentHostDefaults; }' 2>/dev/null)" \
+  || { echo "Cannot evaluate home-manager/macos.nix (nix eval failed)." >&2; exit 2; }
+hot="$(grep -oE 'disabledHotkeys = \[[^]]*\]' "$REPO/home-manager/macos.nix" | tr -cd '0-9 ')"
+python3 -I - "$want" "$hot" <<'PY'
+import json, plistlib, subprocess, sys, os
+want = json.loads(sys.argv[1]); hot = sys.argv[2].split()
+def export(domain, host=False):
+    cmd = ["defaults"] + (["-currentHost"] if host else []) + ["export", "-g" if domain == "NSGlobalDomain" else domain, "-"]
+    out = subprocess.run(cmd, capture_output=True).stdout
+    try: return plistlib.loads(out) if out else {}
+    except Exception: return {}
+def same(a, b):
+    if isinstance(b, bool) or isinstance(a, bool): return bool(a) == bool(b) if a is not None else False
+    if isinstance(b, float) or isinstance(a, float):
+        try: return abs(float(a) - float(b)) < 1e-6
+        except (TypeError, ValueError): return False
+    return a == b
+diff = 0
+for host, table in ((False, want["d"]), (True, want["h"])):
+    for dom, keys in table.items():
+        live = export(dom, host)
+        for k, v in keys.items():
+            if v is None: continue   # option left unset (null): not managed
+            cur = live.get(k)
+            if not same(cur, v):
+                diff += 1
+                print(f"  {'-currentHost ' if host else ''}{dom} {k}: now={cur!r} want={v!r}")
+p = os.path.expanduser("~/Library/Preferences/com.apple.symbolichotkeys.plist")
+try: sk = plistlib.load(open(p, "rb")).get("AppleSymbolicHotKeys", {})
+except Exception: sk = {}
+for n in hot:
+    if sk.get(n, {}).get("enabled", True):
+        diff += 1; print(f"  symbolic hotkey {n}: enabled (want disabled)")
+print("macOS settings: all as declared." if diff == 0 else
+      f"{diff} setting(s) differ. Apply: scripts/macos-defaults.sh --write (then log out/in for trackpad settings).")
+sys.exit(1 if diff else 0)
+PY

@@ -27,10 +27,7 @@ gen="$(readlink -f "$HOME/.local/state/nix/profiles/home-manager" 2>/dev/null)"
 for c in rg fzf zoxide jq starship fd gh atuin; do have "$c" || fail "$c not on PATH" "open a new terminal; else scripts/apply.sh home-manager --write"; done
 HOMEBREW_NO_AUTO_UPDATE=1 brew bundle check --file="$REPO/homebrew/Brewfile" >/dev/null 2>&1 && ok "Brewfile satisfied" || warn "Brewfile not fully installed" "scripts/apply.sh homebrew --write"
 
-echo "== Identity (install.sh writes these)"
-idf="$REPO/home-manager/identity.nix"
-grep -q "username = \"$(id -un)\"" "$idf" && ok "home-manager/identity.nix = $(id -un)" || fail "identity.nix is for another user" "./install.sh (step identity) or edit $idf"
-grep -q "repoDir = \"$REPO\"" "$idf" && ok "repoDir = $REPO" || fail "identity.nix repoDir is not this clone" "./install.sh (step identity)"
+echo "== Identity"
 [ "$(cat "$HOME/.config/macos-config/repo" 2>/dev/null)" = "$REPO" ] && ok "$HOME/.config/macos-config/repo" || fail "$HOME/.config/macos-config/repo missing or stale" "./install.sh (step identity)"
 
 echo "== OmniWM"

@@ -30,12 +30,13 @@ REGISTRY = {
     "moveToWorkspace.2": "Control+Shift+3", "moveToWorkspace.3": "Control+Shift+4",
     # Fenêtre précédente : Option+Tab ne tape aucun caractère (exception à la règle « pas d'Option seul »).
     "focusPrevious": "Option+Tab",
-    # Gauche/droite entre fenêtres (colonnes) : Ctrl+flèche ; déplacer : Ctrl+Shift+flèche.
-    # Reprennent les raccourcis macOS « espace précédent/suivant » (symbolichotkeys 79-82, désactivés : un seul espace).
+    # Four directions, one scheme: Control+arrow = focus, Control+Shift+arrow = move (swap with the
+    # neighbour; in a Niri column up/down reorders the stack). macOS held these chords (symbolic hotkeys
+    # 79-82 spaces, 32-35 Mission Control / application windows): disabled in home-manager/macos.nix.
     "focus.left": "Control+Left Arrow", "focus.right": "Control+Right Arrow",
-    "focus.up": H + "Up Arrow", "focus.down": H + "Down Arrow",
+    "focus.up": "Control+Up Arrow", "focus.down": "Control+Down Arrow",
     "move.left": "Control+Shift+Left Arrow", "move.right": "Control+Shift+Right Arrow",
-    "move.up": HS + "Up Arrow", "move.down": HS + "Down Arrow",
+    "move.up": "Control+Shift+Up Arrow", "move.down": "Control+Shift+Down Arrow",
     "toggleOverview": H + "O",
     "openCommandPalette": H + "Space",
     "toggleQuakeTerminal": H + "Return",

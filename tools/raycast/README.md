@@ -4,7 +4,7 @@ Launcher and the single clipboard history. Free version, no account needed.
 
 - **Install:** Homebrew cask. **Start:** Raycast's own "Open at Login" (the only startup mechanism).
 - **Permission:** Accessibility.
-- **Depends on:** Spotlight removed from Cmd+Space (symbolichotkeys 64 disabled by `scripts/macos-defaults.sh`).
+- **Depends on:** Spotlight removed from Cmd+Space (symbolichotkeys 64 disabled in `home-manager/macos.nix`).
 - **Config:** stored in Raycast's encrypted databases; nothing is captured in this repo.
 
 ## Manual setup

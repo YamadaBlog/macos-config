@@ -13,7 +13,8 @@ bk="$STATE/backups/apply-$(date +%Y%m%d-%H%M%S)"
 case "$id" in
   home-manager)
     cd "$REPO/home-manager" || exit 2
-    nix build '.#homeConfigurations.mac.activationPackage' --out-link result-home || exit 1
+    # identity.nix reads USER, HOME and MACOS_CONFIG_REPO: impure on purpose (no personal value in the repo).
+    MACOS_CONFIG_REPO="$REPO" nix build --impure '.#homeConfigurations.mac.activationPackage' --out-link result-home || exit 1
     echo "Construit : $(readlink result-home)"; echo "Active    : $(readlink -f "$HOME/.local/state/nix/profiles/home-manager")"
     [ "$write" = 1 ] || { echo "Aperçu seulement (--write pour activer)."; exit 0; }
     prev="$(readlink -f "$HOME/.local/state/nix/profiles/home-manager")"

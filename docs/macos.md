@@ -1,20 +1,38 @@
 # macOS settings, permissions, startup and secrets
 
 ## System settings
-All macOS preferences this setup changes are declared in **`scripts/macos-defaults.sh`** (single source of truth;
-values are not repeated here). It covers Dock, Finder, Spaces, menu bar, keyboard shortcuts and trackpad, including:
-- Spaces not reordered by use; Stage Manager off (it fights OmniWM: empty screens, windows piled up as thumbnails);
-- macOS Ctrl+←/→ Space shortcuts (symbolichotkeys 79–82) disabled for OmniWM; Spotlight's Cmd+Space (64) disabled for Raycast;
-- macOS 3/4-finger swipes and the Mission Control gesture disabled (OmniWM owns them, see `docs/shortcuts.md`).
 
-Run it without arguments to preview, with `--write` to apply. `--write` first creates a restore script
-(see `docs/recovery.md`). `scripts/verify.sh` flags drift (e.g. Stage Manager turned on from Control Center).
+### Automated (declared in Nix, applied by Home Manager)
+**`home-manager/macos.nix`** is the single source of truth (`targets.darwin.defaults`, user level, no sudo),
+applied by `scripts/apply.sh home-manager --write` and checked against the live Mac by
+`scripts/macos-defaults.sh` (also run by `verify.sh` and `doctor.sh`). It covers:
 
-Notes:
-- On a display with a notch, macOS keeps the top band out of the usable area even with the menu bar hidden;
-  hiding the menu bar frees no space for windows there.
-- Do not re-enable `com.apple.talagent` if a debloat tool disabled it.
-- nix-darwin is not used: see `docs/architecture.md`.
+| Area | Settings |
+|---|---|
+| Trackpad (built-in and Magic Trackpad) | tap to click, tap to drag, no three-finger drag, three-finger tap = look up, tracking speed, scrolling speed, natural scrolling, force click off, click thresholds |
+| Gestures | macOS 3- and 4-finger swipes off (per-host keys too); Mission Control and App Exposé trackpad gestures off — OmniWM owns them |
+| Keyboard | key repeat 2 / delay 15, French typographic quotes; **macOS shortcuts disabled** so their keys stay free: Spotlight Cmd+Space (→ Raycast), Control+←/→ spaces, Control+↑/↓ and Control+Shift+↑/↓ Mission Control (→ OmniWM focus/move), Control+1… desktops, input-source switching, Launchpad, Notification Center |
+| Dock & Mission Control | auto-hide, left, size 43, no magnification, no recent apps, Spaces never reordered, bottom-right hot corner = Quick Note |
+| Windows | Stage Manager off (it fights OmniWM), widgets hidden, minimise on double-click off |
+| Finder | path bar, status bar, icon view, all file extensions shown |
+| Appearance | Dark mode, auto-hidden menu bar (also in full screen), clock with day of week, no interface sound effects |
+| OmniWM options | `OverviewHideWorkspaceLabels`, `OverviewHideSearchBar` (patches 0001–0002) |
+
+The Dock, Finder and menu bar restart once when these values change. Trackpad changes need a logout to reach
+every app. Rollback: previous Home Manager generation (`docs/recovery.md`).
+
+### Owned by other scripts
+- Accent and highlight colours: `scripts/theme-apply.sh` (follow the wallpaper palette).
+- OmniWM hotkeys, layouts, gaps, gestures: `tools/omniwm/apply-registry.py`.
+
+### Manual (macOS gives no reliable command, or they are personal)
+| Setting | Where | Reference value |
+|---|---|---|
+| Keyboard layout | System Settings → Keyboard → Input Sources | French (AZERTY), the shortcut registry assumes it |
+| Display resolution | System Settings → Displays | "More Space" on a 16" MacBook Pro; `apply-registry.py` adapts window sizes to any resolution |
+| Wallpaper | System Settings → Wallpaper | any image: the colour palette is derived from it |
+| Permissions | System Settings → Privacy & Security | see "Permissions" below |
+| Accounts, Dock apps, iCloud, login items of your own apps | — | personal, not part of this setup |
 
 ## Permissions (TCC)
 Only the user can grant a permission: System Settings > Privacy & Security > <service>.

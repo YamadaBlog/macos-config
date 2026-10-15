@@ -21,10 +21,10 @@ Authority: the real machine (checked by `scripts/verify.sh` / `scripts/doctor.sh
 | GUI apps | `homebrew/Brewfile` (via `brew install --cask` + `scripts/capture.sh`) | `scripts/apply.sh homebrew` |
 | OmniWM behaviour (code) | a patch in `tools/omniwm/patches/` (workflow: `docs/omniwm.md` §1) | `tools/omniwm/build-local.sh` + targeted `swift test --filter` |
 | OmniWM settings owned by the repo (hotkeys, gestures, layouts, gaps, Overview) | `tools/omniwm/apply-registry.py` **and** `tools/omniwm/config/settings.toml` (must agree) | quit OmniWM, `apply-registry.py <settings> --write` |
-| macOS defaults (gestures, Dock, Finder, keyboard, OmniWM `defaults`) | `scripts/macos-defaults.sh` (`WANTED`) | preview, `--write` |
+| macOS settings (gestures, trackpad, keyboard, Dock, Finder, Mission Control, disabled macOS shortcuts, OmniWM `defaults`) | `home-manager/macos.nix` | `scripts/apply.sh home-manager --write`; check: `scripts/macos-defaults.sh` |
 | Hammerspoon helpers | `tools/hammerspoon/config/*.lua` (+ a row in `tools/configs.tsv` for new files) | `scripts/apply.sh hammerspoon --write` |
 | Neru, Stats, Ghostty | `tools/<tool>/config/` | `scripts/apply.sh <tool>` |
-| Machine-specific values | never in code: `install.sh` writes `*/identity.nix` and `~/.config/macos-config/repo` | `./install.sh --run identity` |
+| Machine-specific values | never in the repo: `identity.nix` reads `USER`/`HOME`/`MACOS_CONFIG_REPO` at build time (`--impure`, done by `scripts/apply.sh`); the clone path is in `~/.config/macos-config/repo` | `./install.sh --run identity` |
 | New tool | Brewfile or `home.nix` + `tools/<id>/README.md` if it has a config (+ row in `tools/configs.tsv`) | `scripts/verify.sh` = 0 |
 
 ## 3. Invariants (keep them)
@@ -34,7 +34,7 @@ Authority: the real machine (checked by `scripts/verify.sh` / `scripts/doctor.sh
   `brew upgrade` OmniWM, never ship an ad-hoc signed build (permissions are lost on each rebuild).
 - **Registry = wanted state.** `theme-sync.sh` re-applies `apply-registry.py` on every wallpaper change; if
   the registry disagrees with `tools/omniwm/config/settings.toml` the user's settings get reverted (B16).
-- **macOS must not own 3/4-finger swipes** (B11). Declared in `scripts/macos-defaults.sh`.
+- **macOS must not own 3/4-finger swipes** (B11). Declared in `home-manager/macos.nix`.
 - **ws-hide.lua never hides apps** (B9, B10); `margin-veil.lua` stays below OmniWM's panels and swallows
   clicks (B6). Screenshots do not show OmniWM's own surfaces: verify edges by eye/photo.
 - **No hardcoded user or clone paths in code** (`scripts/check.sh` enforces it). Scripts find the repo from
@@ -71,7 +71,7 @@ Push to GitHub only after `scripts/check.sh` passes; never commit personal data 
 ## 6. Repo layout
 ```
 install.sh  README.md  AGENTS.md  CONTRIBUTING.md  CHANGELOG.md  LICENSE.txt
-home-manager/        Nix flake (CLI, shell, theme, login agents); identity.nix written by install.sh
+home-manager/        Nix flake (CLI, shell, theme, login agents, macOS settings in macos.nix); identity.nix reads the environment
 homebrew/Brewfile    apps (hand-maintained; OmniWM deliberately absent)
 tools/omniwm/        UPSTREAM, patches/, build-local.sh, create-signing-cert.sh, apply-registry.py, config/
 tools/hammerspoon/   config/*.lua, check-margin-veil.sh
@@ -81,8 +81,8 @@ scripts/             doctor, verify, check, capture, apply, macos-defaults, them
 docs/                omniwm, bugs, architecture, shortcuts, macos, recovery; assets/
 wallpapers/          local copy of the wallpaper (ignored by git)
 ```
-nix-darwin is intentionally not used: Lix owns the Nix daemon and macOS settings live in
-`scripts/macos-defaults.sh` (one owner per function).
+nix-darwin is intentionally not used: Lix owns the Nix daemon, and Home Manager's
+user-level `targets.darwin.defaults` (home-manager/macos.nix) covers every setting without sudo.
 Private state of a machine (never committed): `~/.local/state/macos-power-user-deploy/` (backups, logs).
 
 ## 7. Known open items

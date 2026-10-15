@@ -18,7 +18,7 @@ backs up what it replaces and can be undone.
 | Automation | Hammerspoon: contexts (Hyper+P), refocus after a switch, clean screen edges, Accessibility guard | `tools/hammerspoon/` |
 | Keyboard navigation | Neru (hints, grid, scrolling) | `tools/neru/` |
 | Theme | Stylix palette derived from the wallpaper, applied to the terminal, CLI tools, Neru, OmniWM and the macOS accent; re-applied when the wallpaper changes | `scripts/theme-*.sh` |
-| macOS settings | Dock, Finder, key repeat, trackpad gestures handed to OmniWM | `scripts/macos-defaults.sh` |
+| macOS settings | trackpad, gestures, keyboard and disabled macOS shortcuts, Dock, Mission Control, Finder, Stage Manager, appearance — declared in Nix | `home-manager/macos.nix` ([list](docs/macos.md)) |
 
 ## How the windows work
 - **Workspace 1 (Focus)** tiles classically (Dwindle): each new window splits the space.
@@ -29,7 +29,7 @@ backs up what it replaces and can be undone.
 - **Trackpad**: 3 fingers up/down = previous/next workspace · 3 fingers left/right = scroll the columns ·
   4 fingers up = Overview of every workspace with live previews.
 - **Keyboard**: Control+1…9 = go to a workspace, Control+Shift+1…9 = send the window there, Control+arrows =
-  focus. Full map: [`docs/shortcuts.md`](docs/shortcuts.md) (written for a French AZERTY keyboard).
+  focus the neighbour, Control+Shift+arrows = move the window (all four directions). Full map: [`docs/shortcuts.md`](docs/shortcuts.md) (written for a French AZERTY keyboard).
 - No window ever touches a screen edge (8 pt gaps everywhere).
 
 Everything about OmniWM (build, layouts, gestures, Overview, focus, rendering, settings):
@@ -54,11 +54,11 @@ Each step is safe to re-run and can be run alone, e.g. `./install.sh --run omniw
 
 | Step | What it does | How to undo |
 |---|---|---|
-| `identity` | records your username, home and clone path (`home-manager/identity.nix`, `~/.config/macos-config/repo`) | `git checkout -- home-manager/identity.nix` |
+| `identity` | records where the clone lives (`~/.config/macos-config/repo`); your user name and home are read at build time, never stored | delete that file |
 | `backup` | copies your existing shell and app configs | copies are in `~/.local/state/macos-power-user-deploy/backups/install-*` |
 | `homebrew` | installs the missing apps of the Brewfile (never removes or upgrades) | `brew uninstall --cask <app>` |
 | `home-manager` | builds and activates the Nix configuration (CLI, shell, theme, login agents) | activate the previous generation ([recovery](docs/recovery.md)) |
-| `macos` | applies the macOS settings | run the restore script it prints |
+| `macos` | checks the macOS settings of `home-manager/macos.nix` (applied by the previous step) | previous Home Manager generation |
 | `omniwm` | creates a local code-signing certificate, builds the patched OmniWM, installs it | previous app kept in the backups folder |
 | `configs` | copies the OmniWM, Hammerspoon, Neru and Stats configs (each file backed up) and fits windows to your screen | backups printed by each copy |
 | `permissions` | lists the permissions to grant and opens System Settings | System Settings |
@@ -75,6 +75,10 @@ System Settings → Privacy & Security:
 Quit and reopen each app afterwards, then log out and back in once so the trackpad settings apply
 everywhere. OmniWM is signed with a local certificate, so these grants survive rebuilds.
 
+### Manual settings
+Keyboard layout (French AZERTY), display resolution and wallpaper are set by hand in System Settings;
+everything else is automated. The full split is in [`docs/macos.md`](docs/macos.md).
+
 ### Finish
 `scripts/doctor.sh` must end with `no failure`; each problem it reports comes with the command that fixes
 it. Raycast is the one app configured by hand: [`tools/raycast/README.md`](tools/raycast/README.md).
@@ -85,7 +89,7 @@ scripts/doctor.sh             # is everything installed and working?
 scripts/verify.sh             # does the machine still match the repo?
 scripts/capture.sh            # bring settings changed in the apps back into the repo (diff, then --accept)
 scripts/apply.sh <id>         # push a repo config to the machine (preview, then --write)
-scripts/macos-defaults.sh     # macOS settings: preview, then --write
+scripts/macos-defaults.sh     # are the declared macOS settings live? (--write = apply via Home Manager)
 tools/omniwm/build-local.sh   # rebuild OmniWM
 scripts/emergency-stop.sh     # stop OmniWM, Neru and Hammerspoon if input gets stuck
 ```
@@ -95,7 +99,7 @@ scripts/emergency-stop.sh     # stop OmniWM, Neru and Hammerspoon if input gets 
 |---|---|---|
 | CLI tools, shell, prompt | `home-manager/home.nix`, `shell.nix` | `scripts/apply.sh home-manager --write` |
 | Workspaces, layouts, gestures, hotkeys | `tools/omniwm/apply-registry.py` and `tools/omniwm/config/settings.toml` (keep them in agreement) | quit OmniWM, `python3 -I tools/omniwm/apply-registry.py ~/.config/omniwm/settings.toml --write` |
-| macOS settings | the `WANTED` list in `scripts/macos-defaults.sh` | `scripts/macos-defaults.sh --write` |
+| macOS settings | `home-manager/macos.nix` | `scripts/apply.sh home-manager --write` |
 | Terminal look | `home-manager/theme.nix` | `scripts/apply.sh home-manager --write` |
 | Colours | change your wallpaper: the palette follows within seconds | automatic |
 | Apps | `homebrew/Brewfile` | `scripts/apply.sh homebrew --write` |

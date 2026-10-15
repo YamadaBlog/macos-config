@@ -29,7 +29,7 @@ else echo "  skipped: Hammerspoon is not running"; fi
 
 if [ "${1:-}" = --hm ]; then
   echo "== Home Manager"
-  out="$(cd "$REPO/home-manager" && nix build '.#homeConfigurations.mac.activationPackage' --no-link --print-out-paths 2>/dev/null)"
+  out="$(cd "$REPO/home-manager" && MACOS_CONFIG_REPO="$REPO" nix build --impure '.#homeConfigurations.mac.activationPackage' --no-link --print-out-paths 2>/dev/null)"
   active="$(readlink -f "$HOME/.local/state/nix/profiles/home-manager" 2>/dev/null)"
   if [ -n "$out" ] && [ "$out" = "$active" ]; then echo "  ok       active generation = flake"
   else echo "  DRIFT    flake=$out active=$active (scripts/apply.sh home-manager --write)"; rc=1; fi

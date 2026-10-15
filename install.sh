@@ -37,14 +37,11 @@ prereqs() {
 }
 
 step_identity() {
-  say "identity: write your username, home and repo location (home-manager/identity.nix, ~/.config/macos-config/repo)"
-  echo "  username=$(id -un) homeDirectory=$HOME repoDir=$REPO"
-  ask "Write these values?" || return 0
-  printf '# Machine-specific values. Written by ./install.sh (from `id -un`, $HOME and the clone location);\n# edit by hand only if you do not use install.sh.\n{ username = "%s"; homeDirectory = "%s"; repoDir = "%s"; }\n' "$(id -un)" "$HOME" "$REPO" > "$REPO/home-manager/identity.nix"
-  # Keep these values local: git keeps the placeholder, Nix reads the file on disk.
-  git -C "$REPO" update-index --skip-worktree home-manager/identity.nix
+  say "identity: record where this clone lives (~/.config/macos-config/repo); user and home are read at build time"
+  echo "  user=$(id -un) home=$HOME repo=$REPO"
+  ask "Record it?" || return 0
   mkdir -p "$HOME/.config/macos-config"; echo "$REPO" > "$HOME/.config/macos-config/repo"
-  echo "  done (identity.nix is now local to this Mac: git ignores its changes)"
+  echo "  done"
 }
 
 step_backup() {
@@ -74,7 +71,6 @@ step_home_manager() {
     echo "  Nix is not installed. This setup uses Lix: read https://lix.systems/install/ and run its installer"
     echo "  yourself (it asks for your password), open a new terminal, then: ./install.sh --run home-manager"; return 0
   fi
-  grep -q "username = \"$(id -un)\"" "$REPO/home-manager/identity.nix" || { echo "  Run the identity step first."; return 0; }
   echo "  Existing ~/.zshrc etc.: Home Manager refuses to overwrite unmanaged files; it fails and lists them."
   echo "  They were backed up by the backup step: move them aside (mv ~/.zshrc ~/.zshrc.before-hm) and re-run."
   ask "Build and activate the Home Manager configuration?" || return 0
@@ -82,10 +78,8 @@ step_home_manager() {
 }
 
 step_macos() {
-  say "macos: Dock, Finder, keyboard repeat, trackpad gestures handed to OmniWM, Mission Control gesture off"
-  "$REPO/scripts/macos-defaults.sh"
-  ask "Apply (a restore script is written first)?" || return 0
-  "$REPO/scripts/macos-defaults.sh" --write
+  say "macos: check the macOS settings of home-manager/macos.nix (applied by the home-manager step)"
+  "$REPO/scripts/macos-defaults.sh" || echo "  Re-run the home-manager step, then log out and back in."
 }
 
 step_omniwm() {

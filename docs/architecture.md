@@ -32,14 +32,14 @@ OmniWM details: `docs/omniwm.md`. Shortcuts: `docs/shortcuts.md`. macOS settings
 | Launcher | Raycast (Cmd+Space) | Spotlight shortcut (disabled) |
 | Clipboard history | Raycast | OmniWM (`clipboard.historyEnabled = false`) |
 | 2-finger gestures | macOS / apps | OmniWM |
-| 3-finger and 4-finger-up gestures | OmniWM | macOS (disabled by `scripts/macos-defaults.sh`) |
+| 3-finger and 4-finger-up gestures | OmniWM | macOS (disabled in `home-manager/macos.nix`) |
 | Theme / palette | Stylix, palette generated from the wallpaper (`scripts/theme-auto.sh` → `home-manager/palette.nix`); `scripts/theme-apply.sh` → Neru, macOS accent, OmniWM | hand-edited colors |
-| macOS preferences | `scripts/macos-defaults.sh` | nix-darwin |
+| macOS preferences | Home Manager `home-manager/macos.nix` (checked by `scripts/macos-defaults.sh`) | nix-darwin, hand-run `defaults write` |
 | App startup | Home Manager LaunchAgents (`home-manager/startup.nix`); Raycast: its own | apps' internal "open at login" |
 
 ## Decisions
 - **nix-darwin is intentionally not used.** Lix owns the Nix daemon; macOS settings are applied (and reversible)
-  through `scripts/macos-defaults.sh`.
+  through `home-manager/macos.nix` (checked by `scripts/macos-defaults.sh`).
 - **One tool per function** (windows, clipboard, gestures, packages); nothing is installed "just in case".
 - **OmniWM** is the only window manager, built locally from a pinned upstream commit plus patches.
   Rejected alternatives: AeroSpace, yabai, Paneru.

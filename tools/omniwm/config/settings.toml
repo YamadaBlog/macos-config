@@ -550,11 +550,11 @@ binding = "Control+Left Arrow"
 id = "focus.left"
 
 [[hotkeys]]
-binding = "Hyper+Down Arrow"
+binding = "Control+Down Arrow"
 id = "focus.down"
 
 [[hotkeys]]
-binding = "Hyper+Up Arrow"
+binding = "Control+Up Arrow"
 id = "focus.up"
 
 [[hotkeys]]
@@ -662,11 +662,11 @@ binding = "Control+Shift+Left Arrow"
 id = "move.left"
 
 [[hotkeys]]
-binding = "Hyper+Shift+Down Arrow"
+binding = "Control+Shift+Down Arrow"
 id = "move.down"
 
 [[hotkeys]]
-binding = "Hyper+Shift+Up Arrow"
+binding = "Control+Shift+Up Arrow"
 id = "move.up"
 
 [[hotkeys]]

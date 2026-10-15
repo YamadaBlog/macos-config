@@ -35,7 +35,7 @@ so they work from Terminal.app, SSH or a shell without profile.
 | CLI package | remove it from `home-manager/home.nix`, then `home-manager switch --flake <repo>/home-manager#mac` |
 | Homebrew app | quit it, remove its startup agent, `brew uninstall --cask <app>` |
 | OmniWM (local build) | quit, put `backups/OmniWM-local-prev.app` back in place of the installed app, then `launchctl kickstart gui/$(id -u)/org.nix-community.home.omniwm`; config: `backups/omniwm-*/settings.toml` (see `docs/omniwm.md`) |
-| macOS settings | `bash backups/macos-defaults-<date>.restore.sh` (created by `scripts/macos-defaults.sh --write`), then log out and in for trackpad settings |
+| macOS settings | activate the previous Home Manager generation (they are part of it), then log out and in |
 | `install.sh` | files it replaced are saved under `backups/install-<date>/` |
 | Lix | `/nix/nix-installer uninstall` (never `rm -rf /nix`) |
 
