@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="360" viewBox="0 0 760 360" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="13">
+  <title>Workspaces and gestures</title>
+  <rect width="760" height="360" rx="14" fill="#151924"/>
+  <!-- W1 Dwindle -->
+  <text x="40" y="40" fill="#c8d3f5" font-weight="600">1 · Focus — Dwindle (classic tiling)</text>
+  <rect x="40" y="52" width="300" height="120" rx="8" fill="#2b3350"/>
+  <rect x="48" y="60" width="140" height="104" rx="6" fill="#4d5d8f"/>
+  <rect x="196" y="60" width="136" height="48" rx="6" fill="#4d5d8f"/>
+  <rect x="196" y="116" width="136" height="48" rx="6" fill="#4d5d8f"/>
+  <text x="76" y="116" fill="#e6ecff">terminal</text>
+  <text x="232" y="88" fill="#e6ecff">terminal</text>
+  <text x="232" y="144" fill="#e6ecff">terminal</text>
+  <!-- W2 Niri -->
+  <text x="40" y="214" fill="#c8d3f5" font-weight="600">2 · Web — Niri (scrolling columns)</text>
+  <rect x="40" y="226" width="300" height="104" rx="8" fill="#2b3350"/>
+  <rect x="48" y="234" width="138" height="88" rx="6" fill="#4d8f7a"/>
+  <rect x="194" y="234" width="138" height="88" rx="6" fill="#4d8f7a"/>
+  <rect x="340" y="234" width="138" height="88" rx="6" fill="#4d8f7a" opacity="0.35" stroke="#4d8f7a" stroke-dasharray="4 4"/>
+  <text x="86" y="282" fill="#e6ecff">column 1</text>
+  <text x="232" y="282" fill="#e6ecff">column 2</text>
+  <text x="372" y="282" fill="#e6ecff">column 3 →</text>
+  <!-- gestures -->
+  <text x="520" y="40" fill="#c8d3f5" font-weight="600">Trackpad</text>
+  <text x="520" y="78" fill="#ffd27a" font-size="22">↕</text>
+  <text x="548" y="72" fill="#e6ecff">3 fingers up / down</text>
+  <text x="548" y="90" fill="#9aa5ce">previous / next workspace</text>
+  <text x="520" y="138" fill="#ffd27a" font-size="22">↔</text>
+  <text x="548" y="132" fill="#e6ecff">3 fingers left / right</text>
+  <text x="548" y="150" fill="#9aa5ce">scroll Niri columns</text>
+  <text x="520" y="198" fill="#ffd27a" font-size="22">↑</text>
+  <text x="548" y="192" fill="#e6ecff">4 fingers up</text>
+  <text x="548" y="210" fill="#9aa5ce">Overview of all workspaces</text>
+  <text x="520" y="258" fill="#c8d3f5" font-weight="600">Keyboard</text>
+  <text x="520" y="280" fill="#e6ecff">Control + 1…9</text>
+  <text x="520" y="298" fill="#9aa5ce">go to workspace</text>
+  <text x="520" y="320" fill="#e6ecff">Control + Shift + 1…9</text>
+  <text x="520" y="338" fill="#9aa5ce">send window there</text>
+</svg>

@@ -1,0 +1,165 @@
+From 30cd9494ca9f802c592f7babc21376652ee99659 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Thu, 15 Oct 2026 17:32:48 +0200
+Subject: [PATCH 6/7] Swipe previews use WindowServer-composited snapshots of
+ the visible workspace (keeps Ghostty blur and colours); edge masks unchanged
+
+---
+ .../Surface/NativeWindowSnapshotCache.swift   | 92 +++++++++++++++++++
+ .../Core/Surface/WorkspaceSwipePreview.swift  | 21 +++++
+ 2 files changed, 113 insertions(+)
+ create mode 100644 Sources/OmniWM/Core/Surface/NativeWindowSnapshotCache.swift
+
+diff --git a/Sources/OmniWM/Core/Surface/NativeWindowSnapshotCache.swift b/Sources/OmniWM/Core/Surface/NativeWindowSnapshotCache.swift
+new file mode 100644
+index 00000000..62c40746
+--- /dev/null
++++ b/Sources/OmniWM/Core/Surface/NativeWindowSnapshotCache.swift
+@@ -0,0 +1,92 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++import AppKit
++import ScreenCaptureKit
++
++/// Window images composited by the WindowServer exactly as they appear on screen.
++///
++/// Swipe previews stream each window with `SCContentFilter(desktopIndependentWindow:)`. For a
++/// window with a backdrop blur (Ghostty `background-blur` + `background-opacity`) that capture
++/// replaces the live blur with an opaque neutral material: measured on 2026-10-15, a Ghostty
++/// window averaged sRGB (0.192, 0.116, 0.200) on screen but (0.225, 0.154, 0.234) captured, so
++/// the windows looked washed out for the whole swipe. A display capture that includes only the
++/// wallpaper and the workspace's windows is composited like the screen (measured identical), but it
++/// only works while the windows are on screen. So the visible workspace is snapshotted at the
++/// first trackpad contact and right after a swipe lands; a destination workspace then uses its
++/// last native snapshot when the window still has the same size, and the live stream otherwise.
++@MainActor
++final class NativeWindowSnapshotCache {
++    static let shared = NativeWindowSnapshotCache()
++
++    private struct Entry {
++        let image: CGImage
++        let size: CGSize
++    }
++
++    private var entries: [WindowToken: Entry] = [:]
++    private var inFlight = false
++
++    func image(for token: WindowToken, size: CGSize) -> CGImage? {
++        guard let entry = entries[token],
++              abs(entry.size.width - size.width) < 1, abs(entry.size.height - size.height) < 1
++        else { return nil }
++        return entry.image
++    }
++
++    func remove(_ token: WindowToken) {
++        entries.removeValue(forKey: token)
++    }
++
++    /// Snapshots `items` (frames in AppKit screen coordinates) as currently shown on `monitor`.
++    func refresh(_ items: [WorkspaceSwipePreview.Item], monitor: Monitor) {
++        guard !items.isEmpty, !inFlight, ScreenCapturePermissionMonitor.shared.isGranted else { return }
++        inFlight = true
++        let wanted = Dictionary(items.map { (UInt32($0.handle.windowId), $0) }, uniquingKeysWith: { a, _ in a })
++        let displayId = monitor.displayId
++        let monitorFrame = monitor.frame
++        let scale = NSScreen.screens.first(where: { $0.displayId == displayId })?.backingScaleFactor ?? 2
++        Task { @MainActor in
++            defer { self.inFlight = false }
++            guard let content = try? await SCShareableContent.excludingDesktopWindows(false, onScreenWindowsOnly: true),
++                  let display = content.displays.first(where: { $0.displayID == displayId })
++            else { return }
++            let windows = content.windows.filter { wanted[$0.windowID] != nil }
++            guard !windows.isEmpty else { return }
++            let wallpaper = content.windows.filter { ($0.title ?? "").hasPrefix("Wallpaper") }
++            let config = SCStreamConfiguration()
++            config.width = Int(CGFloat(display.width) * scale)
++            config.height = Int(CGFloat(display.height) * scale)
++            config.showsCursor = false
++            config.captureDynamicRange = .SDR
++            let filter = SCContentFilter(display: display, including: wallpaper + windows)
++            guard let image = try? await SCScreenshotManager.captureImage(contentFilter: filter, configuration: config)
++            else { return }
++            let pxScale = CGFloat(image.width) / monitorFrame.width
++            for window in windows {
++                guard let item = wanted[window.windowID] else { continue }
++                // Only a window that is really shown where the item says, fully on this display:
++                // a parked, moving or partly off-screen window would yield wallpaper or a cut image.
++                let primaryHeight = NSScreen.screens.first?.frame.height ?? monitorFrame.height
++                let expected = CGRect(
++                    x: item.frame.minX, y: primaryHeight - item.frame.maxY,
++                    width: item.frame.width, height: item.frame.height
++                )
++                guard window.isOnScreen,
++                      abs(window.frame.minX - expected.minX) < 2, abs(window.frame.minY - expected.minY) < 2,
++                      abs(window.frame.width - expected.width) < 2, abs(window.frame.height - expected.height) < 2,
++                      monitorFrame.contains(item.frame.insetBy(dx: 0.5, dy: 0.5))
++                else { continue }
++                let crop = CGRect(
++                    x: (item.frame.minX - monitorFrame.minX) * pxScale,
++                    y: (monitorFrame.maxY - item.frame.maxY) * pxScale,
++                    width: item.frame.width * pxScale,
++                    height: item.frame.height * pxScale
++                ).integral
++                if let slice = image.cropping(to: crop) {
++                    self.entries[item.handle.token] = Entry(image: slice, size: item.frame.size)
++                }
++            }
++        }
++    }
++}
+diff --git a/Sources/OmniWM/Core/Surface/WorkspaceSwipePreview.swift b/Sources/OmniWM/Core/Surface/WorkspaceSwipePreview.swift
+index 04f1d0a3..537566d0 100644
+--- a/Sources/OmniWM/Core/Surface/WorkspaceSwipePreview.swift
++++ b/Sources/OmniWM/Core/Surface/WorkspaceSwipePreview.swift
+@@ -98,6 +98,7 @@ final class WorkspaceSwipePreview {
+     }
+ 
+     func prepare(source: [Item], destination: [Item], monitor: Monitor, workingFrame: CGRect? = nil) {
++        NativeWindowSnapshotCache.shared.refresh(source, monitor: monitor)
+         reconcile(
+             source: source,
+             destination: destination,
+@@ -178,6 +179,7 @@ final class WorkspaceSwipePreview {
+         root.addSublayer(destinationLayer)
+         self.sourceLayer = sourceLayer
+         self.destinationLayer = destinationLayer
++        landedItems = (destination, monitor)
+         self.panel = panel
+         CATransaction.commit()
+ 
+@@ -208,8 +210,18 @@ final class WorkspaceSwipePreview {
+         CATransaction.commit()
+     }
+ 
++    private var landedItems: ([Item], Monitor)?
++
+     func stop() {
+         isWarming = false
++        if let (items, monitor) = landedItems {
++            landedItems = nil
++            // Whichever workspace ends up visible, its windows are on screen ~0.6 s later.
++            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
++                guard self?.panel == nil else { return }
++                NativeWindowSnapshotCache.shared.refresh(items, monitor: monitor)
++            }
++        }
+         let previous = contents.values.flatMap { $0.map(\.preview) }
+         CATransaction.begin()
+         CATransaction.setDisableActions(true)
+@@ -242,6 +254,15 @@ final class WorkspaceSwipePreview {
+         layer.masksToBounds = true
+         layer.addSublayer(makeWallpaperLayer(image, monitor: monitor, frame: frame))
+         for item in items {
++            if let native = NativeWindowSnapshotCache.shared.image(for: item.token, size: item.frame.size) {
++                let still = CALayer()
++                still.frame = item.frame.offsetBy(dx: -frame.minX, dy: -frame.minY)
++                still.contentsScale = scale
++                still.contentsGravity = .resize
++                still.contents = native
++                layer.addSublayer(still)
++                continue
++            }
+             guard let preview = capture.preview(for: item.handle) else { continue }
+             let content = Content(
+                 preview: preview,

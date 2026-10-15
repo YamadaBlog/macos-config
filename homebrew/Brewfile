@@ -1,0 +1,13 @@
+# GUI apps. OmniWM is NOT here: it is built locally with patches (tools/omniwm/build-local.sh);
+# the Homebrew cask would replace that build on `brew upgrade`.
+tap "y3owk1n/tap"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Desktop automation application
+cask "hammerspoon"
+# Keyboard driven navigation
+cask "y3owk1n/tap/neru", trusted: true
+# Control your tools with a few keystrokes
+cask "raycast"
+# System monitor for the menu bar
+cask "stats"

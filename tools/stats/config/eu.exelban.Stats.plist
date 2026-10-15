@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Battery_state</key>
+	<false/>
+	<key>Battery_widget</key>
+	<string>battery</string>
+	<key>Bluetooth_state</key>
+	<false/>
+	<key>CPU_state</key>
+	<true/>
+	<key>CPU_widget</key>
+	<string>line_chart</string>
+	<key>Clock_state</key>
+	<false/>
+	<key>Disk_state</key>
+	<false/>
+	<key>Disk_widget</key>
+	<string>bar_chart</string>
+	<key>GPU_state</key>
+	<false/>
+	<key>GPU_widget</key>
+	<string>mini</string>
+	<key>LaunchAtLoginNext</key>
+	<true/>
+	<key>NSToolbar Configuration eu.exelban.Stats.Settings.Toolbar</key>
+	<dict>
+		<key>TB Display Mode</key>
+		<integer>1</integer>
+		<key>TB Icon Size Mode</key>
+		<integer>1</integer>
+		<key>TB Is Shown</key>
+		<true/>
+		<key>TB Size Mode</key>
+		<integer>1</integer>
+	</dict>
+	<key>Network_state</key>
+	<true/>
+	<key>Network_widget</key>
+	<string>speed</string>
+	<key>RAM_state</key>
+	<true/>
+	<key>RAM_widget</key>
+	<string>bar_chart</string>
+	<key>Sensors_state</key>
+	<false/>
+	<key>Sensors_widget</key>
+	<string>label</string>
+	<key>remote_tokens_migrated_to_keychain</key>
+	<true/>
+	<key>runAtLoginInitialized</key>
+	<true/>
+	<key>setupProcess</key>
+	<true/>
+	<key>support_ts</key>
+	<integer>1791458438</integer>
+</dict>
+</plist>

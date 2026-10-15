@@ -1,0 +1,144 @@
+From c03777b3d72926a3a4454ef9fc590d657879cffb Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Thu, 15 Oct 2026 17:11:03 +0200
+Subject: [PATCH 5/7] Swipe: leave out Niri columns whose settled frame is
+ edge-clamped over a visible one; tests for click-swallowing masks and 2x
+ captures
+
+---
+ .../WorkspaceSwipePresentation+Geometry.swift | 28 ++++++++++++++
+ Tests/OmniWMTests/ParkingEdgeMaskTests.swift  |  6 +--
+ .../WorkspaceSwipeNiriClampTests.swift        | 37 +++++++++++++++++++
+ .../WorkspaceSwipePreviewWarmupTests.swift    |  2 +-
+ 4 files changed, 69 insertions(+), 4 deletions(-)
+ create mode 100644 Tests/OmniWMTests/WorkspaceSwipeNiriClampTests.swift
+
+diff --git a/Sources/OmniWM/Core/Controller/WorkspaceSwipePresentation+Geometry.swift b/Sources/OmniWM/Core/Controller/WorkspaceSwipePresentation+Geometry.swift
+index 56c0c750..50a12bc8 100644
+--- a/Sources/OmniWM/Core/Controller/WorkspaceSwipePresentation+Geometry.swift
++++ b/Sources/OmniWM/Core/Controller/WorkspaceSwipePresentation+Geometry.swift
+@@ -93,12 +93,40 @@ extension WorkspaceSwipePresentation {
+             guard let frame, !frame.isNull, !frame.isInfinite, frame.width > 0, frame.height > 0 else { return nil }
+             if frame.intersects(monitor.visibleFrame) { items.append(.init(handle: handle, frame: frame)) }
+         }
++        if controller.workspaceManager.activeLayoutKind(for: id) == .niri {
++            items = Self.droppingEdgeClampedNiriItems(items, monitorFrame: monitor.visibleFrame)
++        }
+         swipeGeometryLog.debug(
+             "workspace \(id.uuidString, privacy: .public) active=\(active) niri=\(controller.workspaceManager.activeLayoutKind(for: id) == .niri) items=\(items.map { "\($0.handle.token)@\(Int($0.frame.minX)),\(Int($0.frame.minY)) \(Int($0.frame.width))x\(Int($0.frame.height))" }.joined(separator: " | "), privacy: .public)"
+         )
+         return Workspace(id: id, items: items)
+     }
+ 
++    /// A Niri column scrolled entirely past the content area keeps a "settled" frame that
++    /// `settledRenderedContainerRect` shifts to the screen edge and clamps on screen, so it lands
++    /// on top of the last visible column (Web, 2026-10-15: column 3 at x=1049 over column 2 at
++    /// x=1041) while the real window is parked off screen. Drawn in a swipe, the third window
++    /// covered the second. Tiled columns never overlap and never touch the screen edge (outer
++    /// gaps), so an item that does both is such a clamped off-screen column: leave it out.
++    static func droppingEdgeClampedNiriItems(
++        _ items: [WorkspaceSwipePreview.Item], monitorFrame: CGRect
++    ) -> [WorkspaceSwipePreview.Item] {
++        func touchesEdge(_ f: CGRect) -> Bool {
++            abs(f.maxX - monitorFrame.maxX) < 0.5 || abs(f.minX - monitorFrame.minX) < 0.5
++        }
++        func overlapsMostly(_ a: CGRect, _ b: CGRect) -> Bool {
++            let i = a.intersection(b)
++            guard !i.isNull else { return false }
++            return i.width * i.height > 0.5 * min(a.width * a.height, b.width * b.height)
++        }
++        return items.filter { item in
++            guard touchesEdge(item.frame) else { return true }
++            return !items.contains { other in
++                other.handle != item.handle && !touchesEdge(other.frame) && overlapsMostly(item.frame, other.frame)
++            }
++        }
++    }
++
+     func participantsAreCurrent(_ flight: Flight) -> Bool {
+         guard let controller,
+               let monitor = controller.workspaceManager.monitor(byId: flight.preparation.monitor.id),
+diff --git a/Tests/OmniWMTests/ParkingEdgeMaskTests.swift b/Tests/OmniWMTests/ParkingEdgeMaskTests.swift
+index 25c41536..8471a463 100644
+--- a/Tests/OmniWMTests/ParkingEdgeMaskTests.swift
++++ b/Tests/OmniWMTests/ParkingEdgeMaskTests.swift
+@@ -192,7 +192,7 @@ final class ParkingEdgeMaskTests: XCTestCase {
+     }
+ 
+     @MainActor
+-    func testManagerRegistersReusesAndRemovesClickThroughMask() throws {
++    func testManagerRegistersReusesAndRemovesClickSwallowingMask() throws {
+         let manager = ParkingEdgeMaskManager()
+         let key = ParkingEdgeMaskKey(
+             monitorId: Monitor.ID(displayId: 95_001),
+@@ -209,12 +209,12 @@ final class ParkingEdgeMaskTests: XCTestCase {
+         )
+         let firstWindow = try XCTUnwrap(firstInfo.window)
+         XCTAssertEqual(firstInfo.kind, .parkingEdgeMask)
+-        XCTAssertEqual(firstInfo.hitTestPolicy, .passthrough)
++        XCTAssertEqual(firstInfo.hitTestPolicy, .interactive)  // swallows clicks (2026-10-15)
+         XCTAssertEqual(firstInfo.capturePolicy, .excluded)
+         XCTAssertFalse(firstInfo.suppressesManagedFocusRecovery)
+         XCTAssertEqual(firstInfo.frame, firstFrame)
+         XCTAssertEqual(firstWindow.level, .statusBar)
+-        XCTAssertTrue(firstWindow.ignoresMouseEvents)
++        XCTAssertFalse(firstWindow.ignoresMouseEvents)
+ 
+         manager.apply([DesiredParkingEdgeMask(key: key, frame: secondFrame)])
+ 
+diff --git a/Tests/OmniWMTests/WorkspaceSwipeNiriClampTests.swift b/Tests/OmniWMTests/WorkspaceSwipeNiriClampTests.swift
+new file mode 100644
+index 00000000..ede92961
+--- /dev/null
++++ b/Tests/OmniWMTests/WorkspaceSwipeNiriClampTests.swift
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++import CoreGraphics
++@testable import OmniWM
++import XCTest
++
++/// Regression (2026-10-15): swiping away from a Niri workspace with an off-screen third column drew
++/// that column's edge-clamped settled frame on top of the second column.
++@MainActor
++final class WorkspaceSwipeNiriClampTests: XCTestCase {
++    private let screen = CGRect(x: 0, y: 0, width: 2074, height: 1301)
++    private func item(_ id: Int, _ frame: CGRect) -> WorkspaceSwipePreview.Item {
++        .init(handle: WindowHandle(id: WindowToken(pid: 610_000, windowId: id)), frame: frame)
++    }
++
++    func testDropsOffscreenColumnClampedOverTheLastVisibleOne() {
++        let col1 = item(1, CGRect(x: 8, y: 8, width: 1025, height: 1293))
++        let col2 = item(2, CGRect(x: 1041, y: 8, width: 1025, height: 1293))
++        let clamped = item(3, CGRect(x: 1049, y: 8, width: 1025, height: 1293))
++        let kept = WorkspaceSwipePresentation.droppingEdgeClampedNiriItems([col1, col2, clamped], monitorFrame: screen)
++        XCTAssertEqual(kept.map(\.handle.windowId), [1, 2])
++    }
++
++    func testKeepsColumnsThatOnlyTouchTheEdge() {
++        let full = item(1, CGRect(x: 0, y: 0, width: 2074, height: 1301))
++        let other = item(2, CGRect(x: 2074, y: 0, width: 1000, height: 1301))
++        let kept = WorkspaceSwipePresentation.droppingEdgeClampedNiriItems([full, other], monitorFrame: screen)
++        XCTAssertEqual(kept.count, 2)
++    }
++
++    func testKeepsOrdinaryTiling() {
++        let a = item(1, CGRect(x: 8, y: 8, width: 1025, height: 1293))
++        let b = item(2, CGRect(x: 1041, y: 8, width: 1025, height: 1293))
++        XCTAssertEqual(WorkspaceSwipePresentation.droppingEdgeClampedNiriItems([a, b], monitorFrame: screen).count, 2)
++    }
++}
+diff --git a/Tests/OmniWMTests/WorkspaceSwipePreviewWarmupTests.swift b/Tests/OmniWMTests/WorkspaceSwipePreviewWarmupTests.swift
+index db01cc66..0b00d873 100644
+--- a/Tests/OmniWMTests/WorkspaceSwipePreviewWarmupTests.swift
++++ b/Tests/OmniWMTests/WorkspaceSwipePreviewWarmupTests.swift
+@@ -166,7 +166,7 @@ final class WorkspaceSwipePreviewWarmupTests: XCTestCase {
+     }
+ 
+     func testSevenRetinaCandidatesRemainCachedAfterWarmup() async throws {
+-        let budget = 128 * 1_024 * 1_024
++        let budget = 512 * 1_024 * 1_024  // production swipe budget (WorkspaceSwipePreview); captures are at 2x since 2026-10-15
+         let driver = OverviewPreviewTestDriver()
+         let capture = driver.makeCapture(maximumRetainedBytes: budget)
+         let items = (0 ..< 7).map { index in

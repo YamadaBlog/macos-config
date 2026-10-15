@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Nix build outputs
+result
+result-*
+
+# Local copy of the wallpaper (written by scripts/theme-sync.sh)
+wallpapers/*
+!wallpapers/README.md
+
+# Secrets and private data: never in this repo (see docs/macos.md)
+*.secret
+*.key
+*.env
+secrets/
+*.rayconfig
+*.bttpreset.license
+.zsh_history
+history.jsonl
+atuin.db*
+clipboard-history*
+*.log

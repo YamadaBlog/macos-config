@@ -1,0 +1,39 @@
+From 3eababb54f2c883adffd06e916d05fdcae40f4c6 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Thu, 15 Oct 2026 16:30:47 +0200
+Subject: [PATCH 2/7] Overview: optionally hide the search bar
+ (OverviewHideSearchBar default)
+
+---
+ .../OmniWM/Core/Overview/OverviewLayerRenderer+Chrome.swift  | 1 +
+ Sources/OmniWM/Core/Overview/OverviewLayoutGeometry.swift    | 5 +++--
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/Sources/OmniWM/Core/Overview/OverviewLayerRenderer+Chrome.swift b/Sources/OmniWM/Core/Overview/OverviewLayerRenderer+Chrome.swift
+index 30ca109d..67d1c1ec 100644
+--- a/Sources/OmniWM/Core/Overview/OverviewLayerRenderer+Chrome.swift
++++ b/Sources/OmniWM/Core/Overview/OverviewLayerRenderer+Chrome.swift
+@@ -213,6 +213,7 @@ extension OverviewLayerRenderer {
+ 
+     func updateSearch(_ layout: OverviewLayout, state: OverviewRenderState, caretAnimated: Bool) {
+         search.frame = layout.searchBarFrame
++        search.isHidden = UserDefaults.standard.bool(forKey: "OverviewHideSearchBar")
+         let text = state.searchQuery.isEmpty ? Self.searchPlaceholder : state.searchQuery
+         if searchText.string as? String != text { searchText.string = text }
+         searchText.foregroundColor = state.searchQuery.isEmpty ? Colors.textDimmed : Colors.textWhite
+diff --git a/Sources/OmniWM/Core/Overview/OverviewLayoutGeometry.swift b/Sources/OmniWM/Core/Overview/OverviewLayoutGeometry.swift
+index 944ba8c9..d4f2f330 100644
+--- a/Sources/OmniWM/Core/Overview/OverviewLayoutGeometry.swift
++++ b/Sources/OmniWM/Core/Overview/OverviewLayoutGeometry.swift
+@@ -21,8 +21,9 @@ struct OverviewLayoutGeometry {
+ 
+     init(screenFrame: CGRect, scale: CGFloat) {
+         let metricsScale = OverviewLayoutCalculator.clampedScale(scale)
+-        let scaledSearchBarHeight = OverviewLayoutMetrics.searchBarHeight * metricsScale
+-        let scaledSearchBarPadding = OverviewLayoutMetrics.searchBarPadding * metricsScale
++        let hideSearchBar = UserDefaults.standard.bool(forKey: "OverviewHideSearchBar")
++        let scaledSearchBarHeight = hideSearchBar ? 0 : OverviewLayoutMetrics.searchBarHeight * metricsScale
++        let scaledSearchBarPadding = hideSearchBar ? 0 : OverviewLayoutMetrics.searchBarPadding * metricsScale
+         let searchBarY = screenFrame.maxY - scaledSearchBarHeight - scaledSearchBarPadding
+         let searchBarFrame = CGRect(
+             x: screenFrame.minX + screenFrame.width * 0.25,
