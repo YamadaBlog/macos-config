@@ -3,6 +3,9 @@
 All notable changes. Format: newest first; each entry says what changed and how to roll it back when that
 is not a plain `git revert`.
 
+## Unreleased
+- `claude2` alias: Claude Code with a second account (`CLAUDE_CONFIG_DIR=~/.claude-2`); `claude` unchanged.
+
 ## 1.1.0
 - macOS settings declared in Nix (`home-manager/macos.nix`): trackpad, gestures, keyboard and the macOS
   shortcuts disabled for OmniWM/Raycast, Dock, Mission Control, Finder, Stage Manager, appearance;

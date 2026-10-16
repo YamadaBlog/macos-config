@@ -3,6 +3,8 @@ let profile = import ./profile.nix;
 in lib.mkIf profile.enableShell {
   programs.zsh.enable = true;
   programs.zsh.shellAliases.ll = "ls -lah";
+  # Second Claude Code account: separate config dir (login, settings); plain `claude` keeps ~/.claude.
+  programs.zsh.shellAliases.claude2 = "CLAUDE_CONFIG_DIR=$HOME/.claude-2 claude";
   # Migrated from the old ~/.zprofile (Homebrew) and ~/.zshrc (~/.local/bin: Claude Code).
   programs.zsh.profileExtra = ''
     eval "$(/opt/homebrew/bin/brew shellenv zsh)"
