@@ -83,6 +83,11 @@ SECTIONS = {
     # Overview like the OmniWM author's video (2026-10-15): zoom 0.5, transparent backdrop.
     "[overview]": {"zoom": "0.5"},
     "[overview.backdrop]": {"alpha": "0.0"},
+    # Focus follows the mouse WITH raise: without it OmniWM switches between two windows of one app with
+    # private activate/deactivate records that act on the app's current key window (not the addressed one),
+    # leaving windows drawn inactive while focused, or two drawn active (docs/bugs.md B5, 2026-10-16).
+    # Tiled windows never overlap, so raising is invisible; OmniWM still avoids covering floating windows.
+    "[focus]": {"followsMouse": "true", "raiseOnMouseFocus": "true"},
     "[gaps]": {"size": "8.0", "fullHeightWhenMenuBarHidden": "true"},
     # top = 8 from the PHYSICAL top with gaps.fullHeightWhenMenuBarHidden (local OmniWM option): windows
     # that accept the notch band reach it; apps that refuse it are detected and kept 8 below the band (40).

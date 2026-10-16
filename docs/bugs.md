@@ -54,6 +54,13 @@ Before changing anything listed here, read the entry and keep its verification p
   regression but a debounce without trailing edge (a move inside the 0.1 s debounce was dropped and never
   retried), hit far more often with Niri's narrow columns. Fix: one pending re-evaluation at debounce expiry
   with the latest mouse sample. After: 0/15 (W1), 0/10 (Niri W2), 1/20 on a longer W1 run; slow moves 0/5.
+- **Mitigated at the source — windows drawn inactive while focused / two drawn active (2026-10-16):** caught
+  live: macOS key+main, OmniWM focus and pointer all on one Ghostty window, every window drawn grey. Only the
+  focus-without-raise path switches windows of one app with the private activate/deactivate records, which act
+  on the app's current key window rather than the addressed one; an interrupted or reordered pair leaves the
+  appearance wrong. `focus.raiseOnMouseFocus = true` (registry) makes hover focus use the normal one-step path;
+  tiled windows never overlap, and OmniWM still avoids covering floating windows. Verify: the watchdog that
+  compares coloured traffic lights with AX focus reports no mismatch.
 - **Open — several windows of one app drawn as active (2026-10-16, reproduced):** 4 Ghostty windows showed
   coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
   the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the

@@ -41,7 +41,7 @@ followsWindowToMonitor = true
 lockModifier = "off"
 moveCrossesMonitorAtEdge = false
 moveMouseToFocusedWindow = false
-raiseOnMouseFocus = false
+raiseOnMouseFocus = true
 
 [gaps]
 fullHeightWhenMenuBarHidden = true
