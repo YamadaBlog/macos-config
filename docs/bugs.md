@@ -48,6 +48,12 @@ Before changing anything listed here, read the entry and keep its verification p
   the hovered window, check macOS (frontmost app + AX focused window) once per pointer entry; refocus if the
   same app focuses another window. Verify: `/usr/bin/log stream --predicate 'category == "focus-trace"'` shows
   "native focus diverged: refocusing" instead of the window staying inactive.
+- **Fixed — fast pointer moves leave the window under the pointer unfocused (2026-10-16, measured):** a
+  pointer driver (fast moves between window centres, stop, compare window under pointer / macOS AX focus /
+  OmniWM focus) gave 8/15 mismatches with yesterday-morning's build and 10/15 with the current one: not a
+  regression but a debounce without trailing edge (a move inside the 0.1 s debounce was dropped and never
+  retried), hit far more often with Niri's narrow columns. Fix: one pending re-evaluation at debounce expiry
+  with the latest mouse sample. After: 0/15 (W1), 0/10 (Niri W2), 1/20 on a longer W1 run; slow moves 0/5.
 - **Open — several windows of one app drawn as active (2026-10-16, reproduced):** 4 Ghostty windows showed
   coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
   the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the

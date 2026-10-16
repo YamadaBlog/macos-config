@@ -1,7 +1,7 @@
 From cd6bdfe48a2e681b16511f73dc237a7410d113ec Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 9 Oct 2026 15:43:56 +0200
-Subject: [PATCH 12/16] Keep System Settings and auth dialogs in front: no
+Subject: [PATCH 12/17] Keep System Settings and auth dialogs in front: no
  hover focus while they own focus
 
 (cherry picked from commit 22ee801b9ba25a62599ae9670ec8b4636f8d61d0)

@@ -1,7 +1,7 @@
 From ad75f90551380c556f1758555da124739bd6ac2d Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 00:59:57 +0200
-Subject: [PATCH 15/16] Focus: trace focus-follows-mouse decisions (category
+Subject: [PATCH 15/17] Focus: trace focus-follows-mouse decisions (category
  focus-trace); hover exemption uses the per-pid bundle cache
 
 ---

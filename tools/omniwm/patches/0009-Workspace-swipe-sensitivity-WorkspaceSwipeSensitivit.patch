@@ -1,7 +1,7 @@
 From be5c12d2f6a7fdd94fec294b5b8c648bf3c23208 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Sat, 10 Oct 2026 19:26:54 +0200
-Subject: [PATCH 09/16] Workspace swipe sensitivity
+Subject: [PATCH 09/17] Workspace swipe sensitivity
  (WorkspaceSwipeSensitivity): less finger travel per workspace
 
 (cherry picked from commit 24b32344cd6f220a97cc4d8e016f2d597a6262a8)

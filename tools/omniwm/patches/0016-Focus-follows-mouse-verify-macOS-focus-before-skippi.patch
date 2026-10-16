@@ -1,7 +1,7 @@
-From bbb3ea11ef3e8ffd8fa868d400d94e79fa12d91f Mon Sep 17 00:00:00 2001
+From babf591f09f11c58e9147dde3f395ac28005b3f4 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 10:01:44 +0200
-Subject: [PATCH 16/16] Focus follows mouse: verify macOS focus before skipping
+Subject: [PATCH 16/17] Focus follows mouse: verify macOS focus before skipping
  an 'already focused' window
 
 OmniWM's native-focus record is not updated by same-app hand-offs, so hovering back onto a window it still named did nothing while macOS focused another window. Check frontmost app + AX focused window once per pointer entry.
