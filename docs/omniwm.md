@@ -8,7 +8,7 @@ settings this repo installs; values marked *default* are OmniWM's own defaults.
 | Piece | Where |
 |---|---|
 | Pinned upstream commit | `tools/omniwm/UPSTREAM` |
-| Local patches (git `format-patch` series) | `tools/omniwm/patches/0001…0007` |
+| Local patches (git `format-patch` series) | `tools/omniwm/patches/0001…0017` |
 | Build + sign + install | `tools/omniwm/build-local.sh` (`--check` = patches apply, no build) |
 | Signing certificate (once per Mac) | `tools/omniwm/create-signing-cert.sh` |
 | Working checkout | `$OMNIWM_SRC` (default `~/src/omniwm`), branch `macos-config`, recreated on every build |
@@ -27,6 +27,16 @@ build, so permissions would be lost on each rebuild. The certificate pins them (
 | 0005 | workspace swipe leaves out Niri columns whose settled frame is clamped to the screen edge | third Niri column drawn over the second during swipes (B8) |
 | 0006 | swipe previews use WindowServer-composited snapshots of the visible workspace (`NativeWindowSnapshotCache`) | per-window captures replace Ghostty's blur with an opaque material: washed-out colours during swipes (B7) |
 | 0007 | `swipe-snapshot` log: which windows used a native snapshot vs the live capture | verifying 0006 |
+| 0008 | a diagonal 3-finger start waits for its direction instead of cancelling the gesture | missed swipes (B9) |
+| 0009 | `WorkspaceSwipeSensitivity` default (set to 1.8 in `home-manager/macos.nix`): earlier trigger, less travel per workspace | vertical swipe felt late to start |
+| 0010 | wallpaper cache dropped when the desktop picture changes | stale wallpaper behind swipes/Overview |
+| 0011 | `SuppressSecureInputExplanation` default: no explanation panel after 10 s of Secure Input | the panel interrupted typing in password fields (B15) |
+| 0012 | no hover focus while System Settings or an auth dialog owns focus | hover stole focus from them (B14) |
+| 0013 | Overview restarts the captures of an app unhidden while it is open | grey previews (B10) |
+| 0014 | test: the sensitivity shortens trigger and travel | non-regression for 0009 |
+| 0015 | `focus-trace` log of every focus-follows-mouse decision (hovered window, OmniWM focus, frontmost app, reason) | diagnosing focus |
+| 0016 | before skipping an "already focused" window, check macOS (frontmost app + AX focused window) once per pointer entry | OmniWM's record is not updated by same-app hand-offs: the window under the pointer stayed inactive (B5) |
+| 0017 | a move dropped by the 0.1 s debounce is re-evaluated once when the debounce expires | fast pointer moves left the window under the pointer unfocused: 10/15 → 0/15 measured (B5) |
 
 Tests added by the patches (run targeted only, never the full suite on a machine in use — it froze the
 Mac once): `swift test --filter "WorkspaceSwipeNiriClampTests|ParkingEdgeMaskTests|WorkspaceSwipePreviewTests|WorkspaceSwipePreviewWarmupTests"`.
@@ -36,11 +46,10 @@ Mac once): `swift test --filter "WorkspaceSwipeNiriClampTests|ParkingEdgeMaskTes
 (delete the old files first) → `build-local.sh`. **Updating upstream:** put the new commit in `UPSTREAM`,
 run `--check`; if a patch no longer applies, rebase the branch and re-export.
 
-Fixes that existed in earlier local builds but are **not** in this series (re-port only with a test):
-diagonal 3-finger start waits for its direction; System Settings / auth dialogs keep focus against
-focus-follows-mouse; Secure Input explanation panel suppressed; key-window re-assert after same-app
-focus hand-offs; Dwindle drop near an edge inserts instead of swapping; notch full-height option
-(`gaps.fullHeightWhenMenuBarHidden` is still in `settings.toml` but is ignored by this build).
+Not ported from earlier local builds, on purpose: features rather than fixes (card Overview, drop near an
+edge inserts instead of swapping, animated drops, notch full-height option — `gaps.fullHeightWhenMenuBarHidden`
+is still in `settings.toml` but ignored), and a timer-based key-window re-assert (it could hand focus to the
+wrong window).
 Their history: `docs/bugs.md`.
 
 ## 2. Configuration files
@@ -103,8 +112,12 @@ area at the bottom (+) creates a workspace. Previews come from ScreenCaptureKit,
 Recording**; grey previews mean that permission is missing or the app is hidden (B10).
 
 ## 6. Mouse: focus, drag and drop, swap
-- **Focus follows the mouse** (`focus.followsMouse = true`, no raise): hovering a window focuses it.
-  Floating System Settings / auth dialogs should keep focus while open (that guard is not in this build).
+- **Focus follows the mouse, with raise** (`focus.followsMouse = true`, `raiseOnMouseFocus = true`):
+  hovering a window focuses it. Raise matters: without it OmniWM switches between two windows of one app with
+  private activate/deactivate records that act on the app's current key window, which left windows drawn
+  inactive while focused, or two drawn active (B5). Tiled windows never overlap, so raising is invisible.
+  System Settings and auth dialogs keep focus while open (patch 0012). Diagnose with
+  `/usr/bin/log stream --predicate 'subsystem == "com.barut.OmniWM" AND category == "focus-trace"'`.
 - **Move / swap with the mouse**: drag a window by its title bar, or anywhere with **Option + drag**.
   Dropping on another tile **swaps** the two (upstream behaviour). The "drop on an edge inserts beside"
   and Niri stack/new-column drops of earlier local builds are not in this build (§1).

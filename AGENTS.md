@@ -35,6 +35,9 @@ Authority: the real machine (checked by `scripts/verify.sh` / `scripts/doctor.sh
 - **Registry = wanted state.** `theme-sync.sh` re-applies `apply-registry.py` on every wallpaper change; if
   the registry disagrees with `tools/omniwm/config/settings.toml` the user's settings get reverted (B16).
 - **macOS must not own 3/4-finger swipes** (B11). Declared in `home-manager/macos.nix`.
+- **Keep `focus.raiseOnMouseFocus = true`** (registry): the no-raise hover path uses private same-app
+  activation records that left windows drawn inactive or doubly active (B5). Diagnose focus with the
+  `focus-trace` log before changing focus code.
 - **ws-hide.lua never hides apps** (B9, B10); `margin-veil.lua` stays below OmniWM's panels and swallows
   clicks (B6). Screenshots do not show OmniWM's own surfaces: verify edges by eye/photo.
 - **No hardcoded user or clone paths in code** (`scripts/check.sh` enforces it). Scripts find the repo from
@@ -86,7 +89,6 @@ user-level `targets.darwin.defaults` (home-manager/macos.nix) covers every setti
 Private state of a machine (never committed): `~/.local/state/macos-power-user-deploy/` (backups, logs).
 
 ## 7. Known open items
-- Intermittent "Safari ignores the first clicks after a workspace switch" — cause not established (`docs/bugs.md` B5).
-- Fixes from earlier local OmniWM builds that are not in the patch series (diagonal swipe start, System
-  Settings focus guard, Secure Input panel, key-window re-assert, Dwindle edge-insert): `docs/omniwm.md` §1.
+- Niri horizontal scrolling moves the real windows through Accessibility on every frame, so heavy apps can lag
+  behind lighter ones; animating captures (like the vertical swipe) is the planned fix (`docs/omniwm.md` §8).
 - Tested on one Mac model (16" MacBook Pro, macOS 26.6); a clean install on a second Mac is still to be run.

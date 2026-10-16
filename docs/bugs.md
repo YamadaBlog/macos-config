@@ -61,7 +61,7 @@ Before changing anything listed here, read the entry and keep its verification p
   appearance wrong. `focus.raiseOnMouseFocus = true` (registry) makes hover focus use the normal one-step path;
   tiled windows never overlap, and OmniWM still avoids covering floating windows. Verify: the watchdog that
   compares coloured traffic lights with AX focus reports no mismatch.
-- **Open — several windows of one app drawn as active (2026-10-16, reproduced):** 4 Ghostty windows showed
+- **Investigation notes (before the raise fix):** 4 Ghostty windows showed
   coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
   the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the
   app's *current* key window whatever window id it carries; the key-window records (0x01/0x02) are routed by
