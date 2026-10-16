@@ -42,7 +42,7 @@ if pgrep -x OmniWM >/dev/null; then
   else fail "OmniWM running but IPC silent" "Accessibility permission? System Settings > Privacy > Accessibility > OmniWM"; fi
 else fail "OmniWM not running" "open -a OmniWM (LaunchAgent org.nix-community.home.omniwm starts it at login)"; fi
 n="$(python3 -I "$REPO/tools/omniwm/apply-registry.py" "$HOME/.config/omniwm/settings.toml" 2>/dev/null | tail -1)"
-case "$n" in "0 changement(s)") ok "settings.toml matches the registry";; *) warn "settings.toml differs from the registry ($n)" "quit OmniWM; python3 -I tools/omniwm/apply-registry.py ~/.config/omniwm/settings.toml --write";; esac
+case "$n" in "0 change(s)") ok "settings.toml matches the registry";; *) warn "settings.toml differs from the registry ($n)" "quit OmniWM; python3 -I tools/omniwm/apply-registry.py ~/.config/omniwm/settings.toml --write";; esac
 "$REPO/scripts/macos-defaults.sh" >/dev/null && ok "macOS settings (gestures, Dock, Finder)" || warn "macOS settings differ" "scripts/macos-defaults.sh (preview) then --write"
 
 echo "== Hammerspoon"

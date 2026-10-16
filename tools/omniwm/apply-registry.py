@@ -1,34 +1,34 @@
 #!/usr/bin/env python3
-"""Applique le registre de raccourcis AZERTY du poste à settings.toml d'OmniWM.
+"""Apply the settings this repo owns (hotkeys, gestures, layouts, gaps, Overview) to OmniWM's settings.toml.
 
-Usage : python3 -I apply-registry.py <settings.toml> [--write]
-Sans --write : affiche les changements prévus, n'écrit rien.
-OmniWM doit être quitté avant --write (sinon il réécrit le fichier).
+Usage: python3 -I apply-registry.py <settings.toml> [--write]
+Without --write: print the planned changes, write nothing.
+Quit OmniWM before --write (it rewrites the file otherwise).
 
-Règles :
-- Hyper = Control+Option+Command ; Shift ajouté = transfert/déplacement.
-- Tout raccourci « Option+… » sans Control ni Command est désassigné : sur AZERTY
-  ces combinaisons tapent { } [ ] | @ ~ etc.
-- IPC activé (requis par Hammerspoon / omniwmctl).
-- Bureaux 1-4 étiquetés Focus / Web / Messages / Atelier via displayName (name reste numérique).
+Rules:
+- Hyper = Control+Option+Command; adding Shift = send/move.
+- Any "Option+..." binding without Control or Command is unassigned: on a French AZERTY keyboard those
+  chords type { } [ ] | @ ~ etc.
+- IPC enabled (required by Hammerspoon and omniwmctl).
+- Workspaces 1-4 are labelled Focus / Web / Messages / Atelier through displayName (name stays numeric).
 """
 import os
 import re
 import sys
 
-H = "Hyper+"  # forme normalisée écrite par OmniWM quand hyperKeyModifiers = Control+Option+Command
-# OmniWM 0.7.6 lie les touches par POSITION (codes ANSI/QWERTY), pas par caractère.
-# Touche imprimée W sur AZERTY = position Z en QWERTY. E, D, T, O, F : même position.
+H = "Hyper+"  # form OmniWM writes when hyperKeyModifiers = Control+Option+Command
+# OmniWM binds keys by POSITION (ANSI/QWERTY key codes), not by character:
+# the key printed W on AZERTY is position Z on QWERTY. E, D, T, O, F are at the same position.
 AZ_W = "Z"
 HS = "Hyper+Shift+"
 REGISTRY = {
-    # Bureaux : 2 touches main gauche (choix utilisateur 2026-10-08 : Hyper jugé trop complexe).
-    # Ctrl+chiffre : libre dans macOS (raccourcis « bureau N » non activés) et dans les terminaux.
+    # Workspaces: two left-hand keys (Hyper was judged too awkward). Control+digit is free in macOS
+    # (its "switch to desktop N" shortcuts are disabled in home-manager/macos.nix) and in terminals.
     "switchWorkspace.0": "Control+1", "switchWorkspace.1": "Control+2",
     "switchWorkspace.2": "Control+3", "switchWorkspace.3": "Control+4",
     "moveToWorkspace.0": "Control+Shift+1", "moveToWorkspace.1": "Control+Shift+2",
     "moveToWorkspace.2": "Control+Shift+3", "moveToWorkspace.3": "Control+Shift+4",
-    # Fenêtre précédente : Option+Tab ne tape aucun caractère (exception à la règle « pas d'Option seul »).
+    # Previous window: Option+Tab types no character (the one exception to "never Option alone").
     "focusPrevious": "Option+Tab",
     # Four directions, one scheme: Control+arrow = focus, Control+Shift+arrow = move (swap with the
     # neighbour; in a Niri column up/down reorders the stack). macOS held these chords (symbolic hotkeys
@@ -40,62 +40,58 @@ REGISTRY = {
     "toggleOverview": H + "O",
     "openCommandPalette": H + "Space",
     "toggleQuakeTerminal": H + "Return",
-    # Dwindle controls (2026-10-09): Ctrl+Option + left-hand letter. Names are QWERTY POSITIONS:
+    # Dwindle controls: Control+Option + a left-hand letter. Names are QWERTY POSITIONS:
     # printed AZERTY W = "Z", Q = "A", A = "Q", Z = "W" (E R S D F G T X C are the same).
-    "toggleFullscreen": "Control+Option+F",            # plein écran temporaire
+    "toggleFullscreen": "Control+Option+F",            # temporary fullscreen
     "expandContainerToAvailablePrimarySpan": "Unassigned", "resetWindowSecondarySpan": "Unassigned",
-    "balanceSizes": "Control+Option+R",                # parts égales
-    "toggleSplit": "Control+Option+E",                 # côte à côte <-> empilé
-    "swapSplit": "Control+Option+S",                   # échanger les deux moitiés
+    "balanceSizes": "Control+Option+R",                # equal shares
+    "toggleSplit": "Control+Option+E",                 # side by side <-> stacked
+    "swapSplit": "Control+Option+S",                   # swap the two halves
     "resizeFocusedWindow.grow": "Control+Option+Z", "resizeFocusedWindow.shrink": "Control+Option+A",
-    "toggleFocusedWindowFloating": "Control+Option+T", # flottante <-> pavée
-    "toggleWorkspaceLayout": "Control+Option+G",       # Dwindle <-> Niri sur ce bureau
-    "rescueOffscreenWindows": "Control+Option+X",      # ramener les fenêtres hors écran
+    "toggleFocusedWindowFloating": "Control+Option+T", # floating <-> tiled
+    "toggleWorkspaceLayout": "Control+Option+G",       # Dwindle <-> Niri on this workspace
+    "rescueOffscreenWindows": "Control+Option+X",      # bring off-screen windows back
     "preselect.left": "Control+Option+Q", "preselect.right": "Control+Option+D",
     "preselect.down": "Control+Option+W", "preselectClear": "Control+Option+C",
 }
 NAMES = {"1": "Focus", "2": "Web", "3": "Messages", "4": "Atelier"}
 INVERSE = {v: k for k, v in NAMES.items()}
-GENERAL = {"ipcEnabled": "true", "animationSpeed": "1.0",  # 1.0 like the OmniWM author's setup (user choice 2026-10-15; was 1.6)
-           "updateChecksEnabled": "false",  # local build with the Accessibility fix: no auto-update
+GENERAL = {"ipcEnabled": "true", "animationSpeed": "1.0",  # OmniWM default speed
+           "updateChecksEnabled": "false",  # patched local build: never auto-update to upstream
            "hyperKeyModifiers": '"Control+Option+Command"'}
-# Apparence : bordure et barre DÉSACTIVÉES par choix de l'utilisateur (2026-10-08) ; réglages conservés
-# pour une réactivation éventuelle (passer enabled à "true"). Accent #91baff = Ghostty palette 4.
+# Window border and workspace bar are disabled by choice; their settings are kept so that enabling them is a
+# one-word change. The border colour follows the palette accent (palette_border()).
 SECTIONS = {
     "[borders]": {"enabled": "false", "width": "2.0"},
     "[borders.color]": {"red": "0.5686", "green": "0.7294", "blue": "1.0", "alpha": "0.85"},
-    # Gestures (user choice 2026-10-15, OmniWM-author style): 3 fingers vertical = workspaces,
+    # Gestures: 3 fingers vertical = workspaces,
     # 3 fingers horizontal = Niri columns, 4 fingers up = OmniWM Overview (macOS Mission Control
     # gesture turned off: com.apple.dock showMissionControlGestureEnabled = 0).
     "[gestures]": {"fingerCount": "3", "scrollEnabled": "true", "workspaceSwipeEnabled": "true",
                    "workspaceSwipeAxis": '"vertical"', "workspaceSwipeFingerCount": "3",
                    "overviewGestureEnabled": "true", "overviewGestureFingerCount": "4"},
-    # Disposition Dwindle partout : 1 fenêtre = tout l'écran, l'espace se divise à chaque ouverture.
+    # Default layout for workspaces without their own layoutType (workspace 1; 2-9 are Niri in settings.toml).
     "[general]": {"defaultLayoutType": '"dwindle"'},
-    # Dwindle, window alone: "fill" ignores the outer gaps (window touches the edges). Exact size =
-    # 2074-16 x 1340-16 at 2074x1340, i.e. the full-height working area: no window may touch a screen edge, on any workspace.
-    "[dwindle]": {"singleWindowFit": None},  # computed from the main screen: see screen_fit()
-    # Niri (si réactivé sur un bureau) : 2 colonnes visibles, colonnes à la moitié.
+    # A lone window gets the screen minus the outer gaps ("fill" would touch the edges): see screen_fit().
+    "[dwindle]": {"singleWindowFit": None},
+    # Niri: 2 visible columns, each half the width.
     "[niri]": {"visibleContainerCount": "2", "defaultContainerPrimarySpan": "0.5", "edgeGaps": "false",
-               # Fenêtre seule : taille fixe = écran intégré 1728x1117 (Retina 2x) moins les marges
-               # (2074-16 x 1340-8-8, display 2074x1340). À adapter si l'écran ou sa résolution changent.
                "singleWindowFit": None},
-    # Overview like the OmniWM author's video (2026-10-15): zoom 0.5, transparent backdrop.
+    # Overview: zoom 0.5, transparent backdrop (wallpaper visible behind).
     "[overview]": {"zoom": "0.5"},
     "[overview.backdrop]": {"alpha": "0.0"},
     # Focus follows the mouse WITH raise: without it OmniWM switches between two windows of one app with
     # private activate/deactivate records that act on the app's current key window (not the addressed one),
-    # leaving windows drawn inactive while focused, or two drawn active (docs/bugs.md B5, 2026-10-16).
+    # leaving windows drawn inactive while focused, or two drawn active (docs/bugs.md B5).
     # Tiled windows never overlap, so raising is invisible; OmniWM still avoids covering floating windows.
     "[focus]": {"followsMouse": "true", "raiseOnMouseFocus": "true"},
     "[gaps]": {"size": "8.0", "fullHeightWhenMenuBarHidden": "true"},
-    # top = 8 from the PHYSICAL top with gaps.fullHeightWhenMenuBarHidden (local OmniWM option): windows
-    # that accept the notch band reach it; apps that refuse it are detected and kept 8 below the band (40).
+    # fullHeightWhenMenuBarHidden belonged to an earlier local build; the current one ignores it.
     "[gaps.outer]": {"top": "8.0",
                      "bottom": "8.0", "left": "8.0", "right": "8.0"},
     "[workspaceBar]": {"enabled": "false", "transparentBackground": "true", "showLabels": "true",
                        "hideEmptyWorkspaces": "true", "deduplicateAppIcons": "true",
-                       "reserveLayoutSpace": "false"},  # aucun espace réservé (barre désactivée ; si réactivée, passer à "true" pour ne pas chevaucher les fenêtres)
+                       "reserveLayoutSpace": "false"},  # bar disabled; set "true" if you enable it
 }
 
 
@@ -148,7 +144,7 @@ def main():
     path, write = sys.argv[1], "--write" in sys.argv[2:]
     lines = open(path, encoding="utf-8").read().split("\n")
     changes, inserts, section = [], [], None
-    # Repère les blocs [[hotkeys]] : binding puis id (ordre observé en 0.7.6)
+    # [[hotkeys]] blocks: "binding" line followed by its "id" line (order written by OmniWM)
     for i, line in enumerate(lines):
         if line.startswith("["):
             section = line.strip()
@@ -162,8 +158,8 @@ def main():
             if m and m.group(1) in GENERAL and m.group(2) != GENERAL[m.group(1)]:
                 changes.append((i, f"{m.group(1)} = {GENERAL[m.group(1)]}"))
         if section == "[[workspaces]]":
-            # OmniWM 0.7.6 ignore un bureau dont « name » n'est pas numérique :
-            # le nom reste le chiffre, l'étiquette va dans displayName.
+            # OmniWM ignores a workspace whose "name" is not numeric: the name stays the digit and the
+            # label goes into displayName.
             m = re.match(r'^name = "(.*)"$', line)
             if m:
                 num = INVERSE.get(m.group(1), m.group(1))
@@ -171,7 +167,7 @@ def main():
                     changes.append((i, f'name = "{num}"'))
                 if num in NAMES:
                     label = f'displayName = "{NAMES[num]}"'
-                    # displayName précède id dans le bloc (ordre écrit par OmniWM)
+                    # displayName comes before id in the block (order written by OmniWM)
                     j = i
                     while j > 0 and not lines[j].startswith("[[workspaces]]"):
                         j -= 1
@@ -192,7 +188,7 @@ def main():
                 want = "Unassigned"
             if want and want != cur:
                 changes.append((i, f'binding = "{want}"'))
-    # Un raccourci du registre ne doit pas déjà servir à une autre action
+    # A registry binding must not already be used by another action
     used = {}
     for i, line in enumerate(lines):
         if line.startswith("binding = ") and i + 1 < len(lines):
@@ -205,10 +201,10 @@ def main():
         ctx = lines[i + 1].strip() if lines[i].startswith("binding") else ""
         print(f"{i + 1:5d}: {lines[i].strip()}  ->  {new}  {ctx}")
     for i, new in inserts:
-        print(f"{i + 1:5d}: (insertion)  ->  {new}")
-    print(f"{len(changes) + len(inserts)} changement(s)")
+        print(f"{i + 1:5d}: (insert)  ->  {new}")
+    print(f"{len(changes) + len(inserts)} change(s)")
     if dup:
-        print("DOUBLONS :", dup)
+        print("DUPLICATE BINDINGS:", dup)
         sys.exit(1)
     if write and (changes or inserts):
         for i, new in changes:
@@ -220,7 +216,7 @@ def main():
         with open(tmp, "w", encoding="utf-8") as f:
             f.write("\n".join(lines))
         os.replace(tmp, path)
-        print("écrit :", path)
+        print("written:", path)
 
 
 if __name__ == "__main__":

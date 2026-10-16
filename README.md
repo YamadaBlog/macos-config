@@ -1,5 +1,10 @@
 # macos-config
 
+[![check](https://github.com/YamadaBlog/macos-config/actions/workflows/check.yml/badge.svg)](https://github.com/YamadaBlog/macos-config/actions/workflows/check.yml)
+![macOS 26](https://img.shields.io/badge/macOS-26-black?logo=apple)
+![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-555)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
+
 A reproducible, keyboard- and trackpad-driven macOS setup for Apple Silicon:
 **[OmniWM](https://github.com/OmniNull/OmniWM)** tiling with Niri-style scrolling workspaces,
 **Ghostty**, a **Nix (Lix) + Home Manager** shell, **Homebrew** apps, small **Hammerspoon** helpers and a

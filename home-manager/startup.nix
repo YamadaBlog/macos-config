@@ -1,6 +1,6 @@
-# Démarrage à l'ouverture de session : UN mécanisme par outil (LaunchAgent géré ici).
-# Raycast garde son propre élément d'ouverture (enregistré par l'app) : ne pas le dupliquer ici.
-# open -a ne lance jamais une seconde instance d'une app déjà ouverte.
+# Startup at login: ONE mechanism per tool (LaunchAgents managed here).
+# Raycast keeps its own login item (registered by the app): do not duplicate it here.
+# `open -a` never starts a second instance of an app that is already running.
 { config, pkgs, ... }:
 let
   identity = import ./identity.nix;
@@ -13,9 +13,9 @@ let
       ProcessType = "Interactive";
     };
   };
-  # Rotation « copier puis tronquer » : le fichier reste ouvert par launchd/Neru (O_APPEND vérifié),
-  # donc on ne le déplace pas (Neru continuerait d'écrire dans l'archive). Archive = 1 Mo de fin
-  # au maximum ; stockage borné à ~1 Mo d'archive + croissance pendant 10 min, par journal.
+  # "Copy then truncate" rotation: launchd/Neru keep the file open (O_APPEND checked), so it is not moved
+  # (Neru would keep writing into the archive). The archive keeps at most the last 1 MB; storage stays
+  # bounded to ~1 MB of archive plus 10 minutes of growth, per log.
   logRotate = pkgs.writeShellScript "macos-config-logrotate" ''
     umask 077
     for f in "${logs}"/*.log; do
@@ -30,28 +30,28 @@ let
   '';
 in {
   launchd.agents = {
-    # Gestionnaire de fenêtres : OmniWM (AeroSpace et placement natif essayés le 2026-10-09 puis abandonnés).
+    # Window manager: OmniWM (AeroSpace and native tiling were tried and abandoned).
     omniwm = openApp "OmniWM";
     hammerspoon = openApp "Hammerspoon";
     stats = openApp "Stats";
     neru = {
       enable = true;
       config = {
-        # Binaire lancé DIRECTEMENT : via un script intermédiaire, Neru réinitialise sa propre
-        # autorisation Accessibilité (incident du 2026-10-08 15:31). Pas de lanceur bash ici.
+        # Binary launched DIRECTLY: through an intermediate script Neru resets its own Accessibility
+        # permission (observed once). No bash launcher here.
         ProgramArguments = [ "/Applications/Neru.app/Contents/MacOS/neru" "launch" ];
         RunAtLoad = true;
-        # Relance seulement après un arrêt anormal ; SIGTERM / Quitter (code 0) n'est pas relancé.
+        # Restarted only after an abnormal exit; SIGTERM / Quit (exit 0) is not restarted.
         KeepAlive = { SuccessfulExit = false; };
         # Panne persistante : au plus 2 relances/min (launchd n'a pas de plafond de relances) ;
-        # arrêt durable : launchctl bootout gui/$(id -u)/org.nix-community.home.neru
+        # stop for good: launchctl bootout gui/$(id -u)/org.nix-community.home.neru
         ThrottleInterval = 30;
         ProcessType = "Interactive";
         StandardOutPath = "${logs}/neru.log";
         StandardErrorPath = "${logs}/neru.log";
       };
     };
-    # Thème : régénéré quand macOS change de fond d'écran (index des fonds surveillé) ; sans effet si l'image n'a pas changé.
+    # Theme: regenerated when macOS changes the wallpaper (watches the wallpaper index); no-op if the image is unchanged.
     theme-auto = {
       enable = true;
       config = {
@@ -66,7 +66,7 @@ in {
       config = {
         ProgramArguments = [ "${logRotate}" ];
         RunAtLoad = true;
-        StartInterval = 600; # toutes les 10 min (coût négligeable : un stat par journal)
+        StartInterval = 600; # every 10 min (negligible cost: one stat per log)
         ProcessType = "Background";
       };
     };

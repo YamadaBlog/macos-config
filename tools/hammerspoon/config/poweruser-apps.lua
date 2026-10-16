@@ -1,6 +1,6 @@
 -- SPDX-License-Identifier: MIT
--- Raccourcis d'applications. Cmd+E = Finder (choix de l'utilisateur, 2026-10-08).
--- Remplace globalement Cmd+E (Finder : Éjecter ; Safari/Notes : Utiliser la sélection pour rechercher).
+-- App shortcuts. Cmd+E = Finder.
+-- Overrides Cmd+E everywhere (Finder: Eject; Safari/Notes: Use Selection for Find).
 local M = {}
 
 local function finder()
@@ -14,7 +14,7 @@ local function finder()
   if hasWindow then
     hs.application.launchOrFocusByBundleID("com.apple.finder")
   else
-    -- Aucune fenêtre Finder : en ouvrir une sur le dossier personnel
+    -- No Finder window: open one on the home folder
     hs.task.new("/usr/bin/open", nil, { os.getenv("HOME") }):start()
   end
 end

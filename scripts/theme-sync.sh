@@ -1,9 +1,9 @@
 #!/bin/bash
-# Synchronise le thème du poste avec le fond d'écran.
-#   scripts/theme-sync.sh            reprend le fond d'écran affiché par macOS dans wallpapers/actuel.png, puis applique
-#   scripts/theme-sync.sh --no-copy  applique la palette de home-manager/theme.nix sans changer d'image
-# La palette home-manager/palette.nix est régénérée depuis l'image par scripts/palette-from-image.py (accents distincts).
-# OmniWM recharge settings.toml à chaud : il n'est pas quitté (aucun AppleScript → aucune autorisation Automatisation).
+# Align the theme with the wallpaper.
+#   scripts/theme-sync.sh            copy the wallpaper macOS shows to wallpapers/actuel.png, then apply
+#   scripts/theme-sync.sh --no-copy  apply the palette of home-manager/palette.nix without changing the image
+# home-manager/palette.nix is regenerated from the image by scripts/palette-from-image.py (distinct accents).
+# OmniWM hot-reloads settings.toml, so it is never quit (no AppleScript, hence no Automation permission).
 . "$(dirname "$0")/lib.sh"
 set -e
 if [ "${1:-}" != --no-copy ]; then
@@ -24,19 +24,19 @@ urls = [u for u in walk(d) if re.search(r"\.(png|jpe?g|heic|tiff?)$", u, re.I)]
 print(urllib.parse.unquote(urls[0][7:]) if urls else "")
 PY
 )"
-  [ -n "$src" ] && [ -f "$src" ] || { echo "Fond d'écran actuel introuvable (image dynamique ou système ?)." >&2; exit 2; }
+  [ -n "$src" ] && [ -f "$src" ] || { echo "Current wallpaper file not found (dynamic or system wallpaper?)." >&2; exit 2; }
   tmpdir="$(mktemp -d)"; trap 'rm -rf "$tmpdir"' EXIT
   tmpimg="$tmpdir/w.png"; sips -s format png "$src" --out "$tmpimg" >/dev/null
-  if cmp -s "$tmpimg" "$REPO/wallpapers/actuel.png"; then echo "fond d'écran : inchangé"
-  else cp "$tmpimg" "$REPO/wallpapers/actuel.png"; echo "fond d'écran : copié depuis $src"; fi
-  python3 -I "$REPO/scripts/palette-from-image.py" "$REPO/wallpapers/actuel.png" "$REPO/home-manager/palette.nix" "$(basename "${src%.*}") (auto)"
+  if cmp -s "$tmpimg" "$REPO/wallpapers/actuel.png"; then echo "wallpaper: unchanged"
+  else cp "$tmpimg" "$REPO/wallpapers/actuel.png"; echo "wallpaper: copied from $src"; fi
+  python3 -I "$REPO/scripts/palette-from-image.py" "$REPO/wallpapers/actuel.png" "$REPO/home-manager/palette.nix" "wallpaper (auto)"   # neutral name: no personal file name in commits
 fi
 # The flake only sees files git knows: stage the theme files, and only those (never unrelated work).
 ( cd "$REPO" && git add home-manager/palette.nix )   # wallpapers/ stays local (.gitignore)
 "$REPO/scripts/apply.sh" home-manager --write | tail -1
 "$REPO/scripts/theme-apply.sh" --write
 cp -p "$HOME/.config/omniwm/settings.toml" "$STATE/backups/omniwm-$(date +%Y%m%d-%H%M%S)-theme-sync.toml"
-python3 -I "$REPO/tools/omniwm/apply-registry.py" "$HOME/.config/omniwm/settings.toml" --write </dev/null | tail -1  # rechargé à chaud
+python3 -I "$REPO/tools/omniwm/apply-registry.py" "$HOME/.config/omniwm/settings.toml" --write </dev/null | tail -1  # hot-reloaded by OmniWM
 hs=/Applications/Hammerspoon.app/Contents/Frameworks/hs/hs
 ( "$hs" -c 'hs.timer.doAfter(0.2, function() local g=hs.application.get("com.mitchellh.ghostty"); if g then g:selectMenuItem({"Ghostty","Reload Configuration"}) end; hs.reload() end)' & p=$!; sleep 4; kill $p ) >/dev/null 2>&1 || true
-echo "Thème appliqué. Relire puis capturer : scripts/capture.sh && scripts/capture.sh --accept ; commit."
+echo "Theme applied. Review, then capture: scripts/capture.sh && scripts/capture.sh --accept; commit."

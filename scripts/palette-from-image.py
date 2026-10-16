@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Palette base16 LISIBLE depuis une image (sans dépendance : sips + bibliothèque standard).
+"""A READABLE base16 palette from an image (no dependencies: sips + the standard library).
 
-Usage : python3 -I scripts/palette-from-image.py <image> <sortie.nix> [nom]
+Usage: python3 -I scripts/palette-from-image.py <image> <output.nix> [name]
 
-Principe (la génération brute de Stylix donnait 8 accents de même teinte) :
-- fond (base00-03) : teinte dominante des zones sombres de l'image, assombrie et désaturée ;
-- texte (base04-07) : teinte dominante des zones claires, très claire et peu saturée ;
-- accents (base08-0F) : une famille de teinte fixe par rôle (rouge, orange, or, vert, cyan, bleu, violet, brun)
-  pour rester distincts, chacune attirée (±20°) vers la teinte réellement présente dans l'image si elle existe ;
-- contraste WCAG >= 4,5:1 de chaque accent et du texte sur le fond (luminosité relevée si besoin).
+How (Stylix's raw generation gave 8 accents of the same hue):
+- background (base00-03): dominant hue of the image's dark areas, darkened and desaturated;
+- text (base04-07): dominant hue of the light areas, very light and barely saturated;
+- accents (base08-0F): one fixed hue family per role (red, orange, gold, green, cyan, blue, purple, brown) so
+  they stay distinct, each pulled (±20°) towards a hue really present in the image when there is one;
+- WCAG contrast >= 4.5:1 for every accent and the text on the background (lightness raised if needed).
 """
 import colorsys
 import math
@@ -18,20 +18,20 @@ import subprocess
 import sys
 import tempfile
 
-ROLES = [  # (clé, teinte cible en degrés, saturation, luminosité HLS, commentaire)
-    ("base08", 355, 0.75, 0.66, "rouge : erreurs, suppressions"),
-    ("base09", 28, 0.80, 0.64, "orange : constantes"),
-    ("base0A", 45, 0.85, 0.70, "or : avertissements"),
-    ("base0B", 140, 0.45, 0.62, "vert : succès, ajouts, chaînes"),
-    ("base0C", 185, 0.60, 0.64, "cyan : échappements, info"),
-    ("base0D", 212, 0.65, 0.62, "bleu : fonctions, liens, accent du poste"),
-    ("base0E", 275, 0.55, 0.72, "violet : mots-clés"),
-    ("base0F", 25, 0.45, 0.55, "brun : obsolète"),
+ROLES = [  # (key, target hue in degrees, saturation, HLS lightness, comment)
+    ("base08", 355, 0.75, 0.66, "red: errors, deletions"),
+    ("base09", 28, 0.80, 0.64, "orange: constants"),
+    ("base0A", 45, 0.85, 0.70, "gold: warnings"),
+    ("base0B", 140, 0.45, 0.62, "green: success, additions, strings"),
+    ("base0C", 185, 0.60, 0.64, "cyan: escapes, info"),
+    ("base0D", 212, 0.65, 0.62, "blue: functions, links, system accent"),
+    ("base0E", 275, 0.55, 0.72, "purple: keywords"),
+    ("base0F", 25, 0.45, 0.55, "brown: deprecated"),
 ]
 
 
 def pixels(path):
-    """Réduit l'image à 96x54 en BMP 24 bits via sips, renvoie la liste des (r, g, b) en 0..1."""
+    """Shrink the image to a 96x54 24-bit BMP with sips; return the list of (r, g, b) in 0..1."""
     with tempfile.TemporaryDirectory() as d:
         bmp = os.path.join(d, "p.bmp")
         subprocess.run(["sips", "-s", "format", "bmp", "-z", "54", "96", path, "--out", bmp],
@@ -52,7 +52,7 @@ def pixels(path):
 
 
 def hue_mean(hues_w):
-    """Moyenne circulaire pondérée de teintes (degrés)."""
+    """Weighted circular mean of hues (degrees)."""
     sx = sum(w * math.cos(math.radians(h)) for h, w in hues_w)
     sy = sum(w * math.sin(math.radians(h)) for h, w in hues_w)
     if abs(sx) + abs(sy) < 1e-9:
@@ -102,7 +102,7 @@ def main():
     notes, chosen = {}, []
     dist = lambda a, b: min(abs(a - b), 360 - abs(a - b))
     for key, target, s, l, note in ROLES:
-        # Fenêtre d'attraction : plus étroite pour orange et or (sinon tous deux tirés vers la même teinte d'image)
+        # Narrower pull window for orange and gold (otherwise both are pulled to the same image hue)
         window = {"base09": 8, "base0A": 15}.get(key, 22)
         near = [(h, w) for h, w in vivid if dist(h, target) <= window]
         h = target
@@ -110,8 +110,8 @@ def main():
             m = hue_mean(near)
             if m is not None:
                 h = m
-        # Écart minimal de 20° avec les accents déjà placés (sauf brun, distinct par sa luminosité) :
-        # en cas de collision, se placer à 20° du voisin, du côté de sa teinte de référence.
+        # Keep at least 20° from the accents already placed (except brown, distinct by its lightness):
+        # on collision, move to 20° from the neighbour, on the side of its reference hue.
         if key != "base0F":
             for _ in range(8):
                 clash = [c for c in chosen if dist(c, h) < 20]
@@ -125,8 +125,8 @@ def main():
         while contrast(c, bg) < 4.5 and l < 0.9:
             l += 0.02; c = hexc(h, l, s)
         pal[key] = c
-        notes[key] = f"{note} (teinte {round(h)}°{' issue de l image' if h != target else ''})"
-    lines = [f'# Généré par scripts/palette-from-image.py depuis {os.path.basename(img)} — ne pas éditer à la main.',
+        notes[key] = f"{note} (hue {round(h)}°{', from the image' if h != target else ''})"
+    lines = [f'# Generated by scripts/palette-from-image.py from {os.path.basename(img)}: do not edit by hand.',
              '{', f'  scheme = "{name}"; author = "macos-config (auto)";']
     for i in range(16):
         k = f"base0{i:X}"
@@ -134,7 +134,7 @@ def main():
     lines.append('}')
     open(out, "w").write("\n".join(lines) + "\n")
     worst = min(contrast(pal[f"base0{i:X}"], bg) for i in range(8, 16))
-    print(f"{out} : fond #{bg} (teinte {round(hd)}°), texte #{pal['base05']}, contraste mini accents {worst:.1f}:1")
+    print(f"{out}: background #{bg} (hue {round(hd)}°), text #{pal['base05']}, minimum accent contrast {worst:.1f}:1")
 
 
 if __name__ == "__main__":

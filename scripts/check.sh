@@ -65,7 +65,7 @@ else fail "theme-auto commit isolation / home-manager guard"; fi
 # and a stale registry silently reverted the user's gestures and layouts (2026-10-15).
 cp tools/omniwm/config/settings.toml "$t/omniwm.toml"
 reg=$(OMNIWM_SCREEN=2074x1340 python3 -I tools/omniwm/apply-registry.py "$t/omniwm.toml" | tail -1)
-if [ "$reg" = "0 changement(s)" ]; then echo "  ok    OmniWM registry matches tools/omniwm/config/settings.toml"
+if [ "$reg" = "0 change(s)" ]; then echo "  ok    OmniWM registry matches tools/omniwm/config/settings.toml"
 else fail "apply-registry.py would change the captured settings.toml ($reg): update the registry or the capture"; fi
 
 # Portability: no code file may hardcode a user home or the original clone location (install.sh

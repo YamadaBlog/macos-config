@@ -1,5 +1,5 @@
 #!/bin/bash
-# Fonctions communes aux scripts du dépôt. Sourcé, jamais exécuté seul.
+# Shared helpers for the repo scripts. Sourced, never run on its own.
 set -u
 REPO="$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck disable=SC2034  # used by the scripts that source this file
@@ -16,14 +16,14 @@ config_rows() { awk -F'\t' 'NR>1 && ($2=="file" || $2=="plist")' "$REPO/tools/co
 
 has_secret() { grep -qiE "$SECRET_RE" "$1"; }
 
-# Exporte un domaine de préférences en XML nettoyé vers $2. Code 1 si domaine absent.
+# Export a preferences domain as cleaned XML to $2. Exit code 1 if the domain does not exist.
 export_plist() {
   defaults export "$1" - 2>/dev/null | plutil -convert xml1 -o "$2" - 2>/dev/null || return 1
   for k in remote_id remote_token device_id 'NSWindow Frame'; do plutil -remove "$k" "$2" 2>/dev/null || true; done
   case "$1" in pl.maketheweb.TopNotch|fyi.lunar.Lunar|eu.exelban.Stats)
-    # Clés volatiles ou d'usage (dates, compteurs, positions, Sparkle SU*, historiques d'usage) :
-    # sans valeur de configuration, parfois quasi-identifiantes. plistlib lit aussi les champs <data>
-    # (l'ancienne conversion JSON échouait en silence sur ces champs et ne retirait rien).
+    # Volatile or usage keys (dates, counters, positions, Sparkle SU*, usage history): no configuration
+    # value, sometimes close to identifiers. plistlib also reads <data> fields (the former JSON conversion
+    # failed silently on them and removed nothing).
     python3 -I - "$2" <<'PY' || return 1
 import plistlib, sys
 p = sys.argv[1]
@@ -37,7 +37,7 @@ PY
   esac
 }
 
-# Produit dans $1 la version « poste » d'une ligne de config. Code 1 si absente.
+# Write to $1 the machine's version of a config row. Exit code 1 if it does not exist.
 live_copy() {
   local out="$1" type="$2" live="$3"
   if [ "$type" = file ]; then live="$(expand "$live")"; [ -f "$live" ] || return 1; cp "$live" "$out"

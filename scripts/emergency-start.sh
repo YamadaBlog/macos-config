@@ -1,5 +1,5 @@
 #!/bin/bash
-# Recharge et relance les agents arrêtés par emergency-stop.sh.
+# Reload and restart the agents stopped by emergency-stop.sh.
 export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin
 uid="$(id -u)"
 for a in omniwm hammerspoon neru; do
