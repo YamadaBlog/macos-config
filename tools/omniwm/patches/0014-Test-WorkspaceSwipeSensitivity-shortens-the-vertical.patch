@@ -1,7 +1,7 @@
 From eead0304fa3b682906d9ce475439d24f7d3afce6 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 00:49:21 +0200
-Subject: [PATCH 14/17] Test: WorkspaceSwipeSensitivity shortens the vertical
+Subject: [PATCH 14/18] Test: WorkspaceSwipeSensitivity shortens the vertical
  swipe trigger and travel
 
 ---

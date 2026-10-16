@@ -1,7 +1,7 @@
 From 64365292fc14c61fb15ebc7d4f1225e3e14d19a1 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Thu, 15 Oct 2026 17:06:12 +0200
-Subject: [PATCH 04/17] Parking edge masks show the wallpaper slice and swallow
+Subject: [PATCH 04/18] Parking edge masks show the wallpaper slice and swallow
  clicks; Retina swipe captures; swipe geometry log
 
 ---

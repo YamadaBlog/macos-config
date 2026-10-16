@@ -61,6 +61,14 @@ Before changing anything listed here, read the entry and keep its verification p
   appearance wrong. `focus.raiseOnMouseFocus = true` (registry) makes hover focus use the normal one-step path;
   tiled windows never overlap, and OmniWM still avoids covering floating windows. Verify: the watchdog that
   compares coloured traffic lights with AX focus reports no mismatch.
+- **Fixed — no focus after a workspace switch until the mouse moves (2026-10-16):** hover focus only reacted
+  to mouse-move events, so windows arriving under a still pointer (workspace switch, end of a Niri scroll)
+  were never focused. The old setup hid this because ws-hide.lua refocused after a switch, but only when the
+  frontmost app had no window on the new workspace (one app per workspace). Fix (patch 0018): mark a
+  re-evaluation when the workspace changes or a Niri scroll ends, run it when the layout refresh completes
+  with no swipe running, on the window really under the pointer. Verify: switch workspaces with
+  `omniwmctl command switch-workspace N` without touching the mouse; the window under the pointer is the
+  macOS focused one (8/8 on 2026-10-16).
 - **Investigation notes (before the raise fix):** 4 Ghostty windows showed
   coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
   the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the

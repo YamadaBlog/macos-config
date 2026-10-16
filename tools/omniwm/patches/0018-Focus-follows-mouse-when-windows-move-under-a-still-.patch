@@ -1,0 +1,104 @@
+From c400362ec14710cd3f00ad0a16db71cb35b5e943 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 11:28:12 +0200
+Subject: [PATCH 18/18] Focus follows mouse when windows move under a still
+ pointer (workspace switch, Niri scroll end)
+
+---
+ .../LayoutRefreshController+DisplayLink.swift |  5 +++
+ .../LayoutRefreshController+Scheduling.swift  |  5 +++
+ .../MouseEventHandler+FocusFollowsMouse.swift | 39 +++++++++++++++++++
+ .../WMController+WorldObservation.swift       |  1 +
+ 4 files changed, 50 insertions(+)
+
+diff --git a/Sources/OmniWM/Core/Controller/LayoutRefreshController+DisplayLink.swift b/Sources/OmniWM/Core/Controller/LayoutRefreshController+DisplayLink.swift
+index 8118a5e2..1ac8a617 100644
+--- a/Sources/OmniWM/Core/Controller/LayoutRefreshController+DisplayLink.swift
++++ b/Sources/OmniWM/Core/Controller/LayoutRefreshController+DisplayLink.swift
+@@ -179,6 +179,11 @@ extension LayoutRefreshController {
+     }
+ 
+     func stopScrollAnimation(for displayId: CGDirectDisplayID) {
++        // Hover focus is ignored while columns scroll: re-evaluate the window under the pointer afterwards.
++        defer {
++            PointerFocusReevaluation.markPending(reason: "niri scroll ended")
++            controller?.mouseEventHandler.reevaluatePointerFocusIfPending()
++        }
+         if let workspaceId = niriHandler.scrollAnimationByDisplay[displayId] {
+             niriHandler.terminateViewportGesture(
+                 for: workspaceId,
+diff --git a/Sources/OmniWM/Core/Controller/LayoutRefreshController+Scheduling.swift b/Sources/OmniWM/Core/Controller/LayoutRefreshController+Scheduling.swift
+index 38d2d10c..c7526737 100644
+--- a/Sources/OmniWM/Core/Controller/LayoutRefreshController+Scheduling.swift
++++ b/Sources/OmniWM/Core/Controller/LayoutRefreshController+Scheduling.swift
+@@ -131,6 +131,11 @@ extension LayoutRefreshController {
+         }
+ 
+         startNextRefreshIfNeeded()
++        if didComplete, layoutState.activeRefresh == nil,
++           workspaceSwipe.preparation == nil, !workspaceSwipe.hasPresentation
++        {
++            controller?.mouseEventHandler.reevaluatePointerFocusIfPending()
++        }
+     }
+ 
+     func collectUnusedWorkspacesIfIdle() {
+diff --git a/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift b/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
+index 005de1ad..2e4aa642 100644
+--- a/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
++++ b/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
+@@ -416,3 +416,42 @@ enum FocusFollowsMouseTrailingEdge {
+ 
+     static func cancel() { pending?.cancel(); pending = nil }
+ }
++
++/// Focus follows the mouse also when the windows move under a still pointer (workspace switch, Niri scroll):
++/// mouse-move events alone never re-evaluated the window under the pointer then, so the window under it
++/// stayed unfocused until the mouse moved (2026-10-16). Marked when the workspace changes or a Niri scroll
++/// ends, evaluated once the layout refresh has completed and no swipe is running.
++@MainActor
++enum PointerFocusReevaluation {
++    private(set) static var pendingReason: StaticString?
++    static func markPending(reason: StaticString) { pendingReason = reason }
++    static func take() -> StaticString? { defer { pendingReason = nil }; return pendingReason }
++
++    /// Topmost normal window containing `point` (global top-left coordinates, like CGEvent locations).
++    static func windowId(at point: CGPoint) -> Int? {
++        guard let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID)
++            as? [[String: Any]] else { return nil }
++        for info in list where (info[kCGWindowLayer as String] as? Int) == 0 {
++            guard let bounds = info[kCGWindowBounds as String] as? [String: CGFloat],
++                  CGRect(x: bounds["X"] ?? 0, y: bounds["Y"] ?? 0,
++                         width: bounds["Width"] ?? 0, height: bounds["Height"] ?? 0).contains(point)
++            else { continue }
++            return info[kCGWindowNumber as String] as? Int
++        }
++        return nil
++    }
++}
++
++extension MouseEventHandler {
++    func reevaluatePointerFocusIfPending() {
++        guard let controller, PointerFocusReevaluation.pendingReason != nil,
++              controller.isEnabled, controller.focusFollowsMouseEnabled, !controller.isOverviewOpen(),
++              let location = CGEvent(source: nil)?.location
++        else { return }
++        guard !shouldBlockOwnWindowInput(at: location), shouldHandleFocusFollowsMouse(at: location) else { return }
++        _ = PointerFocusReevaluation.take()
++        FocusTrace.decision("re-evaluate under a still pointer", controller: controller)
++        state.lastFocusFollowsMouseTime = .distantPast   // not a mouse move: the debounce does not apply
++        handleFocusFollowsMouse(at: location, windowIdUnderPointer: PointerFocusReevaluation.windowId(at: location))
++    }
++}
+diff --git a/Sources/OmniWM/Core/Controller/WMController+WorldObservation.swift b/Sources/OmniWM/Core/Controller/WMController+WorldObservation.swift
+index def0102f..792181d2 100644
+--- a/Sources/OmniWM/Core/Controller/WMController+WorldObservation.swift
++++ b/Sources/OmniWM/Core/Controller/WMController+WorldObservation.swift
+@@ -21,6 +21,7 @@ extension WMController {
+             surfaceReconciler.noteBorderChanged()
+         }
+         let changeSet = focusNotificationDispatcher.notifyFocusChangesIfNeeded()
++        if changeSet.workspaceChanged { PointerFocusReevaluation.markPending(reason: "workspace changed") }
+         if statusBarRefreshIsEnabled {
+             refreshStatusBar()
+         }

@@ -13,6 +13,7 @@ is not a plain `git revert`.
 - OmniWM patches 0008–0017: bug fixes from earlier local builds (diagonal swipe start, swipe sensitivity,
   wallpaper cache, Secure Input panel, System Settings focus, Overview captures) and focus reliability
   (macOS-checked "already focused", debounce trailing edge, `focus-trace` log); `raiseOnMouseFocus = true`.
+- OmniWM patch 0018: the window under a still pointer gets focus after a workspace switch or a Niri scroll.
 
 ## 1.0.0 — first public release
 - Guided installation (`install.sh`), diagnostic (`scripts/doctor.sh`), drift check (`scripts/verify.sh`),
