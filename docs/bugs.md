@@ -69,6 +69,14 @@ Before changing anything listed here, read the entry and keep its verification p
   with no swipe running, on the window really under the pointer. Verify: switch workspaces with
   `omniwmctl command switch-workspace N` without touching the mouse; the window under the pointer is the
   macOS focused one (8/8 on 2026-10-16).
+- **Fixed — returning to a workspace re-focused its remembered window, not the one under the pointer
+  (2026-10-16, reproduced every time by the user):** W1 window o1 → W2 → pointer moved to o2 → back to W1:
+  focus went to o1. The swipe commit (and keyboard switch) focused the workspace's remembered window, and the
+  swipe ends without another layout refresh, so patch 0018's re-evaluation never ran for gestures. Fix
+  (patch 0019): `resolveWorkspaceTransitionFocusHandoff` picks the window whose destination frame (Niri settled
+  frames / Dwindle plan, floating first) contains the pointer. One decision, before any animation: no race.
+  Verify: pointer resting on window B of W1, focus another W1 window A via omniwmctl, switch to W2 and back:
+  B is focused (3/3).
 - **Investigation notes (before the raise fix):** 4 Ghostty windows showed
   coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
   the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the

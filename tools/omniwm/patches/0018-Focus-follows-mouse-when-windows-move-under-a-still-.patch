@@ -1,7 +1,7 @@
-From c400362ec14710cd3f00ad0a16db71cb35b5e943 Mon Sep 17 00:00:00 2001
+From 28440f4e946b75e7563a5a1ef0a63fc75cd9dab0 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 11:28:12 +0200
-Subject: [PATCH 18/18] Focus follows mouse when windows move under a still
+Subject: [PATCH 18/19] Focus follows mouse when windows move under a still
  pointer (workspace switch, Niri scroll end)
 
 ---

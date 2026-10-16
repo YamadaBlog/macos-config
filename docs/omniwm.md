@@ -8,7 +8,7 @@ settings this repo installs; values marked *default* are OmniWM's own defaults.
 | Piece | Where |
 |---|---|
 | Pinned upstream commit | `tools/omniwm/UPSTREAM` |
-| Local patches (git `format-patch` series) | `tools/omniwm/patches/0001…0018` |
+| Local patches (git `format-patch` series) | `tools/omniwm/patches/0001…0019` |
 | Build + sign + install | `tools/omniwm/build-local.sh` (`--check` = patches apply, no build) |
 | Signing certificate (once per Mac) | `tools/omniwm/create-signing-cert.sh` |
 | Working checkout | `$OMNIWM_SRC` (default `~/src/omniwm`), branch `macos-config`, recreated on every build |
@@ -37,6 +37,7 @@ build, so permissions would be lost on each rebuild. The certificate pins them (
 | 0015 | `focus-trace` log of every focus-follows-mouse decision (hovered window, OmniWM focus, frontmost app, reason) | diagnosing focus |
 | 0016 | before skipping an "already focused" window, check macOS (frontmost app + AX focused window) once per pointer entry | OmniWM's record is not updated by same-app hand-offs: the window under the pointer stayed inactive (B5) |
 | 0017 | a move dropped by the 0.1 s debounce is re-evaluated once when the debounce expires | fast pointer moves left the window under the pointer unfocused: 10/15 → 0/15 measured (B5) |
+| 0019 | on a workspace switch (gesture or keyboard), focus the window whose destination frame contains the pointer instead of the window remembered for that workspace | W1 o1 → W2 → pointer to o2 → back to W1 re-focused o1 although the pointer was over o2 (B5) |
 | 0018 | after a workspace change (once the layout refresh completes, no swipe running) and after a Niri scroll, focus the window under the still pointer | hover focus only reacted to mouse moves: arriving on a workspace left the window under the pointer unfocused (B5); 8/8 with a still pointer |
 
 Tests added by the patches (run targeted only, never the full suite on a machine in use — it froze the
