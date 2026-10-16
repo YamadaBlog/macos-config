@@ -41,6 +41,13 @@ Before changing anything listed here, read the entry and keep its verification p
 - **Safari after a workspace switch (2026-10-09), established:** the Safari window had become *floating*,
   and ws-hide only refocused tiled windows. Fix: app rules force `layout = "tile"` for Safari/Ghostty/
   Discord/Finder, ws-hide also considers floating windows. Verified 8/8 manual switches.
+- **Fixed — pointer on a window that stays inactive (2026-10-16, established by `focus-trace`):** OmniWM's
+  native-focus record (`nativeManagedFocusToken`) is not updated by same-app hand-offs (hover from one Ghostty
+  window to another), so hovering back onto the window it still named was skipped as "already focused" while
+  macOS focused another window. Fix (patch "Focus follows mouse: verify macOS focus…"): when the record names
+  the hovered window, check macOS (frontmost app + AX focused window) once per pointer entry; refocus if the
+  same app focuses another window. Verify: `/usr/bin/log stream --predicate 'category == "focus-trace"'` shows
+  "native focus diverged: refocusing" instead of the window staying inactive.
 - **Open — several windows of one app drawn as active (2026-10-16, reproduced):** 4 Ghostty windows showed
   coloured traffic lights while AX reported a single main/focused window, so the visual state lied about
   the real focus. Measured facts: the SkyLight "same-app activation" record (type 0x0D, state 1/2) acts on the

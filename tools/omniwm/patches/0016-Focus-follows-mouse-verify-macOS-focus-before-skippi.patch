@@ -1,0 +1,79 @@
+From bbb3ea11ef3e8ffd8fa868d400d94e79fa12d91f Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 10:01:44 +0200
+Subject: [PATCH 16/16] Focus follows mouse: verify macOS focus before skipping
+ an 'already focused' window
+
+OmniWM's native-focus record is not updated by same-app hand-offs, so hovering back onto a window it still named did nothing while macOS focused another window. Check frontmost app + AX focused window once per pointer entry.
+---
+ .../MouseEventHandler+FocusFollowsMouse.swift | 46 ++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 2 deletions(-)
+
+diff --git a/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift b/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
+index cc52a50b..0ecac0a8 100644
+--- a/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
++++ b/Sources/OmniWM/Core/Controller/MouseEventHandler+FocusFollowsMouse.swift
+@@ -4,6 +4,7 @@
+ import AppKit
+ import OSLog
+ import Foundation
++import QuartzCore
+ 
+ extension MouseEventHandler {
+     var hasLatestFocusFollowsMouseSample: Bool {
+@@ -145,8 +146,20 @@ extension MouseEventHandler {
+         }
+         let token = focusFollowsMouseToken(for: target)
+ 
+-        guard token != controller.workspaceManager.nativeManagedFocusToken else {
+-            FocusTrace.decision("skip: OmniWM believes it is already focused", controller: controller, token: token)
++        if token == controller.workspaceManager.nativeManagedFocusToken {
++            // OmniWM's native-focus record is not updated by same-app hand-offs (hover between two
++            // windows of one app), so it can still name this window while macOS focuses another one:
++            // hovering it back then did nothing and the window under the pointer stayed inactive
++            // (2026-10-16, caught by focus-trace). Trust it only after checking macOS once per entry.
++            guard !NativeFocusCheck.differs(from: token, hovered: windowIdUnderPointer) else {
++                FocusTrace.decision("native focus diverged from OmniWM's record: refocusing", controller: controller, token: token)
++                controller.focusPolicyEngine.performIfFocusFollowsMouseAllowed {
++                    state.lastFocusFollowsMouseTime = now
++                    activateFocusFollowsMouseTarget(target)
++                }
++                return
++            }
++            FocusTrace.decision("skip: already focused (checked with macOS)", controller: controller, token: token)
+             return
+         }
+         var allowed = false
+@@ -343,3 +356,32 @@ enum FocusTrace {
+         log.info("\(line, privacy: .public)")
+     }
+ }
++
++/// Ground truth for "is this window really focused?": frontmost app and its AX focused window.
++/// Queried only when the pointer enters a new window or after 1 s, never on every mouse move.
++@MainActor
++enum NativeFocusCheck {
++    private static var lastWindow: Int?
++    private static var lastTime: TimeInterval = 0
++    private static var lastAnswer = false
++
++    static func differs(from token: WindowToken, hovered: Int?) -> Bool {
++        let now = CACurrentMediaTime()
++        if hovered == lastWindow, now - lastTime < 1 { return lastAnswer }
++        lastWindow = hovered; lastTime = now
++        lastAnswer = !isNativelyFocused(token)
++        return lastAnswer
++    }
++
++    /// Only the observed divergence counts: the window's own app is frontmost but another of its windows
++    /// has focus. Any other case keeps OmniWM's record (unchanged behaviour).
++    static func isNativelyFocused(_ token: WindowToken) -> Bool {
++        guard let app = NSWorkspace.shared.frontmostApplication, app.processIdentifier == token.pid else { return true }
++        var value: CFTypeRef?
++        guard AXUIElementCopyAttributeValue(AXUIElementCreateApplication(token.pid), kAXFocusedWindowAttribute as CFString, &value) == .success,
++              let value, CFGetTypeID(value) == AXUIElementGetTypeID(),
++              let windowId = getWindowId(from: value as! AXUIElement)
++        else { return true }   // cannot tell: keep OmniWM's record (previous behaviour)
++        return windowId == token.windowId
++    }
++}
