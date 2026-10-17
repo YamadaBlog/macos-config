@@ -1,0 +1,98 @@
+From 76970fdb51d506603ba1c046e9b875c653c8386b Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 14:30:22 +0200
+Subject: [PATCH 20/27] AX: a size read back at the previously verified size is
+ stale, not a minimum
+
+Leaving OmniWM fullscreen, Safari read back its 2074 pt fullscreen width twice after a 1025 pt
+write; OmniWM learned 2074 pt as the window's minimum and the Niri column stayed at full screen
+width, without gaps, until OmniWM restarted. Do not flag a stable size clamp when every larger
+axis still equals the size OmniWM last verified for that window.
+---
+ .../Core/Ax/AXFrameApplicationLedger.swift    |  5 ++++-
+ .../Core/Ax/AXFrameFailureAssessment.swift    | 15 +++++++++++--
+ .../ObservedMinimumSizeClampTests.swift       | 22 +++++++++++++++++++
+ 3 files changed, 39 insertions(+), 3 deletions(-)
+
+diff --git a/Sources/OmniWM/Core/Ax/AXFrameApplicationLedger.swift b/Sources/OmniWM/Core/Ax/AXFrameApplicationLedger.swift
+index 6336b0b2..8e9d6d80 100644
+--- a/Sources/OmniWM/Core/Ax/AXFrameApplicationLedger.swift
++++ b/Sources/OmniWM/Core/Ax/AXFrameApplicationLedger.swift
+@@ -450,7 +450,10 @@ extension AXFrameApplicationLedger {
+     ) {
+         let windowId = result.windowId
+         retryBudgetByWindowId.removeValue(forKey: windowId)
+-        let assessment = AXFrameFailureAssessment(result: result, priorFailure: priorFailure)
++        let assessment = AXFrameFailureAssessment(
++            result: result, priorFailure: priorFailure,
++            previousVerifiedSize: appliedFrameStates[windowId]?.verifiedSize
++        )
+         if assessment.stableSizeClamp {
+             outcome.stableSizeClamps.append(result)
+         }
+diff --git a/Sources/OmniWM/Core/Ax/AXFrameFailureAssessment.swift b/Sources/OmniWM/Core/Ax/AXFrameFailureAssessment.swift
+index 35501ba2..1786e445 100644
+--- a/Sources/OmniWM/Core/Ax/AXFrameFailureAssessment.swift
++++ b/Sources/OmniWM/Core/Ax/AXFrameFailureAssessment.swift
+@@ -9,7 +9,11 @@ struct AXFrameFailureAssessment {
+     var convergedFrame: CGRect?
+     var terminalRefusal: AXFrameTerminalRefusal?
+ 
+-    init(result: AXFrameApplyResult, priorFailure: AXRecentFrameWriteFailure?) {
++    /// `previousVerifiedSize`: the size OmniWM last wrote and verified for this window. An app still
++    /// reporting exactly that size has not processed the new write yet (Safari leaving OmniWM fullscreen,
++    /// 2026-10-16: 2074 pt observed twice after a 1025 pt write); that is not a minimum size, and learning
++    /// it pinned the column at full screen width until OmniWM restarted.
++    init(result: AXFrameApplyResult, priorFailure: AXRecentFrameWriteFailure?, previousVerifiedSize: CGSize? = nil) {
+         if let failureReason = result.writeResult.failureReason,
+            priorFailure?.reason == failureReason,
+            let observedFrame = result.writeResult.observedFrame
+@@ -18,7 +22,14 @@ struct AXFrameFailureAssessment {
+                 result: result,
+                 observedFrame: observedFrame
+             ) == true
+-            if stableSizeClamp,
++            // Every axis that came out larger than asked still shows the previously verified size.
++            let isStalePreviousSize = previousVerifiedSize.map { previous in
++                let tol = FrameTolerance.frameWrite, target = result.targetFrame.size, seen = observedFrame.size
++                let widthStale = seen.width <= target.width + tol || abs(seen.width - previous.width) < tol
++                let heightStale = seen.height <= target.height + tol || abs(seen.height - previous.height) < tol
++                return widthStale && heightStale
++            } ?? false
++            if stableSizeClamp, !isStalePreviousSize,
+                observedFrame.width >= result.targetFrame.width - FrameTolerance.frameWrite,
+                observedFrame.height >= result.targetFrame.height - FrameTolerance.frameWrite,
+                observedFrame.width > result.targetFrame.width + FrameTolerance.frameWrite
+diff --git a/Tests/OmniWMTests/ObservedMinimumSizeClampTests.swift b/Tests/OmniWMTests/ObservedMinimumSizeClampTests.swift
+index 012fd69a..c5a2d41d 100644
+--- a/Tests/OmniWMTests/ObservedMinimumSizeClampTests.swift
++++ b/Tests/OmniWMTests/ObservedMinimumSizeClampTests.swift
+@@ -51,6 +51,28 @@ final class ObservedMinimumSizeClampTests: XCTestCase {
+         XCTAssertEqual(invalidatedWorkspaces, [fixture.workspaceId, fixture.workspaceId])
+     }
+ 
++    /// Safari leaving OmniWM fullscreen: the 1025 pt write is read back twice at the 2074 pt fullscreen size
++    /// OmniWM had just verified. That is a stale read, not a minimum (learning it pinned the column).
++    func testRepeatedReadOfPreviousVerifiedSizeIsNotAStableClamp() throws {
++        let fixture = try makeFixture()
++        let fullscreen = CGRect(x: 0, y: 0, width: 2074, height: 1301)
++        let target = CGRect(x: 8, y: 8, width: 1025, height: 1293)
++        let observed = CGRect(x: 8, y: 8, width: 2074, height: 1293)
++        let result = clampResult(fixture, target: target, observed: observed)
++        let prior = AXRecentFrameWriteFailure(
++            pid: fixture.token.pid, expectedWindow: fixture.window, reason: .verificationMismatch,
++            targetFrame: target, observedFrame: observed, settersSucceeded: true, components: .all
++        )
++
++        XCTAssertTrue(AXFrameFailureAssessment(result: result, priorFailure: prior).stableSizeClamp)
++        XCTAssertFalse(AXFrameFailureAssessment(
++            result: result, priorFailure: prior, previousVerifiedSize: fullscreen.size
++        ).stableSizeClamp)
++        XCTAssertTrue(AXFrameFailureAssessment(
++            result: result, priorFailure: prior, previousVerifiedSize: CGSize(width: 1025, height: 1293)
++        ).stableSizeClamp, "a real refusal from a different previous size is still learned")
++    }
++
+     func testStableClampClassifiesEachAxisByConvergenceBound() throws {
+         let fixture = try makeFixture()
+         let manager = fixture.controller.workspaceManager

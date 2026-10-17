@@ -10,3 +10,7 @@ axGuard = require("ax-guard")
 -- Click-through wallpaper strip over the right gap (hides parked windows without hiding apps).
 marginVeil = require("margin-veil")
 wsHide = require("ws-hide")
+-- Cmd+F1 pastes the prompt-optimisation prompt at the cursor (clipboard restored).
+promptInsert = require("prompt-insert")
+-- Safari: Cmd+Left/Right = previous/next tab (outside text fields).
+safariTabs = require("safari-tabs")

@@ -42,7 +42,7 @@ Authority: the real machine (checked by `scripts/verify.sh` / `scripts/doctor.sh
   clicks (B6). Screenshots do not show OmniWM's own surfaces: verify edges by eye/photo.
 - **No hardcoded user or clone paths in code** (`scripts/check.sh` enforces it). Scripts find the repo from
   their own location (`scripts/lib.sh` `REPO`); Lua uses `require("repo-path")`; Nix uses `identity.repoDir`.
-- Workspace `name` = digit, label = `displayName`. Bindings are QWERTY key positions; Option alone is never bound.
+- Workspace `name` = digit, label = `displayName`. Bindings are QWERTY key positions; Option alone is never bound (exceptions: Option+Tab, Option+F).
 - Preview by default, back up before writing, print the rollback. No `rm -rf` on user data, no `--force`.
 
 ## 4. Safety rules on a live machine

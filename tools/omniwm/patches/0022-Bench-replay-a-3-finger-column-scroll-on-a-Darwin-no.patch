@@ -1,0 +1,126 @@
+From a0fd686dbbbd2e1faade60c755776006044f0f03 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 15:22:36 +0200
+Subject: [PATCH 22/27] Bench: replay a 3-finger column scroll on a Darwin
+ notification
+
+notifyutil -p com.barut.OmniWM.bench.columnScroll feeds the same 120 Hz gesture (slow, fast,
+reversal, flick) through the real gesture pipeline, so scroll changes can be measured
+before/after with a trace capture instead of hand gestures.
+---
+ .../Core/Controller/ColumnScrollBench.swift   | 85 +++++++++++++++++++
+ .../Controller/ServiceLifecycleManager.swift  |  2 +
+ 2 files changed, 87 insertions(+)
+ create mode 100644 Sources/OmniWM/Core/Controller/ColumnScrollBench.swift
+
+diff --git a/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift b/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift
+new file mode 100644
+index 00000000..6a3b4222
+--- /dev/null
++++ b/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift
+@@ -0,0 +1,85 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++import AppKit
++import OSLog
++
++private let benchLog = Logger(subsystem: "com.barut.OmniWM", category: "column-scroll-bench")
++
++/// Reproducible 3-finger horizontal column scroll for measurements: `notifyutil -p com.barut.OmniWM.bench.columnScroll`
++/// replays the same gesture (120 Hz frames through the real gesture pipeline) at the screen centre. Segments are
++/// (normalized trackpad x velocity per second, duration): slow drag, fast drag, direction reversal, fast flick, lift.
++@MainActor
++final class ColumnScrollBench {
++    static let notification = "com.barut.OmniWM.bench.columnScroll"
++    private static let segments: [(velocity: CGFloat, duration: TimeInterval)] = [
++        (-0.25, 0.8), (-0.9, 0.5), (0.9, 0.5), (0.25, 0.6), (-1.6, 0.15),
++    ]
++    private weak var handler: MouseEventHandler?
++    private var timer: Timer?
++    private var plan: [(time: TimeInterval, x: CGFloat)] = []
++    private var index = 0
++    private var start: TimeInterval = 0
++    private var location: CGPoint = .zero
++
++    init(handler: MouseEventHandler) {
++        self.handler = handler
++        let observer = Unmanaged.passUnretained(self).toOpaque()
++        CFNotificationCenterAddObserver(
++            CFNotificationCenterGetDarwinNotifyCenter(), observer,
++            { _, observer, _, _, _ in
++                guard let observer else { return }
++                let bench = Unmanaged<ColumnScrollBench>.fromOpaque(observer).takeUnretainedValue()
++                DispatchQueue.main.async { MainActor.assumeIsolated { bench.run() } }
++            },
++            Self.notification as CFString, nil, .deliverImmediately
++        )
++    }
++
++    func run() {
++        guard timer == nil, let screen = NSScreen.main else { return }
++        let frame = screen.frame
++        location = CGPoint(x: frame.midX, y: frame.midY)
++        plan = []
++        var t: TimeInterval = 0, x: CGFloat = 0.5
++        let dt = 1.0 / 120.0
++        for segment in Self.segments {
++            var elapsed: TimeInterval = 0
++            while elapsed < segment.duration {
++                t += dt; elapsed += dt; x += segment.velocity * CGFloat(dt)
++                plan.append((t, x))
++            }
++        }
++        index = 0
++        start = CACurrentMediaTime()
++        benchLog.notice("bench start: \(self.plan.count, privacy: .public) frames")
++        send(.began, x: 0.5, at: start)
++        timer = Timer.scheduledTimer(withTimeInterval: dt, repeats: true) { [weak self] _ in
++            MainActor.assumeIsolated { self?.step() }
++        }
++    }
++
++    private func step() {
++        let now = CACurrentMediaTime()
++        // Send every planned frame that is due (a late timer delivers the backlog like the real event tap).
++        while index < plan.count, start + plan[index].time <= now {
++            send(.changed, x: plan[index].x, at: start + plan[index].time)
++            index += 1
++        }
++        guard index >= plan.count else { return }
++        timer?.invalidate(); timer = nil
++        send(.ended, x: 0, at: now + 0.008)
++        benchLog.notice("bench end")
++    }
++
++    private func send(_ phase: NSEvent.Phase, x: CGFloat, at time: TimeInterval) {
++        let touches = phase == .ended ? [] : (0 ..< 3).map { finger in
++            MouseEventHandler.GestureTouchSample(
++                phase: .moved, normalizedPosition: CGPoint(x: x + CGFloat(finger) * 0.05, y: 0.5)
++            )
++        }
++        handler?.receiveTapGestureEvent(MouseEventHandler.GestureEventSnapshot(
++            location: location, phaseRawValue: phase.rawValue, timestamp: time, touches: touches
++        ))
++    }
++}
+diff --git a/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift b/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift
+index 4ccf2272..c3235348 100644
+--- a/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift
++++ b/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift
+@@ -18,6 +18,7 @@ enum ActivationEventSource: String, Sendable {
+ @MainActor
+ final class ServiceLifecycleManager {
+     weak var controller: WMController?
++    private var columnScrollBench: ColumnScrollBench?
+     let topologyInventory: NativeSpaceInventoryController
+     var monitorConfiguration: MonitorConfigurationHandler
+ 
+@@ -140,6 +141,7 @@ final class ServiceLifecycleManager {
+         connectAXFrameCallbacks(controller)
+         workspaceObservation.setupWorkspaceObservation()
+         controller.mouseEventHandler.setup()
++        columnScrollBench = ColumnScrollBench(handler: controller.mouseEventHandler)
+         controller.syncMouseWarpPolicy()
+         controller.syncWorkspaceBarRevealMonitor()
+         monitorConfiguration.startObserving()

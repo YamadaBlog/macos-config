@@ -13,3 +13,5 @@ hammerspoon	file	~/.hammerspoon/margin-veil.lua	tools/hammerspoon/config/margin-
 hammerspoon	file	~/.hammerspoon/repo-path.lua	tools/hammerspoon/config/repo-path.lua	copy	
 neru	file	~/.config/neru/config.toml	tools/neru/config/config.toml	copy	check: neru config validate
 stats	plist	eu.exelban.Stats	tools/stats/config/eu.exelban.Stats.plist	defaults-import-app-quit	remote_id stripped
+hammerspoon	file	~/.hammerspoon/prompt-insert.lua	tools/hammerspoon/config/prompt-insert.lua	copy	
+hammerspoon	file	~/.hammerspoon/safari-tabs.lua	tools/hammerspoon/config/safari-tabs.lua	copy	

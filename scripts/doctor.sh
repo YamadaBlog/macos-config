@@ -63,6 +63,14 @@ done
 [ -f "$HOME/.config/ghostty/config" ] && ok "Ghostty config present" || warn "no Ghostty config" "scripts/apply.sh home-manager --write (Stylix writes it)"
 pgrep -ix neru >/dev/null && ok "Neru running" || warn "Neru not running" "open -a Neru; grant Accessibility"
 
+echo "== macOS services"
+# Safari retried this disabled Quick Note service ~1/s; each retry could block its rendering ~500 ms
+# while windows moved (docs/bugs.md B18). Other disabled Apple services had no measured effect.
+if launchctl print-disabled "gui/$(id -u)" 2>/dev/null | grep -q '"com.apple.synapse.contentlinkingd" => disabled'; then
+  fail "com.apple.synapse.contentlinkingd disabled (Safari freezes while windows move)" \
+    "launchctl enable gui/$(id -u)/com.apple.synapse.contentlinkingd; launchctl bootstrap gui/$(id -u) /System/Library/LaunchAgents/com.apple.synapse.contentlinkingd.plist"
+else ok "Quick Note link service (contentlinkingd) enabled"; fi
+
 echo
 [ "$fails" = 0 ] && echo "doctor: no failure." || echo "doctor: $fails failure(s)."
 [ "$fails" = 0 ]

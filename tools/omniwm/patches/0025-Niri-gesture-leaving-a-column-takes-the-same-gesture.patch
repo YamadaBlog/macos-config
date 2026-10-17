@@ -1,0 +1,214 @@
+From 95fac465708acad705280fa88565bb60462b16c6 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 16:36:03 +0200
+Subject: [PATCH 25/27] Niri gesture: leaving a column takes the same gesture
+ whatever its width
+
+Snap used the snap point nearest to the projected position, and neighbouring points are a column
+width apart: leaving a full-width column needed ~1033 pt of projected travel against ~516 pt for a
+half-width one. From the point the strip rested on, a projected travel past halfway to the next
+point, capped at a quarter of the viewport, now goes to that point (further if the projection
+reaches further); shorter travel returns. Narrow and half-width columns are unchanged.
+---
+ .../MouseEventHandler+TrackpadLifecycle.swift |  3 +-
+ .../Layout/Niri/NiriGestureSnapPlan.swift     | 20 +++++++
+ .../Core/Layout/Niri/NiriProjection.swift     |  6 +-
+ .../Layout/Niri/ViewportState+Gestures.swift  | 25 +++++++--
+ .../NiriGestureIntentSnapTests.swift          | 55 +++++++++++++++++++
+ 5 files changed, 102 insertions(+), 7 deletions(-)
+ create mode 100644 Tests/OmniWMTests/NiriGestureIntentSnapTests.swift
+
+diff --git a/Sources/OmniWM/Core/Controller/MouseEventHandler+TrackpadLifecycle.swift b/Sources/OmniWM/Core/Controller/MouseEventHandler+TrackpadLifecycle.swift
+index 93c66810..ecc36e69 100644
+--- a/Sources/OmniWM/Core/Controller/MouseEventHandler+TrackpadLifecycle.swift
++++ b/Sources/OmniWM/Core/Controller/MouseEventHandler+TrackpadLifecycle.swift
+@@ -331,7 +331,8 @@ extension MouseEventHandler {
+                 centerMode: engine.centerFocusedColumn,
+                 alwaysCenterSingleColumn: engine.alwaysCenterSingleColumn,
+                 viewFrame: monitor.frame,
+-                scale: geometry.scale
++                scale: geometry.scale,
++                gestureStartOffset: baseOffset
+             )
+         }
+         completeTrackpadViewportGesture(selectedWindow, engine: engine, workspaceId: wsId, focus: shouldFocusSelection)
+diff --git a/Sources/OmniWM/Core/Layout/Niri/NiriGestureSnapPlan.swift b/Sources/OmniWM/Core/Layout/Niri/NiriGestureSnapPlan.swift
+index 9d8ea26a..b3bf28d5 100644
+--- a/Sources/OmniWM/Core/Layout/Niri/NiriGestureSnapPlan.swift
++++ b/Sources/OmniWM/Core/Layout/Niri/NiriGestureSnapPlan.swift
+@@ -142,6 +142,26 @@ struct NiriGestureSnapPlan {
+         points.append(Point(viewPos: viewPos, columnIndex: columnIndex))
+     }
+ 
++    /// From the point the strip rested on when the gesture began, a projected travel past halfway to the next point,
++    /// capped at `threshold`, goes at least to that next point in the direction of travel (further if the projection
++    /// reaches further); a shorter travel returns to the start. Plain nearest-point snapping made a full-width column
++    /// need twice the gesture of a half-width one, since its neighbouring snap points are twice as far.
++    mutating func intentPoint(startViewPos: Double, projectedViewPos: Double, threshold: Double) -> Point? {
++        guard let start = closestPoint(to: startViewPos) else { return nil }
++        let travel = projectedViewPos - start.viewPos
++        // Points within two gaps of the start show the same view (a column's leading edge vs its neighbour's).
++        let same = 2 * geometry.gaps + 1
++        let ahead = points.filter { travel > 0 ? $0.viewPos > start.viewPos + same : $0.viewPos < start.viewPos - same }
++        guard let next = ahead.min(by: { abs($0.viewPos - start.viewPos) < abs($1.viewPos - start.viewPos) }) else {
++            return closestPoint(to: projectedViewPos)
++        }
++        // Halfway to the next point (nearest-point snapping) but never more than `threshold`: narrow and half-width
++        // columns behave as before, wide and full-width ones no longer need a longer gesture.
++        guard abs(travel) >= min(threshold, abs(next.viewPos - start.viewPos) / 2) else { return start }
++        let reached = ahead.min(by: { abs($0.viewPos - projectedViewPos) < abs($1.viewPos - projectedViewPos) }) ?? next
++        return abs(reached.viewPos - start.viewPos) > abs(next.viewPos - start.viewPos) ? reached : next
++    }
++
+     mutating func closestPoint(to projectedViewPos: Double) -> Point? {
+         points.sort { $0.viewPos < $1.viewPos }
+         return points.min(by: { abs($0.viewPos - projectedViewPos) < abs($1.viewPos - projectedViewPos) })
+diff --git a/Sources/OmniWM/Core/Layout/Niri/NiriProjection.swift b/Sources/OmniWM/Core/Layout/Niri/NiriProjection.swift
+index 351d16bf..de336618 100644
+--- a/Sources/OmniWM/Core/Layout/Niri/NiriProjection.swift
++++ b/Sources/OmniWM/Core/Layout/Niri/NiriProjection.swift
+@@ -335,7 +335,8 @@ extension NiriLayoutEngine {
+         centerMode: CenterFocusedColumn = .never,
+         alwaysCenterSingleColumn: Bool = false,
+         viewFrame: CGRect? = nil,
+-        scale: CGFloat = 2
++        scale: CGFloat = 2,
++        gestureStartOffset: Double? = nil
+     ) -> NiriWindow? {
+         let projectedColumns = projectedColumns(in: context.workspaceId)
+         guard !projectedColumns.isEmpty else { return nil }
+@@ -369,7 +370,8 @@ extension NiriLayoutEngine {
+                 motion: context.motion,
+                 snapToColumn: snapToColumn,
+                 centerMode: centerMode,
+-                alwaysCenterSingleColumn: alwaysCenterSingleColumn
++                alwaysCenterSingleColumn: alwaysCenterSingleColumn,
++                gestureStartOffset: gestureStartOffset
+             )
+ 
+             let projectedIndex = projectedState.activeColumnIndex
+diff --git a/Sources/OmniWM/Core/Layout/Niri/ViewportState+Gestures.swift b/Sources/OmniWM/Core/Layout/Niri/ViewportState+Gestures.swift
+index 89444445..25896bb2 100644
+--- a/Sources/OmniWM/Core/Layout/Niri/ViewportState+Gestures.swift
++++ b/Sources/OmniWM/Core/Layout/Niri/ViewportState+Gestures.swift
+@@ -5,6 +5,10 @@ import AppKit
+ import Foundation
+ 
+ extension ViewportState {
++    /// Projected gesture travel (fraction of the viewport) that moves to the next column, whatever its width:
++    /// the distance nearest-point snapping already required between two half-width columns.
++    static let gestureColumnChangeFraction = 0.25
++
+     mutating func endGesture(
+         currentOffset: Double,
+         projectedOffset: Double,
+@@ -13,7 +17,8 @@ extension ViewportState {
+         motion: MotionSnapshot,
+         snapToColumn: Bool = true,
+         centerMode: CenterFocusedColumn = .never,
+-        alwaysCenterSingleColumn: Bool = false
++        alwaysCenterSingleColumn: Bool = false,
++        gestureStartOffset: Double? = nil
+     ) {
+         guard !columns.isEmpty else {
+             endGestureWithoutSnap(currentOffset: currentOffset)
+@@ -57,7 +62,11 @@ extension ViewportState {
+             projectedOffset: projectedOffset,
+             currentOffset: currentOffset,
+             columns: columns,
+-            plan: NiriGestureSnapPlan(geometry: snapGeometry)
++            plan: NiriGestureSnapPlan(geometry: snapGeometry),
++            intent: gestureStartOffset.map {
++                (startViewPos: Double(activeContainerPosition) + $0,
++                 threshold: Double(geometry.viewportSpan) * Self.gestureColumnChangeFraction)
++            }
+         )
+ 
+         applyGestureSnap(
+@@ -118,7 +127,8 @@ extension ViewportState {
+         projectedOffset: Double,
+         currentOffset: Double,
+         columns: [NiriContainer],
+-        plan: consuming NiriGestureSnapPlan
++        plan: consuming NiriGestureSnapPlan,
++        intent: (startViewPos: Double, threshold: Double)? = nil
+     ) -> NiriGestureSnapPlan.Point {
+         guard !columns.isEmpty else { return NiriGestureSnapPlan.Point(viewPos: 0, columnIndex: 0) }
+         var plan = consume plan
+@@ -128,7 +138,14 @@ extension ViewportState {
+             let bounds = gestureSnapBounds(columns: columns, plan: &plan)
+             plan.appendBoundedPoints(in: columns, bounds: bounds)
+         }
+-        guard let closest = plan.closestPoint(to: projectedViewPos) else {
++        let target = if let intent, !plan.geometry.isCentering {
++            plan.intentPoint(
++                startViewPos: intent.startViewPos, projectedViewPos: projectedViewPos, threshold: intent.threshold
++            )
++        } else {
++            plan.closestPoint(to: projectedViewPos)
++        }
++        guard let closest = target else {
+             return NiriGestureSnapPlan.Point(viewPos: 0, columnIndex: 0)
+         }
+         guard !plan.geometry.isCentering else { return closest }
+diff --git a/Tests/OmniWMTests/NiriGestureIntentSnapTests.swift b/Tests/OmniWMTests/NiriGestureIntentSnapTests.swift
+new file mode 100644
+index 00000000..870666f9
+--- /dev/null
++++ b/Tests/OmniWMTests/NiriGestureIntentSnapTests.swift
+@@ -0,0 +1,55 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++import CoreGraphics
++@testable import OmniWM
++import XCTest
++
++/// Leaving a column takes the same gesture whatever its width: past halfway to the next snap point, capped at a
++/// quarter of the viewport. Nearest-point snapping needed ~1033 pt from a full-width column, ~516 pt from a half one.
++final class NiriGestureIntentSnapTests: NiriInteractionTestCase {
++    private let viewport: CGFloat = 2058
++    private let gap: CGFloat = 8
++
++    private func landing(widths: [CGFloat], from start: Int = 0, travel: Double, intent: Bool = true) -> Int {
++        let engine = NiriLayoutEngine()
++        let ws = WorkspaceDescriptor.ID()
++        var previous: NiriWindow?
++        for i in widths.indices { previous = addWindow(engine, pid: pid_t(9_300 + i), to: ws, after: previous) }
++        let columns = engine.columns(in: ws)
++        for (column, width) in zip(columns, widths) { column.cachedWidth = width }
++        var state = ViewportState()
++        state.activeColumnIndex = start
++        state.viewOffset = -gap
++        let base = Double(state.viewOffset)
++        state.endGesture(
++            currentOffset: base + travel * 0.6, projectedOffset: base + travel, columns: columns,
++            geometry: NiriViewportGeometry(gap: gap, viewportSpan: viewport, orientation: .horizontal),
++            motion: .disabled, gestureStartOffset: intent ? base : nil
++        )
++        return state.activeColumnIndex
++    }
++
++    func testFullWidthColumnChangesWithTheGestureOfAHalfWidthOne() {
++        let full: [CGFloat] = [2058, 2058, 2058], half: [CGFloat] = [1025, 1025, 1025, 1025]
++        XCTAssertEqual(landing(widths: full, travel: 600, intent: false), 0, "before: 600 pt was not enough")
++        XCTAssertEqual(landing(widths: full, travel: 600), 1)
++        XCTAssertEqual(landing(widths: half, travel: 600), 1)
++    }
++
++    func testShortGestureStaysAndHalfWidthKeepsItsThreshold() {
++        XCTAssertEqual(landing(widths: [2058, 2058, 2058], travel: 400), 0)
++        XCTAssertEqual(landing(widths: [1025, 1025, 1025, 1025], travel: 400), 0)
++        XCTAssertEqual(landing(widths: [1025, 1025, 1025, 1025], travel: 600, intent: false), 1, "unchanged rule")
++    }
++
++    func testReversedGestureGoesBackOneColumn() {
++        XCTAssertEqual(landing(widths: [2058, 2058, 2058], from: 1, travel: -600), 0)
++        XCTAssertEqual(landing(widths: [2058, 2058, 2058], from: 1, travel: -300), 1)
++    }
++
++    func testLongFlickCanPassSeveralColumns() {
++        XCTAssertEqual(landing(widths: [2058, 2058, 2058], travel: 2500), 1)
++        XCTAssertEqual(landing(widths: [2058, 2058, 2058], travel: 4200), 2)
++    }
++}

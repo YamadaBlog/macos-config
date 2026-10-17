@@ -1,0 +1,36 @@
+From 10a06e2e20dfa5eb9217907e06a5aad8a4cfbdcd Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 15:39:44 +0200
+Subject: [PATCH 23/27] Niri scroll: verify the size writes of animation ticks
+ so later ticks move windows only
+
+Animation ticks write position only once a window's size is verified, but ticks never verify,
+so a window whose size was unverified (e.g. a column revealed from parking) re-wrote its size,
+unverified, on every tick of the scroll; Safari then re-laid out its page every frame. Verify
+the ticks' size writes; position-only writes stay unverified.
+---
+ .../OmniWM/Core/Controller/LayoutDiffExecutor.swift   | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift b/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift
+index 5f8f084c..d696ccb7 100644
+--- a/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift
++++ b/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift
+@@ -120,7 +120,16 @@ final class LayoutDiffExecutor {
+             }
+         }
+         guard isInteractiveResize else {
+-            axManager.applyFramesParallel(frameUpdates, verify: !isAnimationTick)
++            guard isAnimationTick else {
++                axManager.applyFramesParallel(frameUpdates, verify: true)
++                return
++            }
++            // Animation ticks write position only once a window's size is verified (animationFrameComponents).
++            // An unverified size was otherwise re-written, unverified, on every tick of the scroll: Safari then
++            // re-laid out its page each frame (2026-10-16 bench: one column wrote its size on ~95 % of ticks).
++            // Verify those size writes so the next ticks move the window only.
++            axManager.applyFramesParallel(frameUpdates.filter { $0.components == .position }, verify: false)
++            axManager.applyFramesParallel(frameUpdates.filter { $0.components != .position }, verify: true)
+             return
+         }
+         let moves = frameUpdates.filter { $0.components == .position }

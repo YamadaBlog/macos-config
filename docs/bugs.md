@@ -171,6 +171,22 @@ Before changing anything listed here, read the entry and keep its verification p
   would change the captured `settings.toml`.
 - **Verify:** `scripts/check.sh` ("OmniWM registry matches …").
 
+### B18 — Safari froze ~500 ms during Niri scrolls (disabled Apple service)
+- **Symptom:** every few gestures all Safari columns stopped for about half a second.
+- **Cause (proved 2026-10-16):** a 2026-10-08 "debloat" had disabled `com.apple.synapse.contentlinkingd`, the Quick
+  Note link service. Safari reconnected to it about once a second; each attempt made its Quick Note observer
+  (`SYNotesActivationObserver`) list the windows through the WindowServer, which waits for the moves in flight
+  (up to ~450 ms) while holding a lock Safari's main thread needs to render. Trace + `sample` of Safari caught it.
+- **Fix:** `launchctl enable gui/$UID/com.apple.synapse.contentlinkingd` and `launchctl bootstrap gui/$UID
+  /System/Library/LaunchAgents/com.apple.synapse.contentlinkingd.plist` (no admin, survives reboots). Undo:
+  `launchctl disable …` then `launchctl bootout gui/$UID/com.apple.synapse.contentlinkingd`.
+- **Measured** (column-scroll bench, 3 Safari windows): gestures with a freeze 18/60 → 0/20, worst Safari move
+  503–521 → 30 ms, worst visible pause 549–734 → 76 ms. The Quick Note hot corner made no difference.
+- **Check:** `scripts/doctor.sh` (section macOS services). Other services still disabled by that debloat were
+  audited: some are retried by apps (BiomeAgent by Safari ~5/s, spotlightknowledged, knowledge-agent, analyticsd,
+  talagent) but off the main thread, with no measured effect on scrolling; re-enabling talagent once froze app
+  switching (B14), so services are re-enabled one at a time, only with evidence.
+
 ### B17 — Process incidents (rules that came out of them)
 - The full OmniWM test suite froze the Mac: run targeted `--filter` tests only.
 - A simulated drag landed on the user's active workspace: never simulate input while the user works.

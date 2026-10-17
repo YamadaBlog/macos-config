@@ -18,6 +18,7 @@ Empty workspaces are skipped. Details: `docs/omniwm.md`.
 | **Ctrl+Option+W / A** | grow / shrink the active window |
 | **Ctrl+Option+R** | balance sizes |
 | **Ctrl+Option+F** | temporary fullscreen (same keys to exit) |
+| **Option+F** | Niri: full-width column ↔ back to its previous width (keeps the 8 pt gaps) |
 | **Ctrl+Option+E** | toggle split orientation (side by side ↔ stacked) |
 | **Ctrl+Option+S** | swap the two halves |
 | **Ctrl+Option+Q / D / Z** | the **next** window opens left / right / below |
@@ -33,6 +34,7 @@ Empty workspaces are skipped. Details: `docs/omniwm.md`.
 
 **Hyper = Ctrl + Option + Cmd.** No Caps Lock remap (`systemHyperTrigger = "None"`).
 AZERTY rule: no **Option alone (+ Shift)** shortcut — those combinations type `{ } [ ] | @ ~ € …`.
+Two deliberate exceptions: Option+Tab (types nothing) and Option+F (costs the `ƒ` character).
 
 ## Other tools
 | Keys | Owner | Effect |
@@ -41,6 +43,8 @@ AZERTY rule: no **Option alone (+ Shift)** shortcut — those combinations type 
 | Esc | Neru | leave a mode |
 | Hyper+P | Hammerspoon | pick a context (workspace + resources) |
 | Cmd+E | Hammerspoon | bring Finder to front (opens ~ if no window) |
+| Cmd+← / Cmd+→ (Safari) | Hammerspoon | previous / next tab; inside a text field they keep start / end of line |
+| Cmd+F1 | Hammerspoon | paste the prompt-optimisation prompt at the cursor (text in `prompt-insert.lua`; clipboard restored after 0.5 s; works with or without fn) |
 | Cmd+Space | Raycast | launcher, clipboard history |
 | Cmd+Option+Space | macOS | Finder search |
 | Option+Space | typing | non-breaking space |
@@ -69,6 +73,6 @@ macOS 3- and 4-finger swipes and the Mission Control gesture are disabled in `ho
 
 ## Adding a shortcut
 1. Check this registry and the `[[hotkeys]]` of `tools/omniwm/config/settings.toml` (no duplicates).
-2. Never Option alone; prefer Ctrl+Option + a free left-hand letter.
+2. Never Option alone (exceptions above); prefer Ctrl+Option + a free left-hand letter.
 3. For OmniWM, use the QWERTY position name (see above) and add it to `apply-registry.py`.
 4. Capture (`scripts/capture.sh`) and update this registry.

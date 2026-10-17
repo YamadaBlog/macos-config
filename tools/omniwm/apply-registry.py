@@ -43,6 +43,9 @@ REGISTRY = {
     # Dwindle controls: Control+Option + a left-hand letter. Names are QWERTY POSITIONS:
     # printed AZERTY W = "Z", Q = "A", A = "Q", Z = "W" (E R S D F G T X C are the same).
     "toggleFullscreen": "Control+Option+F",            # temporary fullscreen
+    # Niri full width toggle (columns keep the 8 pt gaps). Exception to "never Option alone", asked for:
+    # on AZERTY it costs the "ƒ" character.
+    "toggleContainerFullPrimarySpan": "Option+F",
     "expandContainerToAvailablePrimarySpan": "Unassigned", "resetWindowSecondarySpan": "Unassigned",
     "balanceSizes": "Control+Option+R",                # equal shares
     "toggleSplit": "Control+Option+E",                 # side by side <-> stacked

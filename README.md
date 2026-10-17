@@ -16,7 +16,7 @@ backs up what it replaces and can be undone.
 ## What it sets up
 | Area | Tool | Where |
 |---|---|---|
-| Windows, workspaces, gestures, Overview | OmniWM, built locally from upstream + [19 small patches](tools/omniwm/patches) | [`docs/omniwm.md`](docs/omniwm.md) |
+| Windows, workspaces, gestures, Overview | OmniWM, built locally from upstream + [27 small patches](tools/omniwm/patches) | [`docs/omniwm.md`](docs/omniwm.md) |
 | Terminal | Ghostty: translucent with blur, 13 pt, colours from the wallpaper | `home-manager/theme.nix` |
 | Shell & CLI | zsh, Starship, Atuin (local history), ripgrep, fzf, zoxide, bat, jq, fd, gh, delta, ast-grep, yazi, lazygit, btop | `home-manager/` |
 | Apps | Ghostty, Hammerspoon, Neru, Raycast, Stats | `homebrew/Brewfile` |

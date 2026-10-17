@@ -1,0 +1,136 @@
+From cfe72ffecd0ab369525c0ec04b5ac60effa34093 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 16:06:40 +0200
+Subject: [PATCH 24/27] Restore catalog: do not save while the startup rescan
+ is still placing windows
+
+Saving between the startup rescan and the initial refresh (a quit within a second of launch, or the
+debounced saves during startup) replaced the catalog with a half-restored world; the next launch then
+put every window of every workspace on the active one. Gate saves until the initial refresh completes.
+---
+ ...tRefreshController+EffectApplication.swift |  1 +
+ .../Controller/ServiceLifecycleManager.swift  |  3 ++
+ .../PersistedRestoreCatalogStore.swift        | 16 ++++++++++
+ .../Core/Workspace/WorkspaceManager.swift     |  8 +++++
+ .../PersistedRestoreStartupGateTests.swift    | 29 +++++++++++++++++++
+ 5 files changed, 57 insertions(+)
+ create mode 100644 Tests/OmniWMTests/PersistedRestoreStartupGateTests.swift
+
+diff --git a/Sources/OmniWM/Core/Controller/LayoutRefreshController+EffectApplication.swift b/Sources/OmniWM/Core/Controller/LayoutRefreshController+EffectApplication.swift
+index 88ce33f8..12562c99 100644
+--- a/Sources/OmniWM/Core/Controller/LayoutRefreshController+EffectApplication.swift
++++ b/Sources/OmniWM/Core/Controller/LayoutRefreshController+EffectApplication.swift
+@@ -113,6 +113,7 @@ extension LayoutRefreshController {
+     private func completeEffectPlan(_ plan: EffectPlan, controller: WMController) {
+         if plan.effects.markInitialRefreshComplete {
+             layoutState.hasCompletedInitialRefresh = true
++            controller.workspaceManager.markPersistedWindowRestoreCatalogReady()
+         }
+ 
+         if plan.effects.drainDeferredCreatedWindows {
+diff --git a/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift b/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift
+index c3235348..c48d66b9 100644
+--- a/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift
++++ b/Sources/OmniWM/Core/Controller/ServiceLifecycleManager.swift
+@@ -274,6 +274,9 @@ final class ServiceLifecycleManager {
+     func performStartupRefresh() {
+         guard let controller else { return }
+         controller.surfaceReconciler.noteWorldChanged()
++        if !controller.layoutRefreshController.layoutState.hasCompletedInitialRefresh {
++            controller.workspaceManager.beginPersistedWindowRestoreStartup()
++        }
+         controller.layoutRefreshController.requestFullRescan(reason: .startup)
+     }
+ 
+diff --git a/Sources/OmniWM/Core/Reconcile/PersistedRestoreCatalogStore.swift b/Sources/OmniWM/Core/Reconcile/PersistedRestoreCatalogStore.swift
+index 5c4deefa..b7eddee3 100644
+--- a/Sources/OmniWM/Core/Reconcile/PersistedRestoreCatalogStore.swift
++++ b/Sources/OmniWM/Core/Reconcile/PersistedRestoreCatalogStore.swift
+@@ -104,6 +104,10 @@ final class PersistedRestoreCatalogStore {
+     private(set) var consumedBootEntries: Set<PersistedWindowRestoreConsumptionKey> = []
+ 
+     private var dirty = false
++    /// False from the startup rescan until it has placed the windows found at launch. Saving in between replaced
++    /// the catalog with a half-restored world: quitting OmniWM within a second of launch (2026-10-16) put every
++    /// window of every workspace on the active one at the next launch.
++    private(set) var isReady = true
+     private var saveScheduled = false
+     private var buildInFlight = false
+     private var revision: UInt64 = 0
+@@ -126,10 +130,22 @@ final class PersistedRestoreCatalogStore {
+ 
+     func scheduleSave() {
+         markDirty()
++        guard isReady else { return }
+         enqueueSave()
+     }
+ 
++    func beginStartupRestore() {
++        isReady = false
++    }
++
++    func markReady() {
++        guard !isReady else { return }
++        isReady = true
++        if dirty { enqueueSave() }
++    }
++
+     func flushNow() {
++        guard isReady else { return }
+         markDirty()
+         dirty = false
+         save(PersistedWindowRestoreCatalogBuilder.build(from: buildSnapshot()))
+diff --git a/Sources/OmniWM/Core/Workspace/WorkspaceManager.swift b/Sources/OmniWM/Core/Workspace/WorkspaceManager.swift
+index 5dc5fe91..635c4d28 100644
+--- a/Sources/OmniWM/Core/Workspace/WorkspaceManager.swift
++++ b/Sources/OmniWM/Core/Workspace/WorkspaceManager.swift
+@@ -314,6 +314,14 @@ extension WorkspaceManager {
+         persistedRestoreCatalogStore.flushNow()
+     }
+ 
++    func beginPersistedWindowRestoreStartup() {
++        persistedRestoreCatalogStore.beginStartupRestore()
++    }
++
++    func markPersistedWindowRestoreCatalogReady() {
++        persistedRestoreCatalogStore.markReady()
++    }
++
+     func schedulePersistedWindowRestoreCatalogSave() {
+         persistedRestoreCatalogStore.scheduleSave()
+     }
+diff --git a/Tests/OmniWMTests/PersistedRestoreStartupGateTests.swift b/Tests/OmniWMTests/PersistedRestoreStartupGateTests.swift
+new file mode 100644
+index 00000000..cf2c45e5
+--- /dev/null
++++ b/Tests/OmniWMTests/PersistedRestoreStartupGateTests.swift
+@@ -0,0 +1,29 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++@testable import OmniWM
++import XCTest
++
++/// Quitting during the startup rescan must not overwrite the restore catalog with a half-restored world.
++@MainActor
++final class PersistedRestoreStartupGateTests: XCTestCase {
++    func testNoSaveBetweenStartupAndInitialRefresh() async throws {
++        var saves = 0
++        let store = PersistedRestoreCatalogStore(
++            bootCatalog: PersistedWindowRestoreCatalog(entries: []),
++            buildSnapshot: { RestoreCatalogBuildSnapshot(entries: []) },
++            save: { _ in saves += 1 }
++        )
++        store.beginStartupRestore()
++        store.scheduleSave()
++        store.flushNow()
++        try await Task.sleep(nanoseconds: 200_000_000)
++        XCTAssertEqual(saves, 0, "nothing written while the startup restore is in progress")
++
++        store.markReady()
++        try await Task.sleep(nanoseconds: 300_000_000)
++        XCTAssertEqual(saves, 1, "the pending save runs once the windows are placed")
++        store.flushNow()
++        XCTAssertEqual(saves, 2)
++    }
++}

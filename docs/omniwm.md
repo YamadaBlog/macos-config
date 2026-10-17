@@ -8,7 +8,7 @@ settings this repo installs; values marked *default* are OmniWM's own defaults.
 | Piece | Where |
 |---|---|
 | Pinned upstream commit | `tools/omniwm/UPSTREAM` |
-| Local patches (git `format-patch` series) | `tools/omniwm/patches/0001…0019` |
+| Local patches (git `format-patch` series) | `tools/omniwm/patches/0001…0027` |
 | Build + sign + install | `tools/omniwm/build-local.sh` (`--check` = patches apply, no build) |
 | Signing certificate (once per Mac) | `tools/omniwm/create-signing-cert.sh` |
 | Working checkout | `$OMNIWM_SRC` (default `~/src/omniwm`), branch `macos-config`, recreated on every build |
@@ -38,6 +38,14 @@ build, so permissions would be lost on each rebuild. The certificate pins them (
 | 0016 | before skipping an "already focused" window, check macOS (frontmost app + AX focused window) once per pointer entry | OmniWM's record is not updated by same-app hand-offs: the window under the pointer stayed inactive (B5) |
 | 0017 | a move dropped by the 0.1 s debounce is re-evaluated once when the debounce expires | fast pointer moves left the window under the pointer unfocused: 10/15 → 0/15 measured (B5) |
 | 0019 | on a workspace switch (gesture or keyboard), focus the window whose destination frame contains the pointer instead of the window remembered for that workspace | W1 o1 → W2 → pointer to o2 → back to W1 re-focused o1 although the pointer was over o2 (B5) |
+| 0020 | a size read back equal to the size OmniWM last verified is stale, not a minimum | leaving fullscreen, Safari's old 2074 pt width was learned as its minimum: the column stayed full width without gaps |
+| 0021 | keep the fullscreen restore offset while relayouts re-target the same column | leaving fullscreen quickly left the column at x=0 (no left gap) |
+| 0022 | scroll bench: `notifyutil -p com.barut.OmniWM.bench.columnScroll` replays a fixed 3-finger gesture | reproducible measurements (`tools/omniwm/bench`) |
+| 0023 | animation ticks verify the size writes they need, so later ticks move windows only | an unverified size was re-written every tick: Safari re-laid out its page each frame (−82 % size writes) |
+| 0024 | the restore catalog is not saved while the startup rescan is still placing windows | quitting right after launch put every window on the active workspace at the next launch |
+| 0025 | leaving a Niri column takes the same gesture whatever its width (past halfway to the next snap point, capped at a quarter of the screen) | a full-width column needed twice the gesture of a half-width one |
+| 0026 | the restore catalog keeps launch entries of windows not seen again this session | a save while the screen was locked wrote an empty catalog |
+| 0027 | the bench dumps the targets of its animation ticks (`~/Library/Logs/OmniWM/scroll-bench.tsv`) | input for `tools/omniwm/bench` |
 | 0018 | after a workspace change (once the layout refresh completes, no swipe running) and after a Niri scroll, focus the window under the still pointer | hover focus only reacted to mouse moves: arriving on a workspace left the window under the pointer unfocused (B5); 8/8 with a still pointer |
 
 Tests added by the patches (run targeted only, never the full suite on a machine in use — it froze the

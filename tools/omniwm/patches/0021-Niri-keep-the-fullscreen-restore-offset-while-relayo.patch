@@ -1,0 +1,85 @@
+From 6b1d4f998a4b810dcdf3fbf7b75a6509911893ea Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Fri, 16 Oct 2026 15:03:15 +0200
+Subject: [PATCH 21/27] Niri: keep the fullscreen restore offset while
+ relayouts re-target the same column
+
+Entering OmniWM fullscreen saves the viewport offset; every relayout of the selection re-targets
+the column, and retargetColumn cleared that saved offset. Leaving fullscreen within ~0.25 s then
+had nothing to restore and the column stayed aligned for fullscreen (x=0, no left gap, 16 pt on
+the right). Keep the saved offset when the same column is re-targeted while fullscreen.
+---
+ .../ViewportState+ColumnTransitions.swift     |  8 +++-
+ .../NiriFullscreenRestoreOffsetTests.swift    | 42 +++++++++++++++++++
+ 2 files changed, 49 insertions(+), 1 deletion(-)
+ create mode 100644 Tests/OmniWMTests/NiriFullscreenRestoreOffsetTests.swift
+
+diff --git a/Sources/OmniWM/Core/Layout/Niri/ViewportState+ColumnTransitions.swift b/Sources/OmniWM/Core/Layout/Niri/ViewportState+ColumnTransitions.swift
+index 90e65c7a..6e7d9042 100644
+--- a/Sources/OmniWM/Core/Layout/Niri/ViewportState+ColumnTransitions.swift
++++ b/Sources/OmniWM/Core/Layout/Niri/ViewportState+ColumnTransitions.swift
+@@ -151,9 +151,15 @@ extension ViewportState {
+             gap: gap,
+             sizeKeyPath: orientation.renderedSpanKeyPath
+         )
++        // Re-targeting the same fullscreen column (every relayout of its selection) keeps the offset saved on
++        // entering fullscreen. Clearing it lost the restore when fullscreen was left before a later relayout
++        // re-fitted the column (2026-10-16, Control+Option+F twice within ~0.25 s: column left at x=0 with
++        // no left gap in most such runs).
++        let keepsFullscreenRestore = targetIndex == activeColumnIndex
++            && columns.indices.contains(targetIndex) && columns[targetIndex].effectiveSizingMode.isFullscreen
+         rebaseOffset(by: oldActivePosition - newActivePosition)
+         activeColumnIndex = targetIndex
+         activatePrevColumnOnRemoval = nil
+-        viewOffsetToRestore = nil
++        if !keepsFullscreenRestore { viewOffsetToRestore = nil }
+     }
+ }
+diff --git a/Tests/OmniWMTests/NiriFullscreenRestoreOffsetTests.swift b/Tests/OmniWMTests/NiriFullscreenRestoreOffsetTests.swift
+new file mode 100644
+index 00000000..23c08671
+--- /dev/null
++++ b/Tests/OmniWMTests/NiriFullscreenRestoreOffsetTests.swift
+@@ -0,0 +1,42 @@
++// SPDX-License-Identifier: GPL-2.0-only
++// Copyright (C) 2026 BarutSRB — https://github.com/OmniNull/OmniWM
++
++import CoreGraphics
++@testable import OmniWM
++import XCTest
++
++/// Leaving OmniWM fullscreen must restore the viewport offset saved on entering it, even when a relayout
++/// re-targeted the fullscreen column in between (fast toggle left the column at x=0, without its gap).
++final class NiriFullscreenRestoreOffsetTests: NiriInteractionTestCase {
++    func testRetargetingTheSameFullscreenColumnKeepsTheSavedOffset() throws {
++        let engine = NiriLayoutEngine()
++        let ws = WorkspaceDescriptor.ID()
++        let first = addWindow(engine, pid: 8_101, to: ws)
++        _ = addWindow(engine, pid: 8_102, to: ws, after: first)
++        let columns = engine.columns(in: ws)
++        var state = ViewportState()
++        state.viewOffset = -8
++
++        engine.setWindowSizingMode(first, motion: .disabled, mode: .fullscreen, state: &state)
++        XCTAssertEqual(state.viewOffsetToRestore, -8)
++        state.retargetColumn(to: 0, columns: columns, gap: 8, orientation: .horizontal)
++        XCTAssertEqual(state.viewOffsetToRestore, -8, "relayout of the fullscreen column keeps the restore")
++
++        engine.setWindowSizingMode(first, motion: .disabled, mode: .normal, state: &state)
++        XCTAssertEqual(state.viewOffset, -8)
++        XCTAssertNil(state.viewOffsetToRestore)
++    }
++
++    func testRetargetingAnotherColumnStillDropsTheSavedOffset() throws {
++        let engine = NiriLayoutEngine()
++        let ws = WorkspaceDescriptor.ID()
++        let first = addWindow(engine, pid: 8_201, to: ws)
++        _ = addWindow(engine, pid: 8_202, to: ws, after: first)
++        var state = ViewportState()
++        engine.setWindowSizingMode(first, motion: .disabled, mode: .fullscreen, state: &state)
++
++        state.retargetColumn(to: 1, columns: engine.columns(in: ws), gap: 8, orientation: .horizontal)
++
++        XCTAssertNil(state.viewOffsetToRestore)
++    }
++}

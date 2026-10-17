@@ -1,0 +1,70 @@
+From dec5f2a9564544e226fc94f5a700144b48e918d7 Mon Sep 17 00:00:00 2001
+From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
+Date: Sat, 17 Oct 2026 22:23:38 +0200
+Subject: [PATCH 27/27] Bench: dump the targets of the animation ticks of a
+ bench gesture to ~/Library/Logs/OmniWM/scroll-bench.tsv
+
+For the macos-config measurement tools (tools/omniwm/bench); no effect outside a bench gesture.
+---
+ .../Core/Controller/ColumnScrollBench.swift   | 21 +++++++++++++++++++
+ .../Core/Controller/LayoutDiffExecutor.swift  |  1 +
+ 2 files changed, 22 insertions(+)
+
+diff --git a/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift b/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift
+index 6a3b4222..f6467d89 100644
+--- a/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift
++++ b/Sources/OmniWM/Core/Controller/ColumnScrollBench.swift
+@@ -16,6 +16,16 @@ final class ColumnScrollBench {
+         (-0.25, 0.8), (-0.9, 0.5), (0.9, 0.5), (0.25, 0.6), (-1.6, 0.15),
+     ]
+     private weak var handler: MouseEventHandler?
++    /// Targets of the animation ticks while a bench gesture runs, dumped to ~/Library/Logs/OmniWM/scroll-bench.tsv
++    /// (t, window id, x) for tools/omniwm/bench in macos-config.
++    private static var targets: [(t: Double, win: Int, x: CGFloat)] = []
++    private static var recording = false
++
++    static func recordTargets(_ updates: [AXFrameApplicationTarget]) {
++        guard recording else { return }
++        let now = CACurrentMediaTime()
++        for update in updates { targets.append((now, update.windowId, update.frame.minX)) }
++    }
+     private var timer: Timer?
+     private var plan: [(time: TimeInterval, x: CGFloat)] = []
+     private var index = 0
+@@ -53,6 +63,8 @@ final class ColumnScrollBench {
+         index = 0
+         start = CACurrentMediaTime()
+         benchLog.notice("bench start: \(self.plan.count, privacy: .public) frames")
++        Self.targets.removeAll()
++        Self.recording = true
+         send(.began, x: 0.5, at: start)
+         timer = Timer.scheduledTimer(withTimeInterval: dt, repeats: true) { [weak self] _ in
+             MainActor.assumeIsolated { self?.step() }
+@@ -70,6 +82,15 @@ final class ColumnScrollBench {
+         timer?.invalidate(); timer = nil
+         send(.ended, x: 0, at: now + 0.008)
+         benchLog.notice("bench end")
++        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
++            Self.recording = false
++            let dir = (NSHomeDirectory() as NSString).appendingPathComponent("Library/Logs/OmniWM")
++            try? FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
++            var out = "t\twin\tideal\tsent\n"
++            for row in Self.targets { out += "\(row.t)\t\(row.win)\t\(row.x)\t1\n" }
++            try? out.write(toFile: (dir as NSString).appendingPathComponent("scroll-bench.tsv"), atomically: true, encoding: .utf8)
++            Self.targets.removeAll()
++        }
+     }
+ 
+     private func send(_ phase: NSEvent.Phase, x: CGFloat, at time: TimeInterval) {
+diff --git a/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift b/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift
+index d696ccb7..2f9ada00 100644
+--- a/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift
++++ b/Sources/OmniWM/Core/Controller/LayoutDiffExecutor.swift
+@@ -128,6 +128,7 @@ final class LayoutDiffExecutor {
+             // An unverified size was otherwise re-written, unverified, on every tick of the scroll: Safari then
+             // re-laid out its page each frame (2026-10-16 bench: one column wrote its size on ~95 % of ticks).
+             // Verify those size writes so the next ticks move the window only.
++            ColumnScrollBench.recordTargets(frameUpdates)
+             axManager.applyFramesParallel(frameUpdates.filter { $0.components == .position }, verify: false)
+             axManager.applyFramesParallel(frameUpdates.filter { $0.components != .position }, verify: true)
+             return

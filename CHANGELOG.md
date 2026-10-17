@@ -4,6 +4,15 @@ All notable changes. Format: newest first; each entry says what changed and how 
 is not a plain `git revert`.
 
 ## Unreleased
+- OmniWM patches 0020–0027: fullscreen exit keeps the column width and its gaps; scroll animation stops
+  re-writing window sizes; workspace restore survives a quit during startup and a locked screen; leaving a
+  full-width Niri column takes the same gesture as a half-width one; a reproducible scroll bench. The column-scroll
+  image proxy was removed (rejected visually).
+- Option+F = Niri full width; Hammerspoon: Cmd+F1 pastes the prompt-optimisation prompt, Cmd+←/→ switch Safari
+  tabs outside text fields.
+- `scripts/doctor.sh` fails when `com.apple.synapse.contentlinkingd` is disabled: an old debloat had disabled it
+  and Safari froze ~500 ms during scrolls (`docs/bugs.md` B18). Re-enable: see B18.
+- `tools/omniwm/bench`: scroll measurement tools (WindowServer polling, 120 fps pixel capture, test app).
 - `claude2` alias: Claude Code with a second account (`CLAUDE_CONFIG_DIR=~/.claude-2`); `claude` unchanged.
 
 ## 1.1.0

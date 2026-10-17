@@ -1,7 +1,7 @@
 From b2ddfcda8e07728c6263c5fea04a5818872d9391 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 9 Oct 2026 17:48:28 +0200
-Subject: [PATCH 13/19] Overview: restart preview captures of an app unhidden
+Subject: [PATCH 13/27] Overview: restart preview captures of an app unhidden
  while the Overview is open
 
 (cherry picked from commit 6e122beb24d5b9303ac571d349446037464fc51d)

@@ -1,7 +1,7 @@
 From e80b80752182f9f1790bcb20a4750a77c4247a29 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 9 Oct 2026 17:00:04 +0200
-Subject: [PATCH 11/19] Allow suppressing the Secure Input explanation panel
+Subject: [PATCH 11/27] Allow suppressing the Secure Input explanation panel
  (SuppressSecureInputExplanation default)
 
 (cherry picked from commit ed3e15fb90f219e5dd387d6f4824294593ca49c1)
