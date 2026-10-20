@@ -61,6 +61,7 @@ Full OmniWM list: the `[[hotkeys]]` entries of `tools/omniwm/config/settings.tom
 | **4 fingers up** | OmniWM | Overview (also Hyper+O); click a window to jump to it |
 
 macOS 3- and 4-finger swipes and the Mission Control gesture are disabled in `home-manager/macos.nix`.
+With `lockDown = true` in `home-manager/profile.nix` (personal; set it to `false` to keep the macOS behaviour), F3 and F4 do nothing (`tools/hammerspoon/config/function-keys.lua`, Cmd+F3 still works) and the auto-hidden Dock never shows.
 
 ## Technical notes
 - **OmniWM binds physical key positions (QWERTY names).** In `settings.toml`, printed AZERTY **W** is `Z`,

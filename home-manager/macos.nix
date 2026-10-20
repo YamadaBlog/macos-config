@@ -5,6 +5,7 @@
 # (manual steps: README "Manual settings"), and anything personal (accounts, Dock apps, recent items).
 { config, lib, pkgs, ... }:
 let
+  profile = import ./profile.nix;
   # macOS shortcuts turned off so their keys stay free for OmniWM, Raycast and Neru
   # (ids of ~/Library/Preferences/com.apple.symbolichotkeys.plist):
   #   15-26 Mission Control "switch to desktop N" & screenshots chords · 60/61 input source switching
@@ -29,6 +30,8 @@ let
     ForceSuppressed = true;
   };
 in {
+  # Read by tools/hammerspoon/config/function-keys.lua: F3/F4 are blocked only when this file exists.
+  xdg.configFile."macos-config/lock-down" = lib.mkIf profile.lockDown { text = ""; };
   targets.darwin.defaults = {
     NSGlobalDomain = {
       AppleInterfaceStyle = "Dark";
@@ -65,6 +68,8 @@ in {
       wvous-br-corner = 14;                       # bottom-right hot corner: Quick Note
       showMissionControlGestureEnabled = false;   # otherwise Mission Control opens behind OmniWM's Overview
       showAppExposeGestureEnabled = false;
+    } // lib.optionalAttrs profile.lockDown {
+      autohide-delay = 1000.0;                    # the Dock (left edge) never shows
     };
     "com.apple.finder" = {
       ShowPathbar = true;
