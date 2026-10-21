@@ -5,6 +5,8 @@
 { config, pkgs, lib, ... }:
 let
   profile = import ./profile.nix;
+  # opacity: saved with each palette (home-manager/palettes); palettes from before it existed used 0.94.
+  palette = import ./palette.nix;
 in {
   stylix = {
     enable = true;
@@ -13,11 +15,11 @@ in {
     autoEnable = false;
     # Readable palette generated from the image by scripts/palette-from-image.py (distinct accents, contrast >= 4.5:1).
     # Regenerated when the wallpaper changes (theme-auto agent) or by scripts/theme-sync.sh.
-    base16Scheme = import ./palette.nix;
+    base16Scheme = builtins.removeAttrs palette [ "opacity" ];
     # Keep Ghostty's font and transparency (Stylix would otherwise force DejaVu and opacity 1).
     fonts.monospace = { package = pkgs.jetbrains-mono; name = "JetBrains Mono"; };
     fonts.sizes.terminal = 13;
-    opacity.terminal = 0.88;   # the blurred wallpaper shows through slightly
+    opacity.terminal = palette.opacity or 0.94;
     targets = {
       ghostty.enable = true;
       starship.enable = true;
