@@ -13,8 +13,8 @@
   base09 = "ed9e5a"; # orange: constants (hue 28°)
   base0A = "f4da71"; # gold: warnings (hue 48°, from the image)
   base0B = "72ca90"; # green: success, additions, strings (hue 140°)
-  base0C = "6cb5da"; # cyan: escapes, info (hue 200°, from the image)
-  base0D = "5f81dd"; # blue: functions, links, system accent (hue 224°, from the image)
+  base0C = "98bbcd"; # cyan: escapes, info (hue 200°, from the image)
+  base0D = "91a3d4"; # blue: functions, links, system accent (hue 224°, from the image)
   base0E = "be90df"; # purple: keywords (hue 275°)
   base0F = "c08459"; # brown: deprecated (hue 25°)
 }

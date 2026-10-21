@@ -31,8 +31,8 @@ text = "#17327A"
 
 [theme.dark]
 surface = "#121921"
-accent = "#5F81DD"
-accent_alt = "#6CB5DA"
+accent = "#91A3D4"
+accent_alt = "#98BBCD"
 on_accent_alt = "#121921"
 text = "#D3D7EE"
 
