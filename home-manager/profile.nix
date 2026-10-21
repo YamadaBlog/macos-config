@@ -12,4 +12,6 @@ in {
   enableSync = false;
   # F3/F4 do nothing (Hammerspoon) and the Dock never shows.
   lockDown = false;
+  # Light terminal theme: pale background from the wallpaper's colourful tone, dark text.
+  lightTheme = false;
 } // (if builtins.pathExists local then import local else { })

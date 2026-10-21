@@ -3,11 +3,13 @@
 # come from the image, accents are distinct hues pulled towards the image.
 # autoEnable = false: only the targets listed here are themed.
 { config, pkgs, lib, ... }:
-{
+let
+  profile = import ./profile.nix;
+in {
   stylix = {
     enable = true;
     image = ../wallpapers/actuel.png;
-    polarity = "dark";
+    polarity = if profile.lightTheme then "light" else "dark";
     autoEnable = false;
     # Readable palette generated from the image by scripts/palette-from-image.py (distinct accents, contrast >= 4.5:1).
     # Regenerated when the wallpaper changes (theme-auto agent) or by scripts/theme-sync.sh.
@@ -26,6 +28,9 @@
       btop.enable = true;
     };
   };
+
+  # Read by scripts/palette-from-image.py: generate the light variant of the palette.
+  xdg.configFile."macos-config/theme-light" = lib.mkIf profile.lightTheme { text = ""; };
 
   # Colours for Hammerspoon (context alerts), generated from the same palette.
   home.file.".hammerspoon/poweruser-colors.lua".text = let c = config.lib.stylix.colors.withHashtag; in ''
