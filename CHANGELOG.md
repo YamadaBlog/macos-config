@@ -4,6 +4,10 @@ All notable changes. Format: newest first; each entry says what changed and how 
 is not a plain `git revert`.
 
 ## Unreleased
+- OmniWM patch 0028: Option+F works again after leaving macOS fullscreen (an unanswered size write is no
+  longer learned as a minimum size).
+- Theme follows the wallpaper again when it is set for one display (`theme-auto.sh` fingerprints the whole
+  wallpaper index); Cmd+F3 restores Claude Code sessions; optional lock-down (`profile.local.nix`).
 - OmniWM patches 0020–0027: fullscreen exit keeps the column width and its gaps; scroll animation stops
   re-writing window sizes; workspace restore survives a quit during startup and a locked screen; leaving a
   full-width Niri column takes the same gesture as a half-width one; a reproducible scroll bench. The column-scroll

@@ -1,7 +1,7 @@
-From 76970fdb51d506603ba1c046e9b875c653c8386b Mon Sep 17 00:00:00 2001
+From 0de4d87801601e8cf09ebfdd70efdabce24f5475 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 14:30:22 +0200
-Subject: [PATCH 20/27] AX: a size read back at the previously verified size is
+Subject: [PATCH 20/28] AX: a size read back at the previously verified size is
  stale, not a minimum
 
 Leaving OmniWM fullscreen, Safari read back its 2074 pt fullscreen width twice after a 1025 pt

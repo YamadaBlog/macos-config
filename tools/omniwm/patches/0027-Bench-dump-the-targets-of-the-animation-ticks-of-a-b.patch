@@ -1,7 +1,7 @@
-From dec5f2a9564544e226fc94f5a700144b48e918d7 Mon Sep 17 00:00:00 2001
+From 3cbc841c087b050b45019bbc484e9121e6a9a003 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Sat, 17 Oct 2026 22:23:38 +0200
-Subject: [PATCH 27/27] Bench: dump the targets of the animation ticks of a
+Subject: [PATCH 27/28] Bench: dump the targets of the animation ticks of a
  bench gesture to ~/Library/Logs/OmniWM/scroll-bench.tsv
 
 For the macos-config measurement tools (tools/omniwm/bench); no effect outside a bench gesture.

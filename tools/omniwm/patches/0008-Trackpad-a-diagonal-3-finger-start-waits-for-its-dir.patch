@@ -1,7 +1,7 @@
 From 6de3059e064bfd0162727b2d3b24fd28ba89a207 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Sun, 11 Oct 2026 11:50:18 +0200
-Subject: [PATCH 08/27] Trackpad: a diagonal 3-finger start waits for its
+Subject: [PATCH 08/28] Trackpad: a diagonal 3-finger start waits for its
  direction instead of killing the gesture
 
 At the 16-unit recognition point the dominant axis alone decided; fingers that

@@ -1,7 +1,7 @@
-From c8ca0ca17af9f7dee1449f1edb1ba73ce4c07343 Mon Sep 17 00:00:00 2001
+From d7f699f9024795f6f46a268b542309468390253e Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 17:03:36 +0200
-Subject: [PATCH 26/27] Restore catalog: keep the launch entries of windows not
+Subject: [PATCH 26/28] Restore catalog: keep the launch entries of windows not
  seen again this session
 
 A save made while the screen was locked found no window and wrote an empty catalog; the next launch

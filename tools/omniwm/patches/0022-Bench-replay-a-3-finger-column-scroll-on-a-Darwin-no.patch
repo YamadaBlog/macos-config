@@ -1,7 +1,7 @@
-From a0fd686dbbbd2e1faade60c755776006044f0f03 Mon Sep 17 00:00:00 2001
+From 0bf70933b2048545b7496d67150c350b00ac5ba3 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 15:22:36 +0200
-Subject: [PATCH 22/27] Bench: replay a 3-finger column scroll on a Darwin
+Subject: [PATCH 22/28] Bench: replay a 3-finger column scroll on a Darwin
  notification
 
 notifyutil -p com.barut.OmniWM.bench.columnScroll feeds the same 120 Hz gesture (slow, fast,

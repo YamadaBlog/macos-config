@@ -1,7 +1,7 @@
-From 95fac465708acad705280fa88565bb60462b16c6 Mon Sep 17 00:00:00 2001
+From 4922f80c6ffe6db93227af1d0d361d1fb31e44ef Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 16:36:03 +0200
-Subject: [PATCH 25/27] Niri gesture: leaving a column takes the same gesture
+Subject: [PATCH 25/28] Niri gesture: leaving a column takes the same gesture
  whatever its width
 
 Snap used the snap point nearest to the projected position, and neighbouring points are a column

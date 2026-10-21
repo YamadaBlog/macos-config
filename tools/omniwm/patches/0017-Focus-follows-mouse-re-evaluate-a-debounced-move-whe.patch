@@ -1,7 +1,7 @@
 From 17cbf99465d82048643b3ddfa90334e59b87a153 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 10:36:46 +0200
-Subject: [PATCH 17/27] Focus follows mouse: re-evaluate a debounced move when
+Subject: [PATCH 17/28] Focus follows mouse: re-evaluate a debounced move when
  the debounce expires (trailing edge)
 
 A pointer that arrived quickly and stopped kept an unfocused window under it: 8 of 15 fast stops in the old build and 10 of 15 in the new one, measured with a pointer driver. One pending re-evaluation, replaced by newer moves, using the latest mouse sample.

@@ -1,7 +1,7 @@
-From 6b1d4f998a4b810dcdf3fbf7b75a6509911893ea Mon Sep 17 00:00:00 2001
+From 47fcc9664e60b317777abf9008a119c422995a1a Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 15:03:15 +0200
-Subject: [PATCH 21/27] Niri: keep the fullscreen restore offset while
+Subject: [PATCH 21/28] Niri: keep the fullscreen restore offset while
  relayouts re-target the same column
 
 Entering OmniWM fullscreen saves the viewport offset; every relayout of the selection re-targets

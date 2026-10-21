@@ -1,7 +1,7 @@
-From 10a06e2e20dfa5eb9217907e06a5aad8a4cfbdcd Mon Sep 17 00:00:00 2001
+From a9bf4f6039592b9cb25ad8adcce6286d4fa846fa Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 15:39:44 +0200
-Subject: [PATCH 23/27] Niri scroll: verify the size writes of animation ticks
+Subject: [PATCH 23/28] Niri scroll: verify the size writes of animation ticks
  so later ticks move windows only
 
 Animation ticks write position only once a window's size is verified, but ticks never verify,

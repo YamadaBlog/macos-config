@@ -1,7 +1,7 @@
 From f60e01c65d68a8b7b37343a38fe748d6ed9f660d Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 11:37:55 +0200
-Subject: [PATCH 19/27] Workspace switch: with focus follows mouse, focus the
+Subject: [PATCH 19/28] Workspace switch: with focus follows mouse, focus the
  window landing under the pointer, not the remembered one
 
 ---

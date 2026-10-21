@@ -1,7 +1,7 @@
-From cfe72ffecd0ab369525c0ec04b5ac60effa34093 Mon Sep 17 00:00:00 2001
+From f89c7eda8575525f9c499883677755216a588600 Mon Sep 17 00:00:00 2001
 From: YamadaBlog <118530756+YamadaBlog@users.noreply.github.com>
 Date: Fri, 16 Oct 2026 16:06:40 +0200
-Subject: [PATCH 24/27] Restore catalog: do not save while the startup rescan
+Subject: [PATCH 24/28] Restore catalog: do not save while the startup rescan
  is still placing windows
 
 Saving between the startup rescan and the initial refresh (a quit within a second of launch, or the
