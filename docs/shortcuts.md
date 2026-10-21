@@ -45,6 +45,7 @@ Two deliberate exceptions: Option+Tab (types nothing) and Option+F (costs the `�
 | Cmd+E | Hammerspoon | bring Finder to front (opens ~ if no window); closing the last Finder window gives the focus back to the window under the mouse |
 | Cmd+← / Cmd+→ (Safari) | Hammerspoon | previous / next tab; inside a text field they keep start / end of line |
 | Cmd+F1 | Hammerspoon | paste the prompt-optimisation prompt at the cursor (text in `prompt-insert.lua`; clipboard restored after 0.5 s; works with or without fn) |
+| Cmd+F2 | Hammerspoon | next wallpaper among the images of `~/Pictures` (loops); the theme follows, with the saved palette of a wallpaper seen before (`wallpaper-cycle.lua`; works with or without fn) |
 | Cmd+F3 | Hammerspoon | after a crash: reopen Ghostty, Safari, Discord and every Claude Code session (claude / claude2) of the last snapshot on its workspace (`scripts/restore-session.py`; snapshot every minute by `session-snapshot.py`; log `~/Library/Logs/restore-session.log`) |
 | Cmd+Space | Raycast | launcher, clipboard history |
 | Cmd+Option+Space | macOS | Finder search |

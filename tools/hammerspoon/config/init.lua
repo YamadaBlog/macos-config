@@ -18,3 +18,5 @@ safariTabs = require("safari-tabs")
 sessionRestore = require("session-restore")
 -- F3/F4 (Mission Control, Spotlight) do nothing.
 functionKeys = require("function-keys")
+-- Cmd+F2: next wallpaper of ~/Pictures (the theme follows).
+wallpaperCycle = require("wallpaper-cycle")
