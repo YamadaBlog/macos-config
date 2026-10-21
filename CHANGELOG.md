@@ -4,7 +4,8 @@ All notable changes. Format: newest first; each entry says what changed and how 
 is not a plain `git revert`.
 
 ## Unreleased
-- `claude-rm` and `/delete` (Claude Code skill, both accounts): list closed Claude Code sessions and move the
+- `/delete` (Claude Code skill, both accounts) ends the current session and moves it to the Trash; `claude-rm`
+  lists closed sessions and moves the
   chosen ones to the Trash; Claude Code has no built-in command for one session.
 - OmniWM patch 0028: Option+F works again after leaving macOS fullscreen (an unanswered size write is no
   longer learned as a minimum size).

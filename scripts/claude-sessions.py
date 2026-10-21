@@ -4,6 +4,7 @@
   claude-rm              pick sessions with fzf (Tab = several), confirm, move them to the Trash
   claude-rm --list       numbered table of closed sessions (oldest first)
   claude-rm --trash 3 5  move sessions 3 and 5 of --list (or session-id prefixes) to the Trash
+  claude-rm --current    (from inside Claude Code, /delete) end this session, then move it to the Trash
 
 A session is "open" while the process registered in <config>/sessions/<pid>.json runs: it is never listed.
 Files go to ~/.Trash/claude-sessions/<config>/<project>/ (transcript and its subagent folder), so they can be
@@ -73,9 +74,41 @@ def trash(r):
     print(f"Corbeille : {r['title']}")
 
 
+def current():
+    """Delete the session running this command: a detached watcher waits for its Claude process to end (it
+    would otherwise rewrite the transcript), moves the transcript to the Trash, and the session is ended."""
+    sid, pid = os.environ.get("CLAUDE_CODE_SESSION_ID"), os.environ.get("CLAUDE_PID")
+    if not sid or not pid:
+        sys.exit("Not run from a Claude Code session (CLAUDE_CODE_SESSION_ID / CLAUDE_PID missing).")
+    paths = [f for d in CONFIGS for f in glob.glob(f"{d}/projects/*/{sid}.jsonl")]
+    if not paths:
+        sys.exit(f"No transcript for session {sid}.")
+    log = open(os.path.expanduser("~/Library/Logs/claude-rm.log"), "a")
+    subprocess.Popen([sys.executable, os.path.realpath(__file__), "--trash-after", pid, paths[0]],
+                     start_new_session=True, stdout=log, stderr=log)
+    print("Cette session va se fermer et partir à la Corbeille.")
+
+
 def main():
-    rows = sessions()
     args = sys.argv[1:]
+    if args[:1] == ["--current"]:
+        return current()
+    if args[:1] == ["--trash-after"]:  # the detached half of --current
+        pid, path = int(args[1]), args[2]
+        time.sleep(2)  # let the last reply reach the screen
+        try:
+            os.kill(pid, 15)  # end the session
+        except OSError:
+            pass
+        for _ in range(60):
+            try:
+                os.kill(pid, 0)
+                time.sleep(0.5)
+            except OSError:
+                break
+        time.sleep(1)  # Claude Code writes the transcript last on exit
+        return trash({"path": path, "title": os.path.basename(path)})
+    rows = sessions()
     if args[:1] == ["--list"]:
         for i, r in enumerate(rows, 1):
             print(line(i, r))
