@@ -61,7 +61,7 @@ echo "$sum" > "$REPO/wallpapers/source.sha256"; echo "$fp" > "$FP"
 # Accept only the theme files; anything else stays pending for review.
 "$REPO/scripts/capture.sh" --accept tools/neru/config/config.toml tools/omniwm/config/settings.toml 2>/dev/null
 # Commit exactly these paths (git commit -- <paths>): anything else the user staged stays staged.
-paths=(home-manager/palette.nix tools/neru/config/config.toml tools/omniwm/config/settings.toml)
+paths=(home-manager/palette.nix home-manager/palettes tools/neru/config/config.toml tools/omniwm/config/settings.toml)
 cd "$REPO" && git add -- "${paths[@]}" \
   && git commit -qm "auto: theme from the current wallpaper" -- "${paths[@]}" && echo "commit $(git log --format=%h -1)"
 scheme="$(sed -n 's/.*scheme = "\(.*\)"; author.*/\1/p' "$REPO/home-manager/palette.nix")"

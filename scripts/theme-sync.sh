@@ -29,7 +29,15 @@ PY
   tmpimg="$tmpdir/w.png"; sips -s format png "$src" --out "$tmpimg" >/dev/null
   if cmp -s "$tmpimg" "$REPO/wallpapers/actuel.png"; then echo "wallpaper: unchanged"
   else cp "$tmpimg" "$REPO/wallpapers/actuel.png"; echo "wallpaper: copied from $src"; fi
-  python3 -I "$REPO/scripts/palette-from-image.py" "$REPO/wallpapers/actuel.png" "$REPO/home-manager/palette.nix" "wallpaper (auto)"   # neutral name: no personal file name in commits
+  # A wallpaper seen before gets back the palette it had (home-manager/palettes/<sha256 of the image>.nix):
+  # a later change of the generator never alters the theme of an image already validated.
+  saved="$REPO/home-manager/palettes/$(shasum -a 256 "$src" | cut -c1-64).nix"
+  if [ -f "$saved" ]; then cp "$saved" "$REPO/home-manager/palette.nix"; echo "palette: saved one for this wallpaper"
+  else
+    python3 -I "$REPO/scripts/palette-from-image.py" "$REPO/wallpapers/actuel.png" "$REPO/home-manager/palette.nix" "wallpaper (auto)"   # neutral name: no personal file name in commits
+    mkdir -p "$(dirname "$saved")"; cp "$REPO/home-manager/palette.nix" "$saved"
+  fi
+  ( cd "$REPO" && git add home-manager/palettes )
 fi
 # The flake only sees files git knows: stage the theme files, and only those (never unrelated work).
 ( cd "$REPO" && git add home-manager/palette.nix )   # wallpapers/ stays local (.gitignore)
