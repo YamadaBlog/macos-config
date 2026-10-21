@@ -14,5 +14,7 @@ wsHide = require("ws-hide")
 promptInsert = require("prompt-insert")
 -- Safari: Cmd+Left/Right = previous/next tab (outside text fields).
 safariTabs = require("safari-tabs")
+-- Cmd+F3: reopen apps and Claude Code sessions after a crash.
+sessionRestore = require("session-restore")
 -- F3/F4 (Mission Control, Spotlight) do nothing.
 functionKeys = require("function-keys")

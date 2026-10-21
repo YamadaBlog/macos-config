@@ -34,6 +34,31 @@ in {
     omniwm = openApp "OmniWM";
     hammerspoon = openApp "Hammerspoon";
     stats = openApp "Stats";
+    # Work apps reopened at login (Ghostty restores its windows, Safari its last session), then
+    # apply-window-rules.sh puts every restored window back on its rule's workspace.
+    ghostty = openApp "Ghostty";
+    safari = openApp "Safari";
+    discord = openApp "Discord";
+    # Every minute: open Claude Code sessions and their workspace, for Cmd+F3 (restore-session.py) after a crash.
+    session-snapshot = {
+      enable = true;
+      config = {
+        ProgramArguments = [ "/usr/bin/python3" "${identity.repoDir}/scripts/session-snapshot.py" ];
+        RunAtLoad = true;
+        StartInterval = 60;
+        ProcessType = "Background";
+      };
+    };
+    window-rules = {
+      enable = true;
+      config = {
+        ProgramArguments = [ "/bin/bash" "${identity.repoDir}/scripts/apply-window-rules.sh" ];
+        RunAtLoad = true;
+        ProcessType = "Background";
+        StandardOutPath = "${config.home.homeDirectory}/Library/Logs/apply-window-rules.log";
+        StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/apply-window-rules.log";
+      };
+    };
     neru = {
       enable = true;
       config = {

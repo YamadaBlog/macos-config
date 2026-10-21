@@ -42,6 +42,7 @@
     enable = true;
     package = null; # the app itself comes from Homebrew (cask ghostty)
     settings = {
+      window-save-state = "always";   # windows come back after a restart or crash
       window-padding-x = 12;
       window-padding-y = 10;
       background-blur = true;

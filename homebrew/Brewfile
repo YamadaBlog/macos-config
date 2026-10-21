@@ -11,3 +11,8 @@ cask "y3owk1n/tap/neru", trusted: true
 cask "raycast"
 # System monitor for the menu bar
 cask "stats"
+# Browser for the second Claude account (claude2 opens its links there)
+cask "google-chrome"
+
+# ChatGPT desktop app (the web version fails to load conversations in Safari)
+cask "chatgpt"
