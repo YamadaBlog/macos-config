@@ -1,5 +1,5 @@
-{ lib, ... }:
-let profile = import ./profile.nix;
+{ config, lib, ... }:
+let profile = import ./profile.nix; identity = import ./identity.nix;
 in lib.mkIf profile.enableShell {
   programs.zsh.enable = true;
   programs.zsh.shellAliases.ll = "ls -lah";
@@ -7,6 +7,10 @@ in lib.mkIf profile.enableShell {
   # env -u: a Ghostty started from a Claude session leaks its child marker, which turns transcript saving off.
   # BROWSER: its links (artifacts, login) open in Chrome, signed in to the second account; `claude` keeps Safari.
   programs.zsh.shellAliases.claude2 = "env -u CLAUDECODE -u CLAUDE_CODE_CHILD_SESSION -u CLAUDE_CODE_ENTRYPOINT -u CLAUDE_CODE_SESSION_ID CLAUDE_CONFIG_DIR=$HOME/.claude-2 BROWSER=$HOME/.local/bin/open-in-chrome claude";
+  # claude-rm: delete closed Claude Code sessions (both accounts); /delete runs it from inside Claude Code.
+  home.file.".local/bin/claude-rm".source = config.lib.file.mkOutOfStoreSymlink "${identity.repoDir}/scripts/claude-sessions.py";
+  home.file.".claude/skills/delete/SKILL.md".source = ../tools/claude-code/skills/delete/SKILL.md;
+  home.file.".claude-2/skills/delete/SKILL.md".source = ../tools/claude-code/skills/delete/SKILL.md;
   home.file.".local/bin/open-in-chrome" = {
     executable = true;
     text = ''
