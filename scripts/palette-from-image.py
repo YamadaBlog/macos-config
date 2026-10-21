@@ -4,7 +4,7 @@
 Usage: python3 -I scripts/palette-from-image.py <image> <output.nix> [name]
 
 How (Stylix's raw generation gave 8 accents of the same hue):
-- background (base00-03): overall hue of the image, as a dark shade (lightness 0.13) with its saturation;
+- background (base00-03): hue of the image's most colourful tones, as a dark shade (lightness 0.19);
 - text (base04-07): dominant hue of the light areas, very light and barely saturated;
 - accents (base08-0F): one fixed hue family per role (red, orange, gold, green, cyan, blue, purple, brown) so
   they stay distinct, each pulled (±20°) towards a hue really present in the image when there is one;
@@ -87,14 +87,17 @@ def main():
     vivid = [(h * 360, s * (1 - abs(l - 0.5) * 2)) for h, l, s in px if s > 0.25 and 0.2 < l < 0.85]
     tones = [(h * 360, s) for h, l, s in px if s > 0.12 and 0.25 < l < 0.85]  # raw saturation, for softening
     tinted = [(h * 360, s) for h, l, s in px if s > 0.08]
-    # Background hue: the image's overall hue, not its shadows' (a lavender scene has navy-teal shadows).
-    hd = hue_mean(tinted) or (hue_mean(dark) if dark else 220)
+    # Background hue: the image's most colourful tones (the flowers of a misty scene), not its overall
+    # average nor its shadows, which drift to a dull navy.
+    bright = [(h * 360, s) for h, l, s in px if s > 0.45 and 0.2 < l < 0.85]
+    hd = hue_mean(bright) if len(bright) > 50 else (hue_mean(tinted) or (hue_mean(dark) if dark else 220))
     hl = hue_mean(light) if light else hd
-    sd = min(0.35, sum(s for _, s in tinted) / len(tinted)) if tinted else 0.3
-    # Lightness 0.13: dark (lighter looked washed out under the 94 % opacity), not near-black: the terminal reads as a darker shade of the wallpaper.
+    sd = 0.30
+    # Lightness 0.19: the terminal reads as a dark shade of the wallpaper, not near-black (chosen 2026-10-21
+    # from Ghostty previews: "fleur, clair doux").
     pal = {
-        "base00": hexc(hd, 0.13, sd), "base01": hexc(hd, 0.17, sd * 0.85), "base02": hexc(hd, 0.25, sd * 0.7),
-        "base03": hexc(hd, 0.48, sd * 0.35),
+        "base00": hexc(hd, 0.19, sd), "base01": hexc(hd, 0.23, sd * 0.85), "base02": hexc(hd, 0.30, sd * 0.7),
+        "base03": hexc(hd, 0.52, sd * 0.35),
         "base04": hexc(hl, 0.72, 0.25), "base05": hexc(hl, 0.88, 0.45), "base06": hexc(hl, 0.92, 0.45),
         "base07": hexc(hl, 0.95, 0.45),
     }
@@ -105,7 +108,20 @@ def main():
             l += 0.02; pal[key] = hexc(hl, l, 0.25 if key == "base04" else 0.45)
     notes, chosen = {}, []
     dist = lambda a, b: min(abs(a - b), 360 - abs(a - b))
+    # The blue accent (links, border, system accent) is the colourful tone itself when it is blue-violet.
+    vivid_tone = None
+    if len(bright) > 50 and 200 <= hd <= 260:
+        bs = [(l, s) for h, l, s in px if s > 0.45 and 0.2 < l < 0.85]
+        vivid_tone = (hd, 0.72, min(0.65, max(0.50, sum(s for _, s in bs) / len(bs))))
     for key, target, s, l, note in ROLES:
+        if key == "base0D" and vivid_tone:
+            h, l, s = vivid_tone
+            c = hexc(h, l, s)
+            while contrast(c, bg) < 4.5 and l < 0.9:
+                l += 0.02; c = hexc(h, l, s)
+            pal[key] = c; chosen.append(h)
+            notes[key] = f"{note} (hue {round(h)}°, the image's colourful tone)"
+            continue
         # Narrower pull window for orange and gold (otherwise both are pulled to the same image hue)
         window = {"base09": 8, "base0A": 15}.get(key, 22)
         near = [(h, w) for h, w in vivid if dist(h, target) <= window]
