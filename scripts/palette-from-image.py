@@ -85,6 +85,7 @@ def main():
     dark = [(h * 360, s) for h, l, s in px if l < 0.35 and s > 0.08]
     light = [(h * 360, s) for h, l, s in px if l > 0.65 and s > 0.05]
     vivid = [(h * 360, s * (1 - abs(l - 0.5) * 2)) for h, l, s in px if s > 0.25 and 0.2 < l < 0.85]
+    tones = [(h * 360, s) for h, l, s in px if s > 0.12 and 0.25 < l < 0.85]  # raw saturation, for softening
     hd = hue_mean(dark) if dark else 220
     hl = hue_mean(light) if light else hd
     sd = min(0.55, sum(s for _, s in dark) / len(dark)) if dark else 0.3
@@ -121,6 +122,14 @@ def main():
                 side = 1 if ((target - c + 540) % 360 - 180) >= 0 else -1
                 h = (c + 20 * side) % 360
             chosen.append(h % 360)
+        # A hue taken from a soft image (mist, pastel) stays soft: saturation follows the image's tones of that
+        # hue and lightness rises, instead of the fixed vivid default (a royal blue on a lavender wallpaper).
+        if h != target:
+            st = [x for hh, x in tones if dist(hh, h) <= 15]
+            if st:
+                img_s = sum(st) / len(st)
+                if img_s < s / 1.6:
+                    s, l = max(0.35, img_s * 1.6), max(l, 0.70)
         c = hexc(h, l, s)
         while contrast(c, bg) < 4.5 and l < 0.9:
             l += 0.02; c = hexc(h, l, s)
