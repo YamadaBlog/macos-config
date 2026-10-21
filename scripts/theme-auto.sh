@@ -14,11 +14,13 @@ if ! mkdir "$LOCK" 2>/dev/null; then
 fi
 echo $$ > "$LOCK/pid"
 IDX="$HOME/Library/Application Support/com.apple.wallpaper/Store/Index.plist"
-# macOS rewrites the index on every wake/unlock (LastUse timestamps only): fingerprint the desktop
-# choice alone (plutil, ~40 ms) and stop before the 3 s wait and the Python parse when unchanged.
+# macOS rewrites the index on every wake/unlock (LastUse timestamps only): fingerprint the index without
+# them (~40 ms) and stop before the 3 s wait and the Python parse when unchanged. The whole index, not
+# AllSpacesAndDisplays.Desktop: a wallpaper chosen per display lives under Displays.<uuid>.Desktop, and the
+# missing key once gave a constant fingerprint that skipped every change (2026-10-21).
 FP="$HOME/.local/state/macos-power-user-deploy/theme-auto.fingerprint"
-fp="$(plutil -extract AllSpacesAndDisplays.Desktop.Content xml1 -o - "$IDX" 2>/dev/null | shasum | cut -c1-40)"
-if [ -n "$fp" ] && [ "$fp" = "$(cat "$FP" 2>/dev/null)" ]; then rm -rf "$LOCK"; exit 0; fi
+fp="$(plutil -convert xml1 -o - "$IDX" 2>/dev/null | sed '/<key>LastUse<\/key>/{N;d;}' | shasum | cut -c1-40)"
+if [ "$fp" != "da39a3ee5e6b4b0d3255bfef95601890afd80709" ] && [ "$fp" = "$(cat "$FP" 2>/dev/null)" ]; then rm -rf "$LOCK"; exit 0; fi
 start_mtime="$(stat -f %m "$IDX")"
 # launchd does not queue a change that happens while this runs: check again on exit.
 rerun_if_changed() { rm -rf "$LOCK"; [ "$(stat -f %m "$IDX")" != "$start_mtime" ] && { echo "$(date '+%F %T') index changed during the run: running again"; exec /bin/bash "$0"; }; }
