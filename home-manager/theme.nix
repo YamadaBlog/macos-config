@@ -49,6 +49,8 @@ in {
     enable = true;
     package = null; # the app itself comes from Homebrew (cask ghostty)
     settings = {
+      # Written by scripts/ghostty-live-colors.py before the build, so a new theme shows at once; optional (?).
+      config-file = "?live-colors";
       window-save-state = "always";   # windows come back after a restart or crash
       window-padding-x = 12;
       window-padding-y = 10;

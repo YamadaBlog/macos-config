@@ -39,6 +39,8 @@ PY
   fi
   ( cd "$REPO" && git add home-manager/palettes )
 fi
+# Ghostty first (about a second), then the build that makes it permanent and themes everything else.
+python3 -I "$REPO/scripts/ghostty-live-colors.py" "$REPO/home-manager/palette.nix" || true
 # The flake only sees files git knows: stage the theme files, and only those (never unrelated work).
 ( cd "$REPO" && git add home-manager/palette.nix )   # wallpapers/ stays local (.gitignore)
 "$REPO/scripts/apply.sh" home-manager --write | tail -1
