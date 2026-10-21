@@ -17,7 +17,7 @@ in {
     # Keep Ghostty's font and transparency (Stylix would otherwise force DejaVu and opacity 1).
     fonts.monospace = { package = pkgs.jetbrains-mono; name = "JetBrains Mono"; };
     fonts.sizes.terminal = 13;
-    opacity.terminal = 0.94;
+    opacity.terminal = 0.88;   # the blurred wallpaper shows through slightly
     targets = {
       ghostty.enable = true;
       starship.enable = true;

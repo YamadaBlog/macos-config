@@ -4,7 +4,7 @@
 Usage: python3 -I scripts/palette-from-image.py <image> <output.nix> [name]
 
 How (Stylix's raw generation gave 8 accents of the same hue):
-- background (base00-03): hue of the image's most colourful tones, as a dark shade (lightness 0.19);
+- background (base00-03): hue of the image's most colourful tones, in shadow (towards violet, lightness 0.16);
 - text (base04-07): dominant hue of the light areas, very light and barely saturated;
 - accents (base08-0F): one fixed hue family per role (red, orange, gold, green, cyan, blue, purple, brown) so
   they stay distinct, each pulled (±20°) towards a hue really present in the image when there is one;
@@ -98,8 +98,9 @@ def main():
     hd = hue_mean(bright) if len(bright) > 50 else (hue_mean(tinted) or (hue_mean(dark) if dark else 220))
     hl = hue_mean(light) if light else hd
     sd = 0.30
-    # Lightness 0.19: the terminal reads as a dark shade of the wallpaper, not near-black (chosen 2026-10-21
-    # from Ghostty previews: "fleur, clair doux").
+    # The dark background is that tone in shadow: a cool hue shifts ~20° towards violet (lavender at dusk
+    # reads indigo; kept as is it falls into navy), lightness 0.16. Chosen 2026-10-21 from Ghostty previews.
+    hb = min(hd + 20, 270) if 190 <= hd <= 260 else hd
     if LIGHT:
         # Light variant: the background is a pale shade of the colourful tone (lightness 0.78), dark text.
         pal = {
@@ -110,8 +111,8 @@ def main():
         }
     else:
       pal = {
-        "base00": hexc(hd, 0.19, sd), "base01": hexc(hd, 0.23, sd * 0.85), "base02": hexc(hd, 0.30, sd * 0.7),
-        "base03": hexc(hd, 0.52, sd * 0.35),
+        "base00": hexc(hb, 0.16, sd), "base01": hexc(hb, 0.20, sd * 0.85), "base02": hexc(hb, 0.28, sd * 0.7),
+        "base03": hexc(hb, 0.50, sd * 0.35),
         "base04": hexc(hl, 0.72, 0.25), "base05": hexc(hl, 0.88, 0.45), "base06": hexc(hl, 0.92, 0.45),
         "base07": hexc(hl, 0.95, 0.45),
     }
