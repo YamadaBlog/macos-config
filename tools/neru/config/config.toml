@@ -30,10 +30,10 @@ on_accent_alt = "#F8FAFF"
 text = "#17327A"
 
 [theme.dark]
-surface = "#22283F"
+surface = "#201D35"
 accent = "#93A1DC"
 accent_alt = "#98BBCD"
-on_accent_alt = "#22283F"
+on_accent_alt = "#201D35"
 text = "#D3D7EE"
 
 # Hotkeys
