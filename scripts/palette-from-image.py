@@ -4,7 +4,7 @@
 Usage: python3 -I scripts/palette-from-image.py <image> <output.nix> [name]
 
 How (Stylix's raw generation gave 8 accents of the same hue):
-- background (base00-03): dominant hue of the image's dark areas, darkened and desaturated;
+- background (base00-03): overall hue of the image, as a dark shade (lightness 0.19) with its saturation;
 - text (base04-07): dominant hue of the light areas, very light and barely saturated;
 - accents (base08-0F): one fixed hue family per role (red, orange, gold, green, cyan, blue, purple, brown) so
   they stay distinct, each pulled (±20°) towards a hue really present in the image when there is one;
@@ -86,12 +86,15 @@ def main():
     light = [(h * 360, s) for h, l, s in px if l > 0.65 and s > 0.05]
     vivid = [(h * 360, s * (1 - abs(l - 0.5) * 2)) for h, l, s in px if s > 0.25 and 0.2 < l < 0.85]
     tones = [(h * 360, s) for h, l, s in px if s > 0.12 and 0.25 < l < 0.85]  # raw saturation, for softening
-    hd = hue_mean(dark) if dark else 220
+    tinted = [(h * 360, s) for h, l, s in px if s > 0.08]
+    # Background hue: the image's overall hue, not its shadows' (a lavender scene has navy-teal shadows).
+    hd = hue_mean(tinted) or (hue_mean(dark) if dark else 220)
     hl = hue_mean(light) if light else hd
-    sd = min(0.55, sum(s for _, s in dark) / len(dark)) if dark else 0.3
+    sd = min(0.35, sum(s for _, s in tinted) / len(tinted)) if tinted else 0.3
+    # Lightness 0.19, not near-black: the terminal reads as a darker shade of the wallpaper.
     pal = {
-        "base00": hexc(hd, 0.10, sd), "base01": hexc(hd, 0.14, sd * 0.85), "base02": hexc(hd, 0.21, sd * 0.7),
-        "base03": hexc(hd, 0.45, sd * 0.35),
+        "base00": hexc(hd, 0.19, sd), "base01": hexc(hd, 0.23, sd * 0.85), "base02": hexc(hd, 0.30, sd * 0.7),
+        "base03": hexc(hd, 0.52, sd * 0.35),
         "base04": hexc(hl, 0.72, 0.25), "base05": hexc(hl, 0.88, 0.45), "base06": hexc(hl, 0.92, 0.45),
         "base07": hexc(hl, 0.95, 0.45),
     }
