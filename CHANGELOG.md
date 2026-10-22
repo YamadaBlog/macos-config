@@ -4,6 +4,8 @@ All notable changes. Format: newest first; each entry says what changed and how 
 is not a plain `git revert`.
 
 ## Unreleased
+- Audio files open in QuickTime Player, not Apple Music (`swift scripts/default-audio-app.swift`; rollback:
+  Finder > Get Info > Open with > Music > Change All).
 - `/delete` (Claude Code skill, both accounts) ends the current session and moves it to the Trash; `claude-rm`
   lists closed sessions and moves the
   chosen ones to the Trash; Claude Code has no built-in command for one session.
