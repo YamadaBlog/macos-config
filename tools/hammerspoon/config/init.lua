@@ -20,3 +20,5 @@ sessionRestore = require("session-restore")
 functionKeys = require("function-keys")
 -- Cmd+F2: next wallpaper of ~/Pictures (the theme follows).
 wallpaperCycle = require("wallpaper-cycle")
+-- Cmd+F4: cleaning mode, keyboard locked until a click on the banner (or 2 min).
+keyboardClean = require("keyboard-clean")
