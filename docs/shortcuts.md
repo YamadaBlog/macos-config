@@ -47,7 +47,7 @@ Two deliberate exceptions: Option+Tab (types nothing) and Option+F (costs the `Æ
 | Cmd+F1 | Hammerspoon | paste the prompt-optimisation prompt at the cursor (text in `prompt-insert.lua`; clipboard restored after 0.5 s; works with or without fn) |
 | Cmd+F2 | Hammerspoon | next wallpaper among the images of `~/Pictures` (loops); the theme follows, with the saved palette of a wallpaper seen before (`wallpaper-cycle.lua`; works with or without fn) |
 | Cmd+F3 | Hammerspoon | after a crash: reopen Ghostty, Safari, Discord and every Claude Code session (claude / claude2) of the last snapshot on its workspace (`scripts/restore-session.py`; snapshot every minute by `session-snapshot.py`; log `~/Library/Logs/restore-session.log`) |
-| Cmd+F4 | Hammerspoon | cleaning mode: every key is blocked (trackpad still works) until a click on the banner, or after 2 minutes (`keyboard-clean.lua`; works with or without fn) |
+| Cmd+F4 | Hammerspoon | cleaning mode: every key is blocked (trackpad still works) until a click on the card, or after 2 minutes; card image `~/.config/macos-config/keyboard-clean.png`, kept out of the repo (`keyboard-clean.lua`; works with or without fn) |
 | Cmd+Space | Raycast | launcher, clipboard history |
 | Cmd+Option+Space | macOS | Finder search |
 | Option+Space | typing | non-breaking space |

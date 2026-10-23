@@ -6,45 +6,74 @@ local DURATION = 120
 local types = hs.eventtap.event.types
 local f4 = { [118] = true, [177] = true, [131] = true }
 
--- Halloween card: pumpkin inside an orange ring that empties with the time left, the countdown under it,
--- two bats that flap every second. A click anywhere on it unlocks.
-local W, H, R = 300, 330, 92
-local ORANGE, PURPLE = { red = 1, green = 0.55, blue = 0.1 }, { red = 0.13, green = 0.05, blue = 0.2, alpha = 1 }
+-- The card: ~/.config/macos-config/keyboard-clean.png (a personal image, kept out of the repo; a pumpkin
+-- otherwise) full-bleed, the countdown in Didot over a dark fade, a gold bar that empties with the time left.
+-- Entrance in the Attack on Titan way: lightning flash, the card falls in and the screen shakes. A click unlocks.
+local W, H = 340, 400
+local GOLD = { red = 0.83, green = 0.66, blue = 0.38 }
+local IMAGE = os.getenv("HOME") .. "/.config/macos-config/keyboard-clean.png"
+
+local function build(frame)
+  local c = hs.canvas.new(frame)
+  c:level(hs.canvas.windowLevels.screenSaver)
+  c:behavior({ "canJoinAllSpaces", "stationary" })
+  local img = hs.fs.attributes(IMAGE) and hs.image.imageFromPath(IMAGE)
+  c:appendElements(
+    { type = "rectangle", action = "clip", roundedRectRadii = { xRadius = 22, yRadius = 22 } },
+    { type = "rectangle", action = "fill", fillColor = { white = 0.04 }, trackMouseUp = true },
+    img and { type = "image", image = img, imageScaling = "scaleProportionally", imageAlignment = "top",
+              frame = { x = (W - H) / 2, y = 0, w = H, h = H }, trackMouseUp = true }
+        or { type = "text", text = "🎃", frame = { x = 0, y = 90, w = W, h = 160 }, textAlignment = "center", textSize = 120 },
+    { type = "rectangle", action = "fill", frame = { x = 0, y = H - 170, w = W, h = 170 }, trackMouseUp = true,
+      fillGradient = "linear", fillGradientAngle = 90,
+      fillGradientColors = { { white = 0.04, alpha = 0 }, { white = 0.04, alpha = 0.75 }, { white = 0.04, alpha = 0.97 } } },
+    { id = "time", type = "text", frame = { x = 0, y = H - 108, w = W, h = 70 }, textAlignment = "center",
+      textFont = "Didot-Bold", textSize = 54, textColor = { white = 0.97 },
+      textShadow = { blurRadius = 12, color = { white = 0, alpha = 0.9 }, offset = { h = -1, w = 0 } } },
+    { type = "rectangle", action = "fill", frame = { x = 40, y = H - 30, w = W - 80, h = 3 },
+      fillColor = { white = 1, alpha = 0.12 } },
+    { id = "bar", type = "rectangle", action = "fill", frame = { x = 40, y = H - 30, w = W - 80, h = 3 }, fillColor = GOLD },
+    { id = "flash", type = "rectangle", action = "fill", fillColor = { red = 1, green = 0.93, blue = 0.7, alpha = 0 } },
+    { type = "resetClip" })
+  c:mouseCallback(function(_, msg) if msg == "mouseUp" then M.stop() end end)
+  return c
+end
+
+-- Lightning flash, a fall from above with a short bounce, then a decaying shake (about 0.7 s at 60 fps).
+local function entrance(c, x, y)
+  local t = 0
+  M.anim = hs.timer.doEvery(1 / 60, function()
+    t = t + 1 / 60
+    local dy, dx = 0, 0
+    if t < 0.28 then
+      local k = t / 0.28; dy = -(1 - k * k) * 260
+    elseif t < 0.7 then
+      local k = (t - 0.28) / 0.42; local amp = 14 * (1 - k)
+      dx, dy = amp * math.sin(t * 90), amp * 0.6 * math.cos(t * 110)
+    else
+      M.anim:stop(); M.anim = nil
+    end
+    c:topLeft({ x = x + dx, y = y + dy })
+    c.flash.fillColor = { red = 1, green = 0.93, blue = 0.7, alpha = math.max(0, 0.9 - t * 2.2) }
+  end)
+end
 
 local function banner(left)
   if not M.canvas then
     local s = hs.screen.mainScreen():frame()
-    M.canvas = hs.canvas.new({ x = s.x + (s.w - W) / 2, y = s.y + (s.h - H) / 2, w = W, h = H })
-    M.canvas:level(hs.canvas.windowLevels.screenSaver)
-    M.canvas:behavior({ "canJoinAllSpaces", "stationary" })
-    local cx, cy = W / 2, 30 + R
-    M.canvas:appendElements(
-      { type = "rectangle", action = "fill", roundedRectRadii = { xRadius = 36, yRadius = 36 }, fillColor = PURPLE,
-        strokeColor = { red = 1, green = 0.55, blue = 0.1, alpha = 0.35 }, strokeWidth = 2, action = "strokeAndFill",
-        shadow = { blurRadius = 30, color = { red = 1, green = 0.45, blue = 0, alpha = 0.55 }, offset = { h = 0, w = 0 } },
-        withShadow = true, trackMouseUp = true },
-      { type = "circle", center = { x = cx, y = cy }, radius = R, action = "stroke", strokeWidth = 10,
-        strokeColor = { white = 1, alpha = 0.08 } },
-      { id = "ring", type = "arc", center = { x = cx, y = cy }, radius = R, startAngle = 0, endAngle = 360,
-        action = "stroke", strokeWidth = 10, strokeColor = ORANGE, strokeCapStyle = "round", arcRadii = false },
-      { type = "text", text = "🎃", frame = { x = 0, y = cy - 52, w = W, h = 110 }, textAlignment = "center", textSize = 84 },
-      { id = "bat1", type = "text", text = "🦇", frame = { x = 18, y = 18, w = 50, h = 40 }, textSize = 30 },
-      { id = "bat2", type = "text", text = "🦇", frame = { x = W - 62, y = 34, w = 50, h = 40 }, textSize = 26 },
-      { id = "time", type = "text", frame = { x = 0, y = cy + R + 22, w = W, h = 60 }, textAlignment = "center",
-        textFont = "Menlo-Bold", textSize = 40, textColor = ORANGE })
-    M.canvas:mouseCallback(function(_, msg) if msg == "mouseUp" then M.stop() end end)
-    M.canvas:show(0.25)
+    local x, y = s.x + (s.w - W) / 2, s.y + (s.h - H) / 2
+    M.canvas = build({ x = x, y = y - 260, w = W, h = H })
+    M.canvas:show()
+    entrance(M.canvas, x, y)
   end
-  local c, flap = M.canvas, left % 2 == 0
-  c.ring.endAngle = 360 * left / DURATION
-  c.time.text = string.format("%d:%02d", left // 60, left % 60)
-  c.bat1.frame = { x = 18, y = flap and 14 or 22, w = 50, h = 40 }
-  c.bat2.frame = { x = W - 62, y = flap and 38 or 30, w = 50, h = 40 }
+  M.canvas.time.text = string.format("%d:%02d", left // 60, left % 60)
+  M.canvas.bar.frame = { x = 40, y = H - 30, w = math.max(0, (W - 80) * left / DURATION), h = 3 }
 end
 
 function M.stop()
   if M.block then M.block:stop(); M.block = nil end
   if M.timer then M.timer:stop(); M.timer = nil end
+  if M.anim then M.anim:stop(); M.anim = nil end
   if M.canvas then M.canvas:delete(0.3); M.canvas = nil end
 end
 
