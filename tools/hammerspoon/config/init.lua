@@ -14,11 +14,11 @@ wsHide = require("ws-hide")
 promptInsert = require("prompt-insert")
 -- Safari: Cmd+Left/Right = previous/next tab (outside text fields).
 safariTabs = require("safari-tabs")
--- Cmd+F3: reopen apps and Claude Code sessions after a crash.
+-- Cmd+F5: reopen apps and Claude Code sessions after a crash.
 sessionRestore = require("session-restore")
--- F3/F4 (Mission Control, Spotlight) do nothing.
+-- Under lock-down, Mission Control / Spotlight on F3/F4 with a modifier do nothing.
 functionKeys = require("function-keys")
--- Cmd+F2: next wallpaper of ~/Pictures (the theme follows).
+-- F3: next wallpaper of ~/Pictures (the theme follows).
 wallpaperCycle = require("wallpaper-cycle")
--- Cmd+F4: cleaning mode, keyboard locked until a click on the banner (or 2 min).
+-- F4: cleaning mode, keyboard locked until a click on the banner (or 2 min).
 keyboardClean = require("keyboard-clean")

@@ -1,4 +1,4 @@
--- Cmd+F4: cleaning mode. Every key is swallowed (letters, modifiers, brightness, volume, media) while the
+-- F4: cleaning mode. Every key is swallowed (letters, modifiers, brightness, volume, media) while the
 -- trackpad keeps working; a click on the centred banner, or 2 minutes, ends it. Touch ID / power cannot be blocked.
 -- Bound on F4 (keycode 118, fn) and on the Spotlight / Launchpad codes the bare F4 sends (177, 131).
 local M = {}
@@ -95,8 +95,8 @@ end
 M.trigger = hs.eventtap.new({ types.keyDown }, function(e)
   if M.block or not f4[e:getKeyCode()] then return false end
   local fl = e:getFlags()
-  if not fl.cmd or fl.alt or fl.ctrl or fl.shift then return false end
-  -- Start once Cmd and F4 are released: a swallowed key-up would leave them pressed for the apps.
+  if fl.cmd or fl.alt or fl.ctrl or fl.shift then return false end
+  -- Start once F4 and any modifier are released: a swallowed key-up would leave them pressed for the apps.
   hs.timer.waitUntil(function() return next(hs.eventtap.checkKeyboardModifiers()) == nil end,
                      function() hs.timer.doAfter(0.15, M.start) end, 0.05)
   return true

@@ -45,9 +45,9 @@ Two deliberate exceptions: Option+Tab (types nothing) and Option+F (costs the `�
 | Cmd+E | Hammerspoon | bring Finder to front (opens ~ if no window); closing the last Finder window gives the focus back to the window under the mouse |
 | Cmd+← / Cmd+→ (Safari) | Hammerspoon | previous / next tab; inside a text field they keep start / end of line |
 | Cmd+F1 | Hammerspoon | paste the prompt-optimisation prompt at the cursor (text in `prompt-insert.lua`; clipboard restored after 0.5 s; works with or without fn) |
-| Cmd+F2 | Hammerspoon | next wallpaper among the images of `~/Pictures` (loops); the theme follows, with the saved palette of a wallpaper seen before (`wallpaper-cycle.lua`; works with or without fn) |
-| Cmd+F3 | Hammerspoon | after a crash: reopen Ghostty, Safari, Discord and every Claude Code session (claude / claude2) of the last snapshot on its workspace (`scripts/restore-session.py`; snapshot every minute by `session-snapshot.py`; log `~/Library/Logs/restore-session.log`) |
-| Cmd+F4 | Hammerspoon | cleaning mode: every key is blocked (trackpad still works) until a click on the card, or after 2 minutes; card image `~/.config/macos-config/keyboard-clean.png`, kept out of the repo (`keyboard-clean.lua`; works with or without fn) |
+| F3 | Hammerspoon | next wallpaper among the images of `~/Pictures` (loops); the theme follows, with the saved palette of a wallpaper seen before (`wallpaper-cycle.lua`; works with or without fn) |
+| Cmd+F5 | Hammerspoon | after a crash: reopen Ghostty, Safari, Discord and every Claude Code session (claude / claude2) of the last snapshot on its workspace (`scripts/restore-session.py`; snapshot every minute by `session-snapshot.py`; log `~/Library/Logs/restore-session.log`) |
+| F4 | Hammerspoon | cleaning mode: every key is blocked (trackpad still works) until a click on the card, or after 2 minutes; card image `~/.config/macos-config/keyboard-clean.png`, kept out of the repo (`keyboard-clean.lua`; works with or without fn) |
 | Cmd+Space | Raycast | launcher, clipboard history |
 | Cmd+Option+Space | macOS | Finder search |
 | Option+Space | typing | non-breaking space |
@@ -64,7 +64,7 @@ Full OmniWM list: the `[[hotkeys]]` entries of `tools/omniwm/config/settings.tom
 | **4 fingers up** | OmniWM | Overview (also Hyper+O); click a window to jump to it |
 
 macOS 3- and 4-finger swipes and the Mission Control gesture are disabled in `home-manager/macos.nix`.
-With `{ lockDown = true; }` in `~/.config/macos-config/profile.local.nix` (outside the repo; off by default), F3 and F4 do nothing (`tools/hammerspoon/config/function-keys.lua`, Cmd+F3 still works) and the auto-hidden Dock never shows.
+With `{ lockDown = true; }` in `~/.config/macos-config/profile.local.nix` (outside the repo; off by default), Mission Control and Spotlight on F3 / F4 with a modifier do nothing (`tools/hammerspoon/config/function-keys.lua`; bare F3 / F4 are the wallpaper and cleaning shortcuts) and the auto-hidden Dock never shows.
 
 ## Technical notes
 - **OmniWM binds physical key positions (QWERTY names).** In `settings.toml`, printed AZERTY **W** is `Z`,

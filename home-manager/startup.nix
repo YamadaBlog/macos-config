@@ -39,7 +39,7 @@ in {
     ghostty = openApp "Ghostty";
     safari = openApp "Safari";
     discord = openApp "Discord";
-    # Every minute: open Claude Code sessions and their workspace, for Cmd+F3 (restore-session.py) after a crash.
+    # Every minute: open Claude Code sessions and their workspace, for Cmd+F5 (restore-session.py) after a crash.
     session-snapshot = {
       enable = true;
       config = {

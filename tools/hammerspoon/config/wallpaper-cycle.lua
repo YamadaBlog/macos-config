@@ -1,6 +1,7 @@
--- Cmd+F2: next wallpaper among the images of ~/Pictures (alphabetical, loops). The theme follows through the
+-- F3: next wallpaper among the images of ~/Pictures (alphabetical, loops). The theme follows through the
 -- theme-auto agent, which reuses the saved palette of a wallpaper seen before (home-manager/palettes).
--- Bound twice like Cmd+F1: Cmd+fn+F2 (real F2) and Cmd+brightness up (NX_KEYTYPE_BRIGHTNESS_UP).
+-- Bound on fn+F3 (real F3) and on Mission Control (keycode 160), what the bare F3 key sends; with a modifier
+-- F3 keeps its macOS meaning (or is blocked by function-keys.lua under lock-down).
 local M = {}
 local dir = os.getenv("HOME") .. "/Pictures"
 
@@ -27,14 +28,13 @@ function M.next()
   hs.alert.show(nextImage:match("[^/]+$"))
 end
 
-M.hotkey = hs.hotkey.bind({ "cmd" }, "f2", M.next)
+M.hotkey = hs.hotkey.bind({}, "f3", M.next)
 
-M.tap = hs.eventtap.new({ hs.eventtap.event.types.systemDefined }, function(e)
-  local k = e:systemKey()
-  if k.key ~= "BRIGHTNESS_UP" then return false end
+M.tap = hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(e)
+  if e:getKeyCode() ~= 160 then return false end
   local f = e:getFlags()
-  if not (f.cmd and not f.alt and not f.ctrl and not f.shift) then return false end
-  if k.down and not k["repeat"] then M.next() end
+  if f.cmd or f.alt or f.ctrl or f.shift then return false end
+  if e:getProperty(hs.eventtap.event.properties.keyboardEventAutorepeat) == 0 then M.next() end
   return true
 end)
 M.tap:start()

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cmd+F3 (Hammerspoon): reopen what a crash closed. Launches Ghostty, Safari and Discord (they restore their own
+"""Cmd+F5 (Hammerspoon): reopen what a crash closed. Launches Ghostty, Safari and Discord (they restore their own
 windows), reopens every Claude Code session of the last snapshot that is not running (claude or claude2, in its
 folder, in a new Ghostty window, moved back to its workspace), then puts app windows back on their workspaces.
 Uses previous-boot.json (written by session-snapshot.py) when it exists and has not been restored yet, else
