@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- F4 cleaning card (keyboard-clean.lua). Attack on Titan entrance: a lightning bolt strikes, white flash,
+     the card lands with a shake, steam rises off it, the Wings of Freedom glint once. Only transform and
+     opacity are animated (GPU compositing, no repaint); after the 1.6 s entrance nothing moves but the
+     time bar (one compositor animation) and the digits (one text update per second). -->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; height: 100%; background: transparent; overflow: hidden; cursor: pointer;
+               -webkit-user-select: none; }
+  .stage { position: absolute; inset: 0; display: grid; place-items: center; }
+  .card { position: relative; width: 340px; height: 420px; border-radius: 24px; overflow: hidden; background: #0a0a0b;
+          box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.06);
+          animation: land .55s cubic-bezier(.2,.9,.3,1.25) .32s both, shake .5s linear .85s; will-change: transform; }
+  .art { position: absolute; inset: 0; background: url({{IMG}}) center top / cover; transform: scale(1.04); }
+  .fade { position: absolute; inset: auto 0 0 0; height: 190px;
+          background: linear-gradient(to top, rgba(8,8,9,.98) 0%, rgba(8,8,9,.8) 45%, transparent 100%); }
+  .time { position: absolute; inset: auto 0 52px 0; text-align: center; font: 700 58px/1 Didot, serif;
+          color: #f6f1e8; letter-spacing: 2px; text-shadow: 0 2px 14px rgba(0,0,0,.9); font-variant-numeric: lining-nums; }
+  .track, .bar { position: absolute; left: 44px; right: 44px; bottom: 30px; height: 3px; border-radius: 2px; }
+  .track { background: rgba(255,255,255,.12); }
+  .bar { background: linear-gradient(90deg, #b8894a, #e8c88a); transform-origin: left center;
+         animation: drain {{DURATION}}s linear .9s both; }
+  /* Wings of Freedom, top right: drawn once, a gold glint crosses it */
+  .wings { position: absolute; top: 16px; right: 16px; width: 52px; height: 52px; opacity: 0;
+           animation: appear .5s ease-out 1.2s forwards; }
+  .flash { position: absolute; inset: 0; background: #fff6d8; opacity: 0; animation: flash .7s ease-out .3s; }
+  .steam { position: absolute; bottom: -40px; width: 160px; height: 160px; border-radius: 50%; opacity: 0;
+           background: radial-gradient(closest-side, rgba(255,255,255,.55), rgba(255,255,255,0)); will-change: transform, opacity; }
+  .s1 { left: -30px; animation: steam 1.6s ease-out .8s; } .s2 { left: 90px; animation: steam 1.8s ease-out .9s; }
+  .s3 { right: -30px; animation: steam 1.5s ease-out 1s; }
+  .bolt { position: absolute; inset: 0; pointer-events: none; }
+  .bolt path { fill: none; stroke: #fff3c4; stroke-width: 5; stroke-linejoin: miter;
+               filter: drop-shadow(0 0 8px #ffd36b) drop-shadow(0 0 22px #ff9d2e);
+               stroke-dasharray: 1400; stroke-dashoffset: 1400; animation: strike .3s ease-in forwards, gone .4s ease-out .4s forwards; }
+  .out { animation: leave .3s ease-in forwards !important; }
+  @keyframes strike { to { stroke-dashoffset: 0; } }
+  @keyframes gone { to { opacity: 0; } }
+  @keyframes flash { 0% { opacity: .95; } 100% { opacity: 0; } }
+  @keyframes land { from { transform: translateY(-120vh) scale(1.05); } to { transform: none; } }
+  @keyframes shake { 0%,100% { transform: none; } 15% { transform: translate(-9px,4px); } 30% { transform: translate(8px,-5px); }
+                     45% { transform: translate(-6px,3px); } 60% { transform: translate(4px,-2px); } 80% { transform: translate(-2px,1px); } }
+  @keyframes steam { 0% { opacity: 0; transform: translateY(0) scale(.6); } 25% { opacity: .9; }
+                     100% { opacity: 0; transform: translateY(-260px) scale(1.6); } }
+  @keyframes appear { from { opacity: 0; transform: scale(.6) rotate(-8deg); } to { opacity: .92; transform: none; } }
+  @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+  @keyframes leave { to { opacity: 0; transform: scale(.94); } }
+</style></head><body>
+<div class="stage">
+  <div class="card" id="card">
+    <div class="art"></div>
+    <div class="steam s1"></div><div class="steam s2"></div><div class="steam s3"></div>
+    <div class="fade"></div>
+    <svg class="wings" viewBox="0 0 100 100" aria-hidden="true">
+      <path d="M50 8 L88 22 L84 62 Q78 84 50 94 Q22 84 16 62 L12 22 Z" fill="rgba(10,10,12,.55)" stroke="#e8c88a" stroke-width="3"/>
+      <path d="M49 30 C40 30 30 38 24 50 C30 48 36 49 40 52 C33 55 28 61 26 70 C34 64 42 62 49 63 Z" fill="#f6f1e8"/>
+      <path d="M51 30 C60 30 70 38 76 50 C70 48 64 49 60 52 C67 55 72 61 74 70 C66 64 58 62 51 63 Z" fill="#3b5b9a"/>
+    </svg>
+    <div class="time" id="t"></div>
+    <div class="track"></div><div class="bar"></div>
+    <div class="flash"></div>
+  </div>
+  <svg class="bolt" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+    <path d="M232 -10 L190 120 L226 128 L168 260 L212 268 L150 420 L196 430 L170 610"/>
+  </svg>
+</div>
+<script>
+  const end = Date.now() + {{DURATION}} * 1000, t = document.getElementById('t');
+  const tick = () => { const s = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+                       t.textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  tick(); setInterval(tick, 1000);
+  document.addEventListener('mouseup', () => webkit.messageHandlers.kc.postMessage('stop'));
+  window.leave = () => document.getElementById('card').classList.add('out');
+</script>
+</body></html>
