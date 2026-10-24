@@ -1,6 +1,6 @@
 # macos-config
 
-[![check](https://github.com/YamadaBlog/macos-config/actions/workflows/check.yml/badge.svg)](https://github.com/YamadaBlog/macos-config/actions/workflows/check.yml)
+[![check](https://github.com/maoxor/macos-config/actions/workflows/check.yml/badge.svg)](https://github.com/maoxor/macos-config/actions/workflows/check.yml)
 ![macOS 26](https://img.shields.io/badge/macOS-26-black?logo=apple)
 ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-555)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE.txt)
@@ -50,7 +50,7 @@ Everything about OmniWM (build, layouts, gestures, Overview, focus, rendering, s
 
 ## Install
 ```sh
-git clone https://github.com/YamadaBlog/macos-config.git ~/dev/macos-config   # any location works
+git clone https://github.com/maoxor/macos-config.git ~/dev/macos-config   # any location works
 cd ~/dev/macos-config
 ./install.sh          # plan: checks prerequisites and lists the steps; changes nothing
 ./install.sh --run    # runs the steps in order, asking before each one (y = run, s = skip, q = quit)
