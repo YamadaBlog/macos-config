@@ -82,6 +82,9 @@ def main():
     if old and old.get("boot") != boot:
         os.replace(cur, os.path.join(STATE, "previous-boot.json"))
     snap = {"boot": boot, "sessions": sessions()}
+    # At shutdown the sessions end before this job does: an empty run keeps the last list of the same boot.
+    if not snap["sessions"] and old and old.get("boot") == boot:
+        return
     tmp = cur + ".tmp"
     json.dump(snap, open(tmp, "w"), indent=1)
     os.replace(tmp, cur)
