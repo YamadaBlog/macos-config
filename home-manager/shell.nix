@@ -11,6 +11,8 @@ in lib.mkIf profile.enableShell {
   home.file.".local/bin/claude-rm".source = config.lib.file.mkOutOfStoreSymlink "${identity.repoDir}/scripts/claude-sessions.py";
   home.file.".claude/skills/delete/SKILL.md".source = ../tools/claude-code/skills/delete/SKILL.md;
   home.file.".claude-2/skills/delete/SKILL.md".source = ../tools/claude-code/skills/delete/SKILL.md;
+  home.file.".claude/skills/apres/SKILL.md".source = ../tools/claude-code/skills/apres/SKILL.md;
+  home.file.".claude-2/skills/apres/SKILL.md".source = ../tools/claude-code/skills/apres/SKILL.md;
   home.file.".local/bin/open-in-chrome" = {
     executable = true;
     text = ''
